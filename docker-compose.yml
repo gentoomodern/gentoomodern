@@ -1,27 +1,24 @@
 services:
 
   autogentoo-builder:
-    image: gentoo/stage3:amd64-musl-hardened
+    image: colingilbert/stage3:amd64-musl-hardened
     volumes:
       - binpkgs:/var/cache/binpkgs
       - distfiles:/var/cache/distfiles
       - ebuilds:/var/db/repos/gentoo
-      - ./build/config/make.conf:/etc/portage/make.conf:ro
-      - ./build/config/package.use:/etc/portage/package.use:ro
-      - ./build/config/package.accept_keywords:/etc/portage/package.accept_keywords:ro
-      - ./build/config/package.unmask:/etc/portage/package.unmask:ro
-      - ./build/config/package.mask:/etc/portage/package.mask:ro
-      - ./build/config/package.license:/etc/portage/package.license:ro
-      - ./build/config/sets:/etc/portage/sets:ro
+      - ./build/config:/etc/portage:ro
       - /dev:/dev
       - /proc:/proc
       - /sys:/sys:ro
 
-  autogentoo-rsync:
-    image: gentoo/stage3:amd64-musl-hardened
-    command: emerge --sync
+  autogentoo-rsyncd:
+    image: colingilbert/rsync
+    command: rsync --daemon --no-detach
+    ports:
+      - "873:873"
     volumes:
-      - ebuilds:/var/db/repos/gentoo
+      - ebuilds:/data:ro
+      - ./config/rsyncd/rsyncd.conf:/etc/rsyncd.conf:ro
 
   autogento-package-host:
     image: caddy/caddy:alpine

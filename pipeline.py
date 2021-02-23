@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from common import prep_config
 
 import os
 
@@ -7,11 +8,9 @@ buildmaster = 'autogentoo-builder'
 #packager = "autogentoo-packager"
 package_host = "autogentoo-package-host"
 git_worker = "autogentoo-git-worker"
+sync = "emerge --sync"
 
 rebuild_emptytree = "emerge -uDkq --changed-use --emptytree @world"
-
-def prep_config():
-    return os.system('rsync -aXHp config build')
 
 def run_container(root, command):
     return os.system("docker-compose run " + root + " " + command)
@@ -39,11 +38,13 @@ def install(packageset):
 #if code == 0:
 prep_config()
 checkout_config("bootstrap")
-code = run_container(buildmaster, rebuild_emptytree)
+code = run_container(buildmaster, "bash -c '" + sync + " && " + rebuild_emptytree + "'")
 
 # We can now recompile libcap with its default options again.
 if code == 0:
     checkout_config("bootstrap-2")
-    code = run_container(buildmaster, 'bash -c \'' + rebuild_emptytree + " && " + build("autogentoo/build-server") +'\'')
+    code = run_container(buildmaster, build("autogentoo/build-server"))
     #if code == 0:
     #    code = run_container(buildmaster, rebuild("autogentoo/build-server"))
+
+
