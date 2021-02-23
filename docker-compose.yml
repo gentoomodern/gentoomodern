@@ -6,7 +6,14 @@ services:
       - binpkgs:/var/cache/binpkgs
       - distfiles:/var/cache/distfiles
       - ebuilds:/var/db/repos/gentoo
-      - ./build/config:/etc/portage:ro
+      - ./build/config/autogentoo-builder/make.conf:/etc/portage/make.conf:ro
+      - ./build/config/autogentoo-builder/package.mask:/etc/portage/package.mask:ro
+      - ./build/config/autogentoo-builder/package.unmask:/etc/portage/package.unmask:ro
+      - ./build/config/autogentoo-builder/package.accept_keywords:/etc/portage/package.accept_keywords:ro
+      - ./build/config/autogentoo-builder/package.license:/etc/portage/package.license:ro
+      - ./build/config/autogentoo-builder/package.use:/etc/portage/package.use:ro
+      - ./build/config/autogentoo-builder/repos.conf:/etc/portage/repos.conf:ro
+      - ./build/config/autogentoo-builder/sets:/etc/portage/sets:ro
       - /dev:/dev
       - /proc:/proc
       - /sys:/sys:ro
@@ -17,15 +24,15 @@ services:
     ports:
       - "873:873"
     volumes:
-      - ebuilds:/data:ro
+      - ebuilds:/mnt:ro
       - ./config/rsyncd/rsyncd.conf:/etc/rsyncd.conf:ro
 
-  autogento-package-host:
-    image: caddy/caddy:alpine
-    volumes:
-      - binpkgs:/data:ro
-    ports:
-      - "8000:80"
+        #autogentoo-package-host:
+        # image: caddy/caddy:alpine
+        # volumes:
+        # - binpkgs:/data:ro
+        # ports:
+        # - "80:80"
 
 networks:
   frontend:

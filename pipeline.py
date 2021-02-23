@@ -22,7 +22,6 @@ def create_mutable_container(root, name):
     # Assign the name
     return os.system()
 
-#TODO: Git checkout in an immutable manner
 def checkout_config(branch):
     return os.system("git -C build/config checkout " + branch)
 
@@ -48,3 +47,4 @@ if code == 0:
     #    code = run_container(buildmaster, rebuild("autogentoo/build-server"))
 
 
+os.system('rm -rf ./build/*')

@@ -6,4 +6,4 @@ from common import prep_config
 
 prep_config()
 
-os.system('docker-compose up')
+os.system('docker-compose up -d')
