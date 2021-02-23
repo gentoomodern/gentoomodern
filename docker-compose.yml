@@ -1,6 +1,8 @@
 services:
-  bootstrap:
-    image: gentoo/stage3:musl-hardened
+
+  autogentoo-builder:
+    image: gentoo/stage3:amd64-musl-hardened
+    command: /bin/bash
     volumes:
       - binpkgs:/var/cache/binpkgs
       - distfiles:/var/cache/distfiles
@@ -14,9 +16,50 @@ services:
       - ./config/sets:/etc/portage/sets:ro
       - /dev:/dev
       - /proc:/proc
-      - /sys:/sys
+      - /sys:/sys:ro
 
+  autogentoo-packager:
+    image: gentoo/stage3:amd64-musl-hardened
+    command: /bin/bash
+    # TODO: Replace with some kind of code-reuse
+    volumes:
+    - binpkgs:/var/cache/binpkgs:ro
+    - distfiles:/var/cache/distfiles:ro
+    - ebuilds:/var/db/repos/gentoo:ro
+    - ./config/make.conf:/etc/portage/make.conf:ro
+    - ./config/package.use:/etc/portage/package.use:ro
+    - ./config/package.accept_keywords:/etc/portage/package.accept_keywords:ro
+    - ./config/package.unmask:/etc/portage/package.unmask:ro
+    - ./config/package.mask:/etc/portage/package.mask:ro
+    - ./config/package.license:/etc/portage/package.license:ro
+    - ./config/sets:/etc/portage/sets:ro
+    - /dev:/dev
+    - /proc:/proc
+    - /sys:/sys:ro
 
+  autogentoo-rsync:
+    image: gentoo/stage3:amd64-musl-hardened
+    command: emerge --sync
+    volumes:
+      - ebuilds:/var/db/repos/gentoo
+
+  autogento-package-host:
+    image: caddy/caddy:alpine
+    volumes:
+      - binpkgs:/data:ro
+    ports:
+      - "8000:80"
+
+  autogentoo-git-worker:
+    image: alpine/git:user
+    volumes:
+      - ./config:/git:ro
+
+networks:
+  frontend:
+    driver: host
+  backend:
+    driver: overlay
 
 volumes:
   distfiles:
