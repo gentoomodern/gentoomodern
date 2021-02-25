@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from common import prep_config
 
 import os
 
@@ -23,7 +22,7 @@ def create_mutable_container(root, name):
     return os.system()
 
 def checkout_config(branch):
-    return os.system("git -C build/config checkout " + branch)
+    return os.system("git -C config/autogentoo-builder checkout " + branch)
 
 def build(packageset):
     return "emerge -uDkq --changed-use @" + packageset
@@ -35,16 +34,16 @@ def install(packageset):
 #TODO: Optimize into a single docker-compose run
 # We run the initial bootstrap
 #if code == 0:
-prep_config()
-checkout_config("bootstrap")
-code = run_container(buildmaster, "bash -c '" + sync + " && " + rebuild_emptytree + "'")
+#prep_config()
+code = checkout_config("bootstrap")
+code = run_container(buildmaster, rebuild_emptytree)#"bash -c '" + sync + " && " + rebuild_emptytree + "'")
 
 # We can now recompile libcap with its default options again.
 if code == 0:
-    checkout_config("bootstrap-2")
+    code = checkout_config("bootstrap-2")
     code = run_container(buildmaster, build("autogentoo/build-server"))
     #if code == 0:
     #    code = run_container(buildmaster, rebuild("autogentoo/build-server"))
 
 
-os.system('rm -rf ./build/*')
+code = os.system('rm -rf ./build/*')
