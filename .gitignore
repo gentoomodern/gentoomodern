@@ -1,4 +1,6 @@
 **/.*.sw*
-/build/**
+/build/
 **/__pycache__
 !/build/README.md
+work/
+config/user-data/

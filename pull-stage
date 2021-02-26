@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 
-import sys
-import os
+import sys, os
 
-if sys.argv == 0:
+if len(sys.argv) == 1:
     tag = "latest"
 else:
-    tag = sys.argv[1].strip()
+    tag = sys.argv[2].strip()
+print('TAG: ' + tag)
 
-infile = file.open('include/stage3/Dockerfile.in')
-lines = readlines(infile)
+infile = open('include/zentoo-stage3/Dockerfile.in')
+lines = infile.readlines()
 header = lines[0].strip() + tag
+lines[0] = header
 infile.close()
 
-outfile = file.open('work/zentoo-stage3/Dockerfile', 'rw')
-oufile.writelines(lines)
+outfile = open('work/zentoo-stage3/zentoo-stage3.Dockerfile', 'w')
+outfile.writelines(lines)
 outfile.close()
 
+code = os.system('cd work/zentoo-stage3 && docker build -t zentoo-stage3 . && docker tag zentoo-stage3:latest localhost:5000/zentoo-stage3:' + tag + ' && echo "' + tag + '"')
 
+if code != 0:
+    sys.exit(code)

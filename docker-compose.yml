@@ -1,6 +1,6 @@
 services:
   zentoo-builder:
-    image: zentoo-stage3:amd64-musl-hardened
+    image: zentoo-stage3
     networks:
       - backend
     volumes:
@@ -14,7 +14,7 @@ services:
       - /sys:/sys:ro
 
   zentoo-packager:
-    image: zentoo-stage3:amd64-musl-hardened
+    image: zentoo-stage3
       networks:
         - backend
       volumes:
@@ -22,6 +22,7 @@ services:
         - distfiles:/var/cache/distfiles:ro
         - ebuilds:/var/cache/distfiles:ro
         - stages:/mnt/stages
+        - kernels:/mnt/kernels:ro
         - /dev/:/dev
         - /proc:/proc
         - /sys:/sys:ro
@@ -38,6 +39,7 @@ services:
       - binpkgs:/data/binpkgs:ro
       - stages:/data/stages:ro
       - kernels:/data/kernels:ro
+      - ./work/user-data:/data/user:ro
 
   zentoo-rsync:
     image: zentoo-rsync
@@ -65,5 +67,3 @@ volumes:
     driver: local
   kernels:
     driver: local
-
-
