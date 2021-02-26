@@ -1,34 +1,56 @@
 services:
-
-  infrastructure/builder:
-    image: autogentoo-builder
+  zentoo-builder:
+    image: zentoo-stage3:amd64-musl-hardened
     networks:
       - backend
     volumes:
       - binpkgs:/var/cache/binpkgs
       - distfiles:/var/cache/distfiles
       - ebuilds:/var/db/repos/gentoo
+      - stages:/mnt/stages:ro 
+      - kernels:/mnt/kernels
       - /dev:/dev
       - /proc:/proc
       - /sys:/sys:ro
 
-  autogentoo-rsync:
-    image: colingilbert/rsync
+  zentoo-packager:
+    image: zentoo-stage3:amd64-musl-hardened
+      networks:
+        - backend
+      volumes:
+        - binpkgs:/var/cache/binpkgs:ro
+        - distfiles:/var/cache/distfiles:ro
+        - ebuilds:/var/cache/distfiles:ro
+        - stages:/mnt/stages
+        - /dev/:/dev
+        - /proc:/proc
+        - /sys:/sys:ro
+
+  zentoo-bin:
+    image: zentoo-caddy
+    networks:
+      - backend
+    ports:
+      - "80:8080"
+    volumes:
+      - distfiles:/data/distfiles:ro
+      - ebuilds:/data/ebuilds:ro
+      - binpkgs:/data/binpkgs:ro
+      - stages:/data/stages:ro
+      - kernels:/data/kernels:ro
+
+  zentoo-rsync:
+    image: zentoo-rsync
     command: rsync --daemon --no-detach
     networks:
       - backend
     ports:
       - "873:873"
     volumes:
-      - ebuilds:/mnt/portage:ro
-      - distfiles:/mnt/distfiles:ro
       - ebuilds:/var/db/repos/gentoo:ro
-      - ./config/autogentoo/portage/rsyncd.conf:/etc/rsyncd.conf:ro
-
+      - ./include/infrastructure/rsyncd.conf:/etc/rsyncd.conf:ro
     
 networks:
-  frontend:
-    driver: host
   backend:
     driver: overlay
 
@@ -39,5 +61,9 @@ volumes:
     driver: local
   binpkgs:
     driver: local
-  configs:
+  stages:
     driver: local
+  kernels:
+    driver: local
+
+

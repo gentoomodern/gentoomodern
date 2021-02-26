@@ -3,29 +3,28 @@
 import os
 
 
-buildmaster = 'autogentoo-builder'
-#packager = "autogentoo-packager"
-package_host = "autogentoo-package-host"
-git_worker = "autogentoo-git-worker"
+buildmaster = 'zentoo-builder'
+# package_host = "zentoo-package-host"
 sync = "emerge --sync"
+features = "FEATURES=\"binpkg-multi-instance buildpkg userpriv usersync xattr parallel-fetch\" "
 
-rebuild_emptytree = "emerge -uDkq --changed-use --emptytree @world"
+rebuild_emptytree = features + "emerge -uDkq --changed-use --emptytree @world"
 
 def run_container(root, command):
-    return os.system("docker-compose run " + root + " " + command)
+    return "docker-compose run " + root + " " + command
 
 def create_mutable_container(root, name):
     # TODO:
     # Make temp Dockerfile
     # Build our Dockerfile
     # Assign the name
-    return os.system()
+    
 
 def checkout_config(branch):
-    return os.system("git -C config/autogentoo-builder checkout " + branch)
+    return "git -C config/zentoo-builder checkout " + branch
 
 def build(packageset):
-    return "emerge -uDkq --changed-use @" + packageset
+    return features + "emerge -uDkq --changed-use @" + packageset
 
 def install(packageset):
     return "FEATURES='usepkgonly' " + build(packageset)
@@ -35,15 +34,15 @@ def install(packageset):
 # We run the initial bootstrap
 #if code == 0:
 #prep_config()
-code = checkout_config("bootstrap")
-code = run_container(buildmaster, rebuild_emptytree)#"bash -c '" + sync + " && " + rebuild_emptytree + "'")
+
+
+code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, rebuild_emptytree))#"bash -c '" + sync + " && " + rebuild_emptytree + "'")
 
 # We can now recompile libcap with its default options again.
 if code == 0:
-    code = checkout_config("bootstrap-2")
-    code = run_container(buildmaster, build("autogentoo/build-server"))
+    code = os.system(checkout_config('bootstrap-2')  + " && " + run_container(buildmaster, build("zentoo/build-server"))
     #if code == 0:
-    #    code = run_container(buildmaster, rebuild("autogentoo/build-server"))
+    #    code = run_container(buildmaster, rebuild("zentoo/build-server"))
 
 
-code = os.system('rm -rf ./build/*')
+#code = os.system('rm -rf ./work/build/*')

@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+
+if sys.argv == 0:
+    tag = "latest"
+else:
+    tag = sys.argv[1].strip()
+
+infile = file.open('include/stage3/Dockerfile.in')
+lines = readlines(infile)
+header = lines[0].strip() + tag
+infile.close()
+
+outfile = file.open('work/zentoo-stage3/Dockerfile', 'rw')
+oufile.writelines(lines)
+outfile.close()
+
+
