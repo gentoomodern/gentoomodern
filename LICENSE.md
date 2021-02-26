@@ -1,1 +1,1 @@
-MIT License
+GPL-2 License
