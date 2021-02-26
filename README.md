@@ -8,7 +8,7 @@ Zentoo is Gentoo with an additional abstraction layer that builds and packages, 
 
 Zen, as emphasizes rigorous self-restraint, meditation-practice, insight into the nature of mind and things, and the expression of this insight in daily life, especially for the benefit of others. (Adapted from Wikipedia.)
 
-Rhis toolkit (hopefully) mirrors these ideals: This form imposes enough restraint over your builds to keep them sane over extended periods of time. It is the result of constant practice and meditation, from which I fetched the insights needed to make these tools well-considered. Last, this is intended for the benefit of the public.   
+This toolkit (hopefully) mirrors these ideals: This form imposes enough restraint over your builds to keep them sane over extended periods of time. It is the result of constant practice and meditation upon the nature of how people think and machines work, from which I fetched the insights needed to make these tools well-considered. Last, this is intended for the benefit of the public.   
 
 This toolkit aims to pick up where Gentoo's Catalyst/Crossdev stop and the end-users' needs begin. The Gentoo Project has existing tools for building stages, but these aren't really designed for production: Although excellent for their intended purposes, these are ill-suited to the task of customizing a network's worth of installations. Zentoo aims to be a production tool as much as a development system. Due to being inspired by Gentoo's existing workflows, its patterns should be implicitly relatable to anyone who already uses it.
 
