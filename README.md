@@ -30,8 +30,8 @@ Furthermore, the latter two are not image-specific but represent the initial sta
 Implementation details:
 
 Our docker-compose file creates persistent volumes for:
-``
+```
 /var/cache/binpkg
 /var/cache/distfiles
 /var/db/repos/gentoo
-``
+```
