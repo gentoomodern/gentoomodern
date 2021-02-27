@@ -23,7 +23,7 @@ def checkout_config(branch):
     return "git -C config/portage checkout " + branch
 
 def build(packageset):
-    return features + "emerge -uDkq --changed-use @" + packageset
+    return 'features + "emerge -uDkq --changed-use @"' + packageset
 
 def install(packageset):
     return "FEATURES='usepkgonly' " + build(packageset)
@@ -35,11 +35,11 @@ def install(packageset):
 #prep_config()
 
 
-code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, rebuild_emptytree))#"bash -c '" + sync + " && " + rebuild_emptytree + "'")
+code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, 'bash -c \'' + rebuild_emptytree + '\''))#"bash -c '" + sync + " && " + rebuild_emptytree + "'")
 
 # We can now recompile libcap with its default options again.
 if code == 0:
-    code = os.system(checkout_config('bootstrap-2')  + " && " + run_container(buildmaster, build("zentoo/build-server")))
+    code = os.system(checkout_config('bootstrap-2')  + " && " + run_container(buildmaster, 'bash -c \'' + build("zentoo/build-server") + '\''))
 #if code == 0:
 #code = run_container(buildmaster, rebuild("zentoo/build-server"))
 #code = os.system('rm -rf ./work/build/*')

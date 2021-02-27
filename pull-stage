@@ -5,7 +5,7 @@ import sys, os
 if len(sys.argv) == 1:
     tag = "latest"
 else:
-    tag = sys.argv[2].strip()
+    tag = sys.argv[1].strip()
 print('TAG: ' + tag)
 
 infile = open('include/zentoo-stage3/Dockerfile.in')

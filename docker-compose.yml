@@ -9,6 +9,7 @@ services:
       - ebuilds:/var/db/repos/gentoo
       - stages:/mnt/stages:ro 
       - kernels:/mnt/kernels
+      - ./config/portage:/etc/portage
       - /dev:/dev
       - /proc:/proc
       - /sys:/sys:ro
@@ -23,6 +24,7 @@ services:
       - ebuilds:/var/sb/repos/gentoo:ro
       - stages:/mnt/stages
       - kernels:/mnt/kernels:ro
+      - ./config/portage:/etc/portage
       - /dev/:/dev
       - /proc:/proc
       - /sys:/sys:ro
@@ -41,7 +43,7 @@ services:
       - kernels:/data/kernels:ro
       - ./work/user-data:/data/user:ro
 
-  zentoo-rsync:
+  zentoo-rsyncd:
     image: localhost:5000/zentoo-rsync
     command: rsync --daemon --no-detach
     networks:
@@ -50,7 +52,7 @@ services:
       - "873:873"
     volumes:
       - ebuilds:/var/db/repos/gentoo:ro
-      - ./include/infrastructure/rsyncd.conf:/etc/rsyncd.conf:ro
+      - ./config/infrastructure/rsyncd.conf:/etc/rsyncd.conf:ro
 
 networks:
   backend:
