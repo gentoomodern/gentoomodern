@@ -1,0 +1,13 @@
+  zentoo-bin:
+    image: localhost:5000/zentoo-caddy
+    networks:
+      - backend
+    ports:
+      - "8888:80"
+    volumes:
+      - distfiles:/data/distfiles:ro
+      - ebuilds:/data/ebuilds:ro
+      - binpkgs:/data/binpkgs:ro
+      - stages:/data/stages:ro
+      - kernels:/data/kernels:ro
+      - user-data:/data/user-data:ro

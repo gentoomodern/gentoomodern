@@ -4,7 +4,6 @@ import os
 
 
 buildmaster = 'zentoo-builder'
-# package_host = "zentoo-package-host"
 sync = "emerge --sync"
 features = "FEATURES=\"binpkg-multi-instance buildpkg userpriv usersync xattr parallel-fetch\" "
 
@@ -35,7 +34,7 @@ def install(packageset):
 #prep_config()
 
 
-code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, 'bash -c \'' + rebuild_emptytree + '\''))#"bash -c '" + sync + " && " + rebuild_emptytree + "'")
+code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, 'bash -c \'' + rebuild_emptytree + '\''))
 
 # We can now recompile libcap with its default options again.
 if code == 0:

@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+import os, sys
+from include.common import read_file_lines, write_file_lines
+
+builder_str = 'builder'
+packer_str = 'packer'
+
+def zentoo_config(is_builder_arg):
+    results = []
+    if is_builder_arg:
+        results.append('  zentoo-' + builder_str + ':\n')
+    else:
+        results.append('  zentoo-' + packer_str + ':\n')
+
+    results.append('    image: localhost:5000/zentoo-stage3\n')
+    results.append('    networks:\n')
+    results.append('    - backend\n')
+    results.append('    volumes:\n')
+    results.append('    - /dev:/dev\n')
+    results.append('    - /proc:/proc\n')
+    results.append('    - /sys:/sys:ro\n')
+
+    binpkg_str =    '    - binpkgs:/var/cache/binpkgs'
+    distfiles_str = '    - distfiles:/var/cache/distfiles'
+    ebuilds_str =   '    - ebuilds:/var/db/repos/gentoo'
+    stages_str =    '    - stages:/mnt/stages'
+    kernels_str =   '    - kernels:/mnt/kernels'
+    user_data_str = '    - user-data:/mnt/user-data'
+
+    if is_builder_arg:
+        results.append(binpkg_str + '\n')
+        results.append(distfiles_str +'\n')
+        results.append(ebuilds_str + '\n')
+        results.append(stages_str + ':ro\n')
+        results.append(kernels_str + '\n')
+        results.append(user_data_str + ':ro\n')
+    else:
+        results.append(binpkg_str + ':ro\n')
+        results.append(distfiles_str + ':ro\n')
+        results.append(ebuilds_str + ':ro\n')
+        results.append(stages_str + '\n')
+        results.append(kernels_str + ':ro\n')
+        results.append(user_data_str + 'ro\n')
+    return results
+
+is_both = True
+is_builder = False
+is_packer = False
+
+if len(sys.argv) == 2:
+    is_both = False
+    arg = sys[1].strip()
+    if arg != builder_str and arg != packer_str:
+        sys.exit('Usage:\n  geninfra\n  geninfra { ' + builder_str + ' | ' + packer_str + ' }')
+
+lines = ['services:\n']
+
+if is_both == False:
+    if is_builder:
+        lines.extend(zentoo_config(True))
+    else:
+        lines.extend(zentoo_config(False))
+else:
+    lines.extend(zentoo_config(True))
+    lines.extend(zentoo_config(False))
+
+include_prefix = 'include/docker/docker-compose.'
+
+lines.extend(read_file_lines(include_prefix + 'httpserver'))
+lines.extend(read_file_lines(include_prefix + 'rsyncd'))
+lines.extend(read_file_lines(include_prefix + 'tail'))
+
+write_file_lines('docker-compose.yml', lines)
+
+code = os.system('docker-compose up -d')
+if code != 0:
+    sys.exit('Error generating infrastucture! Code = ' + code)
