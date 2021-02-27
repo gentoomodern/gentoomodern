@@ -1,6 +1,6 @@
 services:
   zentoo-builder:
-    image: zentoo-stage3
+    image: localhost:5000/zentoo-stage3
     networks:
       - backend
     volumes:
@@ -14,25 +14,25 @@ services:
       - /sys:/sys:ro
 
   zentoo-packager:
-    image: zentoo-stage3
-      networks:
-        - backend
-      volumes:
-        - binpkgs:/var/cache/binpkgs:ro
-        - distfiles:/var/cache/distfiles:ro
-        - ebuilds:/var/cache/distfiles:ro
-        - stages:/mnt/stages
-        - kernels:/mnt/kernels:ro
-        - /dev/:/dev
-        - /proc:/proc
-        - /sys:/sys:ro
+    image: localhost:5000/zentoo-stage3
+    networks:
+      - backend
+    volumes:
+      - binpkgs:/var/cache/binpkgs:ro
+      - distfiles:/var/cache/distfiles:ro
+      - ebuilds:/var/sb/repos/gentoo:ro
+      - stages:/mnt/stages
+      - kernels:/mnt/kernels:ro
+      - /dev/:/dev
+      - /proc:/proc
+      - /sys:/sys:ro
 
   zentoo-bin:
-    image: zentoo-caddy
+    image: localhost:5000/zentoo-caddy
     networks:
       - backend
     ports:
-      - "80:8080"
+      - "8888:80"
     volumes:
       - distfiles:/data/distfiles:ro
       - ebuilds:/data/ebuilds:ro
@@ -42,7 +42,7 @@ services:
       - ./work/user-data:/data/user:ro
 
   zentoo-rsync:
-    image: zentoo-rsync
+    image: localhost:5000/zentoo-rsync
     command: rsync --daemon --no-detach
     networks:
       - backend
@@ -51,7 +51,7 @@ services:
     volumes:
       - ebuilds:/var/db/repos/gentoo:ro
       - ./include/infrastructure/rsyncd.conf:/etc/rsyncd.conf:ro
-    
+
 networks:
   backend:
     driver: overlay

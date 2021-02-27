@@ -14,9 +14,18 @@ header = lines[0].strip() + tag
 lines[0] = header
 infile.close()
 
-outfile = open('work/zentoo-stage3/zentoo-stage3.Dockerfile', 'w')
+outfile = open('work/zentoo-stage3/Dockerfile', 'w')
 outfile.writelines(lines)
 outfile.close()
+
+
+code = os.system('cp -R include/zentoo-rsync work && cd work/zentoo-rsync && docker build -t zentoo-rsync . && docker tag zentoo-rsync:latest localhost:5000/zentoo-rsync:latest')
+if code != 0:
+    sys.exit(code)
+
+code = os.system('cp -R include/zentoo-caddy work && cd work/zentoo-caddy && docker build -t zentoo-caddy . && docker tag zentoo-caddy:latest localhost:5000/zentoo-caddy:latest')
+if code != 0:
+    sys.exit(code)
 
 code = os.system('cd work/zentoo-stage3 && docker build -t zentoo-stage3 . && docker tag zentoo-stage3:latest localhost:5000/zentoo-stage3:' + tag + ' && echo "' + tag + '"')
 

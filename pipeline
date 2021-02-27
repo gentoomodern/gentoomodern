@@ -13,15 +13,14 @@ rebuild_emptytree = features + "emerge -uDkq --changed-use --emptytree @world"
 def run_container(root, command):
     return "docker-compose run " + root + " " + command
 
-def create_mutable_container(root, name):
+#def create_mutable_container(root, name):
     # TODO:
     # Make temp Dockerfile
     # Build our Dockerfile
     # Assign the name
-    
-
+        
 def checkout_config(branch):
-    return "git -C config/zentoo-builder checkout " + branch
+    return "git -C config/portage checkout " + branch
 
 def build(packageset):
     return features + "emerge -uDkq --changed-use @" + packageset
@@ -40,9 +39,7 @@ code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmast
 
 # We can now recompile libcap with its default options again.
 if code == 0:
-    code = os.system(checkout_config('bootstrap-2')  + " && " + run_container(buildmaster, build("zentoo/build-server"))
-    #if code == 0:
-    #    code = run_container(buildmaster, rebuild("zentoo/build-server"))
-
-
+    code = os.system(checkout_config('bootstrap-2')  + " && " + run_container(buildmaster, build("zentoo/build-server")))
+#if code == 0:
+#code = run_container(buildmaster, rebuild("zentoo/build-server"))
 #code = os.system('rm -rf ./work/build/*')
