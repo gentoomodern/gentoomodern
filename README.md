@@ -24,7 +24,7 @@ User tasks:
 Something worth noting is that the first three tasks rely upon git branches, whereas the latter two do not. This is both because the first three's file hierarchies are duplicate, and also due to the fact that these settings only concern a single root at a time: As such our build system can checkout from a given branch, do its work, and restart with another. Also, these tend to be more widely-shared as they are used as building blocks to build a production network.
 
 Furthermore, the latter two are not image-specific but represent the initial state of an entire network. Not only does that kind of information tend to be kept private, but the type kind of workflow is better-suited to the master-dev branch workflow instead of using git as a convenient key-value store for code configuration. However, there will be an option for building multiple sites.
-=======
+
 Gentoo Linux has been cast as intimidating and error-prone. This toolkit aims to remove much of the error-prone parts by ensuring all your builds can be repeated. However, it does not get in the way; if it feels exactly like using Gentoo, its because you're using Gentoo.
 
 'I absolutely fell in love with Gentoo Linux several years ago.' It is an amazing meta-distribution backed by a vibrant all-volunteer group of developers and maintainers who operate mostly by concensus. You can readily optimize a Gentoo system to obtain the best performance, reliability, and compatibility possible. People often speak of Gentoo as a speed-freaks' OS, but I originally switched over because Ubuntu 12.04 was giving so much grief with the NVidia drivers that Gentoo was actually _far easier_ to install. I have since compared every OS to a well-configured Gentoo system.
@@ -65,19 +65,11 @@ Something worth noting is that the first two tasks require a git branch every ti
 - System images almost always end up in the possession of the end-user; confidentiality losses are basically nil because you're too smart to put all your secrets unencrypted into your OS image, right? :)
 - Branching at the package-set and system tuples level is possibler. However, checking out is done by the user prior to running this tool.
 
->>>>>>> dev
 
 Implementation details:
 
 Our docker-compose file creates persistent volumes for:
-<<<<<<< HEAD
-``
-/var/cache/binpkg
-/var/cache/distfiles
-/var/db/repos/gentoo
-``
-=======
-```
+````
 /var/cache/binpkg
 /var/cache/distfiles
 /var/db/repos/gentoo
