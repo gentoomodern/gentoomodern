@@ -1,0 +1,10 @@
+!#/usr/bin/env python3
+
+code = os.system('cp -R include/docker/zentoo-rsync work && cd work/zentoo-rsync && docker build -t zentoo-rsync . && docker tag zentoo-rsync:latest localhost:5000/zentoo-rsync:latest')
+if code != 0:
+    sys.exit(code)
+
+code = os.system('cp -R include/docker/zentoo-caddy work && cd work/zentoo-caddy && docker build -t zentoo-caddy . && docker tag zentoo-caddy:latest localhost:5000/zentoo-caddy:latest')
+if code != 0:
+    sys.exit(code)
+

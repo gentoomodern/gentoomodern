@@ -33,6 +33,9 @@ def install(packageset):
 #if code == 0:
 #prep_config()
 
+code = os.system('docker-compose down && docker-compose up -d')
+if code != 0:
+    system.exit('Could not run Docker Compose!')
 
 code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, 'bash -c \'' + rebuild_emptytree + '\''))
 

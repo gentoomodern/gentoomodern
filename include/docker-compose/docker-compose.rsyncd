@@ -7,4 +7,4 @@
       - "873:873"
     volumes:
       - ebuilds:/var/db/repos/gentoo:ro
-      - ./config/infrastructure/rsyncd.conf:/etc/rsyncd.conf:ro
+      - ./config/rsync-host/rsyncd.conf:/etc/rsyncd.conf:ro

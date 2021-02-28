@@ -13,6 +13,16 @@ services:
     - stages:/mnt/stages:ro
     - kernels:/mnt/kernels
     - user-data:/mnt/user-data:ro
+    - ./config/portage/package.accept_keywords:/etc/portage/package.accept_keywords:ro
+    - ./config/portage/package.unmask:/etc/portage/package.unmask:ro
+    - ./config/portage/.make.conf.swp:/etc/portage/.make.conf.swp:ro
+    - ./config/portage/package.license:/etc/portage/package.license:ro
+    - ./config/portage/make.conf:/etc/portage/make.conf:ro
+    - ./config/portage/README.md:/etc/portage/README.md:ro
+    - ./config/portage/repos.conf:/etc/portage/repos.conf:ro
+    - ./config/portage/sets:/etc/portage/sets:ro
+    - ./config/portage/package.mask:/etc/portage/package.mask:ro
+    - ./config/portage/package.use:/etc/portage/package.use:ro
   zentoo-packer:
     image: localhost:5000/zentoo-stage3
     networks:
@@ -26,7 +36,17 @@ services:
     - ebuilds:/var/db/repos/gentoo:ro
     - stages:/mnt/stages
     - kernels:/mnt/kernels:ro
-    - user-data:/mnt/user-dataro
+    - user-data:/mnt/user-data:ro
+    - ./config/portage/package.accept_keywords:/etc/portage/package.accept_keywords:ro
+    - ./config/portage/package.unmask:/etc/portage/package.unmask:ro
+    - ./config/portage/.make.conf.swp:/etc/portage/.make.conf.swp:ro
+    - ./config/portage/package.license:/etc/portage/package.license:ro
+    - ./config/portage/make.conf:/etc/portage/make.conf:ro
+    - ./config/portage/README.md:/etc/portage/README.md:ro
+    - ./config/portage/repos.conf:/etc/portage/repos.conf:ro
+    - ./config/portage/sets:/etc/portage/sets:ro
+    - ./config/portage/package.mask:/etc/portage/package.mask:ro
+    - ./config/portage/package.use:/etc/portage/package.use:ro
   zentoo-bin:
     image: localhost:5000/zentoo-caddy
     networks:
@@ -40,16 +60,6 @@ services:
       - stages:/data/stages:ro
       - kernels:/data/kernels:ro
       - user-data:/data/user-data:ro
-  zentoo-rsyncd:
-    image: localhost:5000/zentoo-rsync
-    command: rsync --daemon --no-detach
-    networks:
-      - backend
-    ports:
-      - "873:873"
-    volumes:
-      - ebuilds:/var/db/repos/gentoo:ro
-      - ./config/infrastructure/rsyncd.conf:/etc/rsyncd.conf:ro
 networks:
   backend:
     driver: overlay
