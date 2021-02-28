@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-Zentoo, a very clean Gentoo Linux DevOps pipeline system
+Zentoo, a very clean Gentoo Linux workbench and DevOps pipeline
 Copyright (C) 2021 Colin Philippe Gilbert
 
 This program is free software; you can redistribute it and/or
@@ -25,5 +24,3 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
->>>>>>> dev
-

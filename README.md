@@ -1,6 +1,3 @@
-Note: Master branch only has initial work - almost everything is in dev; it will be merged within the next few days.
-
-<<<<<<< HEAD
 I absolutely fell in love with Gentoo Linux several years ago. It is an amazing meta-distribution backed by a vibrant all-volunteer group of developers and maintainers who operate mostly by concensus. You can readily optimize a Gentoo system to obtain the best performance, reliability, and compatibility possible. I originally switched to Gentoo because Ubuntu at the time was giving me so much grief with video drivers, and I never looked back. There are significant advantages in working with a tailored operating system as things tends to stay in harmony. However, unless carefully managed Gentoo is guaranteed to suffer from configuration drift.
 
 The good news is that the Gentoo project has started offering stage3 images on Dockerhub. It's time for Gentoo and DevOps to make a baby: Let's implement immutable infrastructure with Gentoo!
@@ -85,4 +82,3 @@ Our docker-compose file creates persistent volumes for:
 /var/cache/distfiles
 /var/db/repos/gentoo
 ```
->>>>>>> dev
