@@ -1,0 +1,17 @@
+networks:
+  backend:
+    driver: overlay
+
+volumes:
+  distfiles:
+    driver: local
+  ebuilds:
+    driver: local
+  binpkgs:
+    driver: local
+  stages:
+    driver: local
+  kernels:
+    driver: local
+  user-data:
+    driver: local

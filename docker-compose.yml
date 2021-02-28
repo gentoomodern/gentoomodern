@@ -1,63 +1,66 @@
 services:
-
-  autogentoo-builder:
-    image: gentoo/stage3:amd64-musl-hardened
-    command: /bin/bash
+  zentoo-builder:
+    image: localhost:5000/zentoo-stage3
+    networks:
+    - backend
     volumes:
-      - binpkgs:/var/cache/binpkgs
-      - distfiles:/var/cache/distfiles
-      - ebuilds:/var/db/repos/gentoo
-      - ./config/make.conf:/etc/portage/make.conf:ro
-      - ./config/package.use:/etc/portage/package.use:ro
-      - ./config/package.accept_keywords:/etc/portage/package.accept_keywords:ro
-      - ./config/package.unmask:/etc/portage/package.unmask:ro
-      - ./config/package.mask:/etc/portage/package.mask:ro
-      - ./config/package.license:/etc/portage/package.license:ro
-      - ./config/sets:/etc/portage/sets:ro
-      - /dev:/dev
-      - /proc:/proc
-      - /sys:/sys:ro
-
-  autogentoo-packager:
-    image: gentoo/stage3:amd64-musl-hardened
-    command: /bin/bash
-    # TODO: Replace with some kind of code-reuse
-    volumes:
-    - binpkgs:/var/cache/binpkgs:ro
-    - distfiles:/var/cache/distfiles:ro
-    - ebuilds:/var/db/repos/gentoo:ro
-    - ./config/make.conf:/etc/portage/make.conf:ro
-    - ./config/package.use:/etc/portage/package.use:ro
-    - ./config/package.accept_keywords:/etc/portage/package.accept_keywords:ro
-    - ./config/package.unmask:/etc/portage/package.unmask:ro
-    - ./config/package.mask:/etc/portage/package.mask:ro
-    - ./config/package.license:/etc/portage/package.license:ro
-    - ./config/sets:/etc/portage/sets:ro
     - /dev:/dev
     - /proc:/proc
     - /sys:/sys:ro
-
-  autogentoo-rsync:
-    image: gentoo/stage3:amd64-musl-hardened
-    command: emerge --sync
+    - binpkgs:/var/cache/binpkgs
+    - distfiles:/var/cache/distfiles
+    - ebuilds:/var/db/repos/gentoo
+    - stages:/mnt/stages:ro
+    - kernels:/mnt/kernels
+    - user-data:/mnt/user-data:ro
+    - ./config/portage/package.accept_keywords:/etc/portage/package.accept_keywords:ro
+    - ./config/portage/package.unmask:/etc/portage/package.unmask:ro
+    - ./config/portage/.make.conf.swp:/etc/portage/.make.conf.swp:ro
+    - ./config/portage/package.license:/etc/portage/package.license:ro
+    - ./config/portage/make.conf:/etc/portage/make.conf:ro
+    - ./config/portage/README.md:/etc/portage/README.md:ro
+    - ./config/portage/repos.conf:/etc/portage/repos.conf:ro
+    - ./config/portage/sets:/etc/portage/sets:ro
+    - ./config/portage/package.mask:/etc/portage/package.mask:ro
+    - ./config/portage/package.use:/etc/portage/package.use:ro
+  zentoo-packer:
+    image: localhost:5000/zentoo-stage3
+    networks:
+    - backend
     volumes:
-      - ebuilds:/var/db/repos/gentoo
-
-  autogento-package-host:
-    image: caddy/caddy:alpine
-    volumes:
-      - binpkgs:/data:ro
+    - /dev:/dev
+    - /proc:/proc
+    - /sys:/sys:ro
+    - binpkgs:/var/cache/binpkgs:ro
+    - distfiles:/var/cache/distfiles:ro
+    - ebuilds:/var/db/repos/gentoo:ro
+    - stages:/mnt/stages
+    - kernels:/mnt/kernels:ro
+    - user-data:/mnt/user-data:ro
+    - ./config/portage/package.accept_keywords:/etc/portage/package.accept_keywords:ro
+    - ./config/portage/package.unmask:/etc/portage/package.unmask:ro
+    - ./config/portage/.make.conf.swp:/etc/portage/.make.conf.swp:ro
+    - ./config/portage/package.license:/etc/portage/package.license:ro
+    - ./config/portage/make.conf:/etc/portage/make.conf:ro
+    - ./config/portage/README.md:/etc/portage/README.md:ro
+    - ./config/portage/repos.conf:/etc/portage/repos.conf:ro
+    - ./config/portage/sets:/etc/portage/sets:ro
+    - ./config/portage/package.mask:/etc/portage/package.mask:ro
+    - ./config/portage/package.use:/etc/portage/package.use:ro
+  zentoo-bin:
+    image: localhost:5000/zentoo-caddy
+    networks:
+      - backend
     ports:
-      - "8000:80"
-
-  autogentoo-git-worker:
-    image: alpine/git:user
+      - "8888:80"
     volumes:
-      - ./config:/git:ro
-
+      - distfiles:/data/distfiles:ro
+      - ebuilds:/data/ebuilds:ro
+      - binpkgs:/data/binpkgs:ro
+      - stages:/data/stages:ro
+      - kernels:/data/kernels:ro
+      - user-data:/data/user-data:ro
 networks:
-  frontend:
-    driver: host
   backend:
     driver: overlay
 
@@ -67,4 +70,10 @@ volumes:
   ebuilds:
     driver: local
   binpkgs:
+    driver: local
+  stages:
+    driver: local
+  kernels:
+    driver: local
+  user-data:
     driver: local

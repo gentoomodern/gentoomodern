@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+
+import sys, os
+
+if len(sys.argv) >= 2:
+    tag = sys.argv[1].strip()
+else:
+    sys.exit('Usage: pull-stage3 <upstream-stage-name>')
+
+print('TAG: ' + tag)
+
+infile = open('include/docker/zentoo-stage3/Dockerfile.in')
+lines = infile.readlines()
+header = lines[0].strip() + tag
+lines[0] = header
+infile.close()
+
+outfile = open('work/zentoo-stage3/Dockerfile', 'w')
+outfile.writelines(lines)
+outfile.close()
+
+code = os.system('docker image rm localhost:5000/zentoo-stage3:latest & cd work/zentoo-stage3 && docker build -t localhost:5000/zentoo-stage3 .')
+
+if code != 0:
+    sys.exit(code)

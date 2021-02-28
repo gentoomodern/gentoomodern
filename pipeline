@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+import os
+
+
+buildmaster = 'zentoo-builder'
+sync = "emerge --sync"
+features = "FEATURES=\"binpkg-multi-instance buildpkg userpriv usersync xattr parallel-fetch\" "
+
+rebuild_emptytree = features + "emerge -uDkq --changed-use --emptytree @world"
+
+def run_container(root, command):
+    return "docker-compose run " + root + " " + command
+
+#def create_mutable_container(root, name):
+    # TODO:
+    # Make temp Dockerfile
+    # Build our Dockerfile
+    # Assign the name
+        
+def checkout_config(branch):
+    return "git -C config/portage checkout " + branch
+
+def build(packageset):
+    return 'features + "emerge -uDkq --changed-use @"' + packageset
+
+def install(packageset):
+    return "FEATURES='usepkgonly' " + build(packageset)
+
+
+#TODO: Optimize into a single docker-compose run
+# We run the initial bootstrap
+#if code == 0:
+#prep_config()
+
+code = os.system('docker-compose down && docker-compose up -d')
+if code != 0:
+    system.exit('Could not run Docker Compose!')
+
+code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, 'bash -c \'' + rebuild_emptytree + '\''))
+
+# We can now recompile libcap with its default options again.
+if code == 0:
+    code = os.system(checkout_config('bootstrap-2')  + " && " + run_container(buildmaster, 'bash -c \'' + build("zentoo/build-server") + '\''))
+#if code == 0:
+#code = run_container(buildmaster, rebuild("zentoo/build-server"))
+#code = os.system('rm -rf ./work/build/*')
