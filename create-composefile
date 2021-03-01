@@ -8,7 +8,7 @@ packer_str = 'packer'
 
 def zentoo_config(is_builder_arg):
     # Our results will be a list of strings
-    results = []
+    results = [] 
     # First, we define whether this'll be a builder or a packer
     if is_builder_arg:
         results.append('  zentoo-' + builder_str + ':\n')
@@ -57,6 +57,9 @@ def zentoo_config(is_builder_arg):
     for d in dirs:
         if d != '.git':
             results.append('    - ' + portage_cfg + d + ':' + portage_tgt + d + ':ro\n')
+    
+    
+    results.append('    tmpfs:\n      - /mnt/temp\n')
     # Finally, we return the list of string
     return results
 
@@ -73,7 +76,7 @@ if len(sys.argv) >= 2:
         sys.exit('Usage:\n  geninfra\n  geninfra { ' + builder_str + ' | ' + packer_str + ' }')
 
 # First line in the docker-compose file!
-lines = ['services:\n']
+lines = ['# Do not make changes to this file, as they will be overriden next time ./create-composefile is called!\n' , 'services:\n']
 # Here, we will write either one, the other, or both...
 if is_both == False:
     if is_builder:
@@ -85,13 +88,13 @@ else:
     lines.extend(zentoo_config(False))
 
 
-include_prefix = 'include/docker/docker-compose.'
+include_prefix = 'include/docker-compose/docker-compose.'
 
 
 # The latter two are commented-out, but different branches hold different setups.
 # Select the ones you want by uncommenting them
-#lines.extend(read_file_lines(include_prefix + 'httpserver'))
-#lines.extend(read_file_lines(include_prefix + 'rsyncd'))
+lines.extend(read_file_lines(include_prefix + 'httpserver'))
+lines.extend(read_file_lines(include_prefix + 'rsyncd'))
 
 # This line is mzndatory
 lines.extend(read_file_lines(include_prefix + 'tail'))

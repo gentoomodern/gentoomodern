@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import os, sys
 
 
 buildmaster = 'zentoo-builder'
@@ -33,15 +33,15 @@ def install(packageset):
 #if code == 0:
 #prep_config()
 
-code = os.system('docker-compose down && docker-compose up -d')
+code = os.system("docker-compose down && docker-compose up -d")
 if code != 0:
-    system.exit('Could not run Docker Compose!')
+    sys.exit("Could not run Docker Compose!")
 
-code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, 'bash -c \'' + rebuild_emptytree + '\''))
+# code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, "bash -c '"  + rebuild_emptytree + "'"))
 
 # We can now recompile libcap with its default options again.
 if code == 0:
-    code = os.system(checkout_config('bootstrap-2')  + " && " + run_container(buildmaster, 'bash -c \'' + build("zentoo/build-server") + '\''))
+    code = os.system(checkout_config("bootstrap-2")  + " && " + run_container(buildmaster, "bash -c '" + build("zentoo/build-server") + "'"))
 #if code == 0:
 #code = run_container(buildmaster, rebuild("zentoo/build-server"))
 #code = os.system('rm -rf ./work/build/*')

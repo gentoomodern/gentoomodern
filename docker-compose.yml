@@ -1,3 +1,4 @@
+# Do not make changes to this file, as they will be overriden next time ./create-composefile is called!
 services:
   zentoo-builder:
     image: localhost:5000/zentoo-stage3
@@ -23,6 +24,8 @@ services:
     - ./config/portage/sets:/etc/portage/sets:ro
     - ./config/portage/package.mask:/etc/portage/package.mask:ro
     - ./config/portage/package.use:/etc/portage/package.use:ro
+    tmpfs:
+      - /mnt/temp
   zentoo-packer:
     image: localhost:5000/zentoo-stage3
     networks:
@@ -47,6 +50,8 @@ services:
     - ./config/portage/sets:/etc/portage/sets:ro
     - ./config/portage/package.mask:/etc/portage/package.mask:ro
     - ./config/portage/package.use:/etc/portage/package.use:ro
+    tmpfs:
+      - /mnt/temp
   zentoo-bin:
     image: localhost:5000/zentoo-caddy
     networks:
@@ -60,6 +65,16 @@ services:
       - stages:/data/stages:ro
       - kernels:/data/kernels:ro
       - user-data:/data/user-data:ro
+  zentoo-rsyncd:
+    image: localhost:5000/zentoo-rsync
+    command: rsync --daemon --no-detach
+    networks:
+      - backend
+    ports:
+      - "873:873"
+    volumes:
+      - ebuilds:/var/db/repos/gentoo:ro
+      - ./config/rsync-host/rsyncd.conf:/etc/rsyncd.conf:ro
 networks:
   backend:
     driver: overlay
@@ -77,3 +92,4 @@ volumes:
     driver: local
   user-data:
     driver: local
+
