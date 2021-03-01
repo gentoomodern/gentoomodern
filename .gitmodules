@@ -1,3 +1,0 @@
-[submodule "include/upstream/gentoo/docker-images"]
-	path = include/upstream/gentoo/docker-images
-	url = https://www.github.com/ColinGilbert/docker-images
