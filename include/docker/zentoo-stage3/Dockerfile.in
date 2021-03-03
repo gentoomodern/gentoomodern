@@ -1,3 +1,0 @@
-FROM gentoo/stage3:
-
-RUN mkdir /mnt/{stages,kernels} && mkdir /etc/portage/{sets,conf.d}

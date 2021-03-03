@@ -1,4 +1,6 @@
 networks:
+  frontend:
+    driver: overlay
   backend:
     driver: overlay
 
@@ -9,10 +11,11 @@ volumes:
     driver: local
   binpkgs:
     driver: local
+  stage3-tarball:
+    driver: local
   stages:
     driver: local
   kernels:
     driver: local
   user-data:
     driver: local
-

@@ -1,0 +1,3 @@
+[submodule "include/gentoo-docker-images"]
+	path = include/zentoo-bootstrap
+	url = https://www.github.com/ColinGilbert/gentoo-docker-images

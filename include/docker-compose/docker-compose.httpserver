@@ -1,6 +1,7 @@
   zentoo-bin:
     image: localhost:5000/zentoo-caddy
     networks:
+      - frontend
       - backend
     ports:
       - "8888:80"
