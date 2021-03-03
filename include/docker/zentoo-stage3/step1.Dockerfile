@@ -1,6 +1,7 @@
-# This was adapted from stage3.Dockerfile from https://www.github.com/gentoo/gentoo-docker-images
-# It does not support any of the dockerx-related code, as I've found it to break a lot, unpredictably.
-# Also, mulltistage builds seem to require a local registry, which is very poor practice for our use-case as we need transient, hyper-localized build artifacts
+# This was adapted from stage3.Dockerfile from https://www.github.com/gentoo/gentoo-docker-images.
+# The main difference is that the downloaded, verified stage3 is NOT deleted; we use it to seed another chroot.
+# It also removes all BuildKit/builx-related code, as it constantly breaks.
+# Furthermore, multistage builds seem to require a local registry, which is very poor practice for our use-case:  We need transient, hyper-localized build artifacts.
 
 FROM alpine:latest
 

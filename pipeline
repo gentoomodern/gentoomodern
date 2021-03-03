@@ -5,7 +5,6 @@ import os, sys
 
 buildmaster = 'zentoo-builder'
 sync = "emerge --sync"
-
 rebuild_emptytree = "emerge -uDkq --changed-use --emptytree @world"
 
 def run_container(root, command):
@@ -25,7 +24,6 @@ def build(packageset):
 
 def install(packageset):
     return "FEATURES='usepkgonly' " + build(packageset)
-
 
 #TODO: Optimize into a single docker-compose run
 # We run the initial bootstrap

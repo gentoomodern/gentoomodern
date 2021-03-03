@@ -26,10 +26,10 @@ def zentoo_config(is_builder_arg):
     binpkg_str =    '    - binpkgs:/var/cache/binpkgs'
     distfiles_str = '    - distfiles:/var/cache/distfiles'
     ebuilds_str =   '    - ebuilds:/var/db/repos/gentoo'
-    tarball_str =   '    - stage3-tarball:/mnt/tarball'
     stages_str =    '    - stages:/mnt/stages'
     kernels_str =   '    - kernels:/mnt/kernels'
     user_data_str = '    - user-data:/mnt/user-data'
+    dataout_str =   '    - data-out:/mnt/data-out'
     # Here we actually write these differential parts into our list.
     if is_builder_arg:
         results.append(binpkg_str + '\n')
@@ -42,7 +42,6 @@ def zentoo_config(is_builder_arg):
         results.append(binpkg_str + ':ro\n')
         results.append(distfiles_str + ':ro\n')
         results.append(ebuilds_str + ':ro\n')
-        results.append(tarball_str + ':ro\n')
         results.append(stages_str + '\n')
         results.append(kernels_str + ':ro\n')
         results.append(user_data_str + ':ro\n')

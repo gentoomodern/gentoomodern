@@ -19,3 +19,5 @@ volumes:
     driver: local
   user-data:
     driver: local
+  data-out:
+    driver: local

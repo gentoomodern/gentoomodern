@@ -17,8 +17,3 @@ if code != 0:
 code = os.system('cp -R include/docker/zentoo-caddy work && cd work/zentoo-caddy && docker build -t localhost:5000/zentoo-caddy:latest .')
 if code != 0:
     sys.exit(code)
-
-code = os.system('cp -R include/docker/zentoo-stage3-tarball work && cd work/zentoo-stage3-tarball && docker build -t zentoo-stage3-tarball . && docker volume create zentoo_stage3-tarball')
-if code != 0:
-    sys.exit(code)
-
