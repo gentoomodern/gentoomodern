@@ -14,6 +14,7 @@ services:
     - stages:/mnt/stages:ro
     - kernels:/mnt/kernels
     - user-data:/mnt/user-data:ro
+    - ./work/data-out:/mnt/data-out
     - ./config/portage/package.accept_keywords:/etc/portage/package.accept_keywords:ro
     - ./config/portage/package.unmask:/etc/portage/package.unmask:ro
     - ./config/portage/package.license:/etc/portage/package.license:ro
@@ -28,7 +29,7 @@ services:
     tmpfs:
       - /mnt/temp
   zentoo-packer:
-    image: localhost:5000/zentoo-finalist
+    image: localhost:5000/zentoo-stage3
     networks:
     - backend
     volumes:
@@ -38,7 +39,6 @@ services:
     - binpkgs:/var/cache/binpkgs:ro
     - distfiles:/var/cache/distfiles:ro
     - ebuilds:/var/db/repos/gentoo:ro
-    - stage3-tarball:/mnt/tarball:ro
     - stages:/mnt/stages
     - kernels:/mnt/kernels:ro
     - user-data:/mnt/user-data:ro
@@ -99,4 +99,6 @@ volumes:
   kernels:
     driver: local
   user-data:
+    driver: local
+  data-out:
     driver: local

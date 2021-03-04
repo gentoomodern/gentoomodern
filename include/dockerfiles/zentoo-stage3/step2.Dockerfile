@@ -5,5 +5,6 @@ FROM scratch
 
 WORKDIR /
 COPY --from=zentoo-bootstrap:latest /gentoo /
+RUN mkdir /mnt/{stages, kernels, user-data, data-out}
 CMD ["/bin/bash"]
 
