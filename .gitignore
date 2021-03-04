@@ -3,3 +3,8 @@
 **/__pycache__
 !/build/README.md
 work/
+config/kernels.defines/*
+!config/kernel.defines/kernel.configs/PLACEHOLDER
+!**/README*
+!**/PLACEHOLDER
+
