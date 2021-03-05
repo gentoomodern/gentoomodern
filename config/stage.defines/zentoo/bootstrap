@@ -1,0 +1,3 @@
+cpu: intel-xeon-e3-12x1-v3
+flags: zentoo/bootstrap
+profile: default/linux/amd64/17.1/hardened/nomultilib

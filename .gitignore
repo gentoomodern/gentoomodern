@@ -5,9 +5,8 @@
 work/
 !**/README*
 !**/PLACEHOLDER
-!config/packages.flags/bootstrap
-!config/packages.flags/zentoo-bootstrap
-!config/packages.flags/gentoo-upstream-latest
+!config/packages.flags/zentoo/**
+!config/packages.sets/**
 !config/kernel.defines/kernel.sources/gentoo-upstream-latest
 !config/cpu.defines/
-config/
+!config/
