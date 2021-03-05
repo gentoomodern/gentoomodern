@@ -2,14 +2,26 @@
 
 import sys, os
 
+custom_http = False
+custom_key = False
+
 if len(sys.argv) >= 3:
     arch = sys.argv[1].strip()
     tag = sys.argv[2].strip()
+if len(sys.argv >= 4):
+    custom_http = True
+    http = sys.argv[3].strip()
+if len(sys.argv >= 5):
+    custom_key = True
+    signing_key = sys.argv[4].strip()
+    
+
 else:
-    sys.exit('Usage: pull-stage3 <arch: amd64 | arm64 | armv5tel | armv6j_hardfp | ppc64le | s390 | x86 > <tag: latest | hardened | hardened-nomultilib | musl-hardened | musl-vanilla | nomultilib | systemd | uclibc-hardened | uclibc-vanilla >')
-
-print('Attempting to pull stage "' + '" wih tag "'  + tag + '"')
-
+    sys.exit('Usage: pull-stage3 <arch> <tag> [http-server] [stage3-signing-key]\n
+    \tUpstream support:\n
+    \t\tarchitectures: amd64|arm64|armv5tel|armv6j_hardfp|armv7a_hardfp|ppc64le|s390x|x86\n
+    \t\tlatest|hardened|hardened-nomultilib|musl-hardened|musl-vanilla|nomultilib|systemd|uclibc-hardened|uclibc-vanilla
+            ')
 
 tags_to_arches = {
     "latest": "amd64", "arm64", "armv5tel", "armv6j_hardfp", "armv7a_hardfp". "ppc64le", "s390x" , "x86"
@@ -24,6 +36,7 @@ tags_to_arches = {
     }
 
 arches_to_tag = { v: k for k, v in tags_to_arches.items() }
+
 infile = open('include/docker/zentoo-stage3/Dockerfile.in')
 lines = infile.readlines()
 header = lines[0].strip() + arch + '-' + tag
@@ -34,7 +47,25 @@ outfile = open('work/zentoo-stage3/Dockerfile', 'w')
 outfile.writelines(lines)
 outfile.close()
 
-code = os.system('docker image rm localhost:5000/zentoo-stage3:latest & cd work/zentoo-stage3 && docker build -t localhost:5000/zentoo-stage3 .')
+attempt_msg_prefix = 'Attempted to pull stage3 of arch "' 
+tag_msg = '" wih tag, "' 
+build_arg = ' --build-arg '
+sys_cmd_head = 'docker image rm localhost:5000/zentoo-stage3:latest & cd work/zentoo-stage3 && docker build '
+sys_cmd_tail = ' -t localhost:5000/zentoo-stage3 .'
+if len(sys.argv) == 3:
+    code = os.system(sys_cmd_head + sys_cmd_tail)
+    print(attempt_msg_prefix + arch + tag_msg + tag + '" from gentoo\'s upstream')
+if len(sys.argv) == 4:
+    http_msg = '" from custom http-server "'
+    code = os.system(sus_cmd_head + http + build_arg + 'DIST=' + http + sys_cmd_tail)
+    print(attempt_msg_prefix + arch +  tag_msg + tag + http_msg + http +  '"')
+if len(sys.argv) == 5:
+    code = os.system(sus_cmd_head + http + build_arg + 'DIST=' + http + build_arg + 'KEY=' + signing_key + sys_cmd_tail)
+    print(attempt_msg_prefix + arch +  arch + tag_msg + tag + http_msg + http +  '", and signing-key "' + signing_key + '"')
+
+
+
+
 
 if code != 0:
     sys.exit(code)

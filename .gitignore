@@ -3,11 +3,11 @@
 **/__pycache__
 !build/README.md
 work/
-!config/kernel.defines/kernel.configs/PLACEHOLDER
 !**/README*
 !**/PLACEHOLDER
 !config/packages.flags/bootstrap
 !config/packages.flags/zentoo-bootstrap
 !config/packages.flags/gentoo-upstream-latest
 !config/kernel.defines/kernel.sources/gentoo-upstream-latest
+!config/cpu.defines/
 config/
