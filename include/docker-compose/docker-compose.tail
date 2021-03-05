@@ -1,6 +1,6 @@
 networks:
-  frontend:
-    driver: overlay
+#  frontend:
+#    driver: overlay
   backend:
     driver: overlay
 

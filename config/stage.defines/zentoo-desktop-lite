@@ -1,4 +1,0 @@
-cpu: intel-xeon-e3-12x1-v3
-packages: zentoo/sway-desktop
-flags: zentoo/musl-wayland
-profile: default/linux/amd64/17.0/musl/hardened/selinux

@@ -13,19 +13,6 @@ services:
     - ebuilds:/var/db/repos/gentoo
     - stages:/mnt/stages:ro
     - kernels:/mnt/kernels
-    - user-data:/mnt/user-data:ro
-    - ./work/data-out:/mnt/data-out
-    - ./config/portage/package.accept_keywords:/etc/portage/package.accept_keywords:ro
-    - ./config/portage/package.unmask:/etc/portage/package.unmask:ro
-    - ./config/portage/package.license:/etc/portage/package.license:ro
-    - ./config/portage/make.conf:/etc/portage/make.conf:ro
-    - ./config/portage/README.md:/etc/portage/README.md:ro
-    - ./config/portage/.make.conf.swo:/etc/portage/.make.conf.swo:ro
-    - ./config/portage/.make.conf.swp:/etc/portage/.make.conf.swp:ro
-    - ./config/portage/repos.conf:/etc/portage/repos.conf:ro
-    - ./config/portage/sets:/etc/portage/sets:ro
-    - ./config/portage/package.mask:/etc/portage/package.mask:ro
-    - ./config/portage/package.use:/etc/portage/package.use:ro
     tmpfs:
       - /mnt/temp
   zentoo-packer:
@@ -41,47 +28,11 @@ services:
     - ebuilds:/var/db/repos/gentoo:ro
     - stages:/mnt/stages
     - kernels:/mnt/kernels:ro
-    - user-data:/mnt/user-data:ro
-    - ./config/portage/package.accept_keywords:/etc/portage/package.accept_keywords:ro
-    - ./config/portage/package.unmask:/etc/portage/package.unmask:ro
-    - ./config/portage/package.license:/etc/portage/package.license:ro
-    - ./config/portage/make.conf:/etc/portage/make.conf:ro
-    - ./config/portage/README.md:/etc/portage/README.md:ro
-    - ./config/portage/.make.conf.swo:/etc/portage/.make.conf.swo:ro
-    - ./config/portage/.make.conf.swp:/etc/portage/.make.conf.swp:ro
-    - ./config/portage/repos.conf:/etc/portage/repos.conf:ro
-    - ./config/portage/sets:/etc/portage/sets:ro
-    - ./config/portage/package.mask:/etc/portage/package.mask:ro
-    - ./config/portage/package.use:/etc/portage/package.use:ro
     tmpfs:
       - /mnt/temp
-  zentoo-bin:
-    image: localhost:5000/zentoo-caddy
-    networks:
-      - frontend
-      - backend
-    ports:
-      - "8888:80"
-    volumes:
-      - distfiles:/data/distfiles:ro
-      - ebuilds:/data/ebuilds:ro
-      - binpkgs:/data/binpkgs:ro
-      - stages:/data/stages:ro
-      - kernels:/data/kernels:ro
-      - user-data:/data/user-data:ro
-  zentoo-rsyncd:
-    image: localhost:5000/zentoo-rsync
-    command: rsync --daemon --no-detach
-    networks:
-      - backend
-    ports:
-      - "873:873"
-    volumes:
-      - ebuilds:/var/db/repos/gentoo:ro
-      - ./config/rsync-host/rsyncd.conf:/etc/rsyncd.conf:ro
 networks:
-  frontend:
-    driver: overlay
+#  frontend:
+#    driver: overlay
   backend:
     driver: overlay
 
@@ -92,13 +43,7 @@ volumes:
     driver: local
   binpkgs:
     driver: local
-  stage3-tarball:
-    driver: local
   stages:
     driver: local
   kernels:
-    driver: local
-  user-data:
-    driver: local
-  data-out:
     driver: local

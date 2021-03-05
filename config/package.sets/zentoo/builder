@@ -6,3 +6,4 @@ app-arch/cpio
 sys-kernel/gentoo-sources
 sys-kernel/linux-firmware
 dev-vcs/git
+app-eselect/eselect-repository

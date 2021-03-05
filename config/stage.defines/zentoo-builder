@@ -1,3 +1,0 @@
-inherits: zentoo-bootstrap
-packages: zentoo/builder
-flags: zentoo/builder
