@@ -1,2 +1,2 @@
 #!/bin/sh
-cd config/portage/repos.conf && cd ../../.. && docker-compose down --remove-orphans && docker-compose up -d && docker-compose run zentoo-builder bash -c 'emerge --sync' && cd config/portage/repos.conf && cd ../../..
+cd config/portage/repos.conf && cd ../../.. && docker-compose down && docker-compose up -d && docker-compose run zentoo-builder bash -c 'emerge --sync' && cd config/portage/repos.conf && cd ../../..

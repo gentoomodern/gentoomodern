@@ -17,19 +17,19 @@ if len(sys.argv) >= 5:
 else:
     sys.exit('Usage: pull-stage3 <arch> <tag> [http-server] [stage3-signing-key]\n\tUpstream support:\n\t\tarchitectures: amd64|arm64|armv5tel|armv6j_hardfp|armv7a_hardfp|ppc64le|s390x|x86\n\t\tlatest|hardened|hardened-nomultilib|musl-hardened|musl-vanilla|nomultilib|systemd|uclibc-hardened|uclibc-vanilla')
 
-tags_to_arches = {
-    "latest": ["amd64","arm64","armv5tel","armv6j_hardfp","armv7a_hardfp","ppc64le","s390x","x86"]
-    ,"hardened": ["amd64","x86"]
-    ,"hardened-nomultilib": ["amd64"]
-    ,"musl-hardened": ["amd64"]
-    ,"musl-vanilla": ["amd64","x86"]
-    ,"nomultilib": ["amd64"]
-    ,"systemd": ["amd64","arm64","x86"]
-    ,"uclibc-hardened": ["amd64", "x86"]
-    ,"uclibc-vanilla": ["amd64","x86"]
-    }
+# tags_to_arches = {
+#    "latest": ["amd64","arm64","armv5tel","armv6j_hardfp","armv7a_hardfp","ppc64le","s390x","x86"]
+#    ,"hardened": ["amd64","x86"]
+#    ,"hardened-nomultilib": ["amd64"]
+#    ,"musl-hardened": ["amd64"]
+#    ,"musl-vanilla": ["amd64","x86"]
+#    ,"nomultilib": ["amd64"]
+#    ,"systemd": ["amd64","arm64","x86"]
+#    ,"uclibc-hardened": ["amd64", "x86"]
+#    ,"uclibc-vanilla": ["amd64","x86"]
+#    }
 
-arches_to_tag = { v: k for k, v in tags_to_arches.items() }
+# arches_to_tag = { v: k for k, v in tags_to_arches.items() }
 
 infile = open('include/docker/zentoo-stage3/Dockerfile.in')
 lines = infile.readlines()

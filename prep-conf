@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+import os, sys
+import from include.common read_file_lines, write_file_lines
+
+config_dir_str    = './config/'
+stage_defines_str = config_dir_str + 'stage.defines/'
+cpu_defines_str   = config_dir_str + 'cpu.defines/'
+package_sets_str  = config_dir_str + 'package.sets/'
+package_flags_str = config_dir_str + 'package.flags/'
+profile_overrides = config_dir_str + 'profile.overrides/'
+build_hooks       = config_dir_str + 'build.hooks/'
+kernel_defines    = config_dir_str + 'kernel.defines/'
+
+def check_config_filestructure(stage_definition):
+    
+    # files = [f for f in os.listdir(portage_cfg) if os.path.isfile(os.path.join(portage_cfg, f))]
+
+# Parse args
+if len(sys.argv) == 2:
+    stage_name = sys.argv[2]
+    valid = False
+    # Check if folder and necessary files exist:
+    # TODO: Implement
+
+    # Otherwise, shut it down!
+    if stage_name == False:
+        sys.exit('[Zentoo.prep-conf] ' + stage_name + ' directory not found in ' + config_dir_str)
+else:
+    sys.exit('prep-conf <stage-name>\n\tTakes its argument from the pathname of a folder in ' + stage_defines_str)
+
+# profile.overrides
+# TODO: Implement
+
+global_use_overrides = []
+package_use_overrides = 
+
+
+# cpu.defines
+# Check whether or not path is valid and ingest required files
+# TODO: Implement
+cpu_str
+
+
+# package.sets
+# TODO: Implement
+
+package_set = read_file_lines('./config/')
+write_file_lines('./work/CURRENT-PACKAGESET', package_set)
+
+# package.flags
+# Merge all use-flags; after checking for conflicts we either exit with an error message or write them in.
+# TODO:Implement
+# config_dir_str <global.use | package.use>
+
+# build.hooks
+# TODO: Implement
+# 
+
+
+# We're done, here!
+# PS: kernel.defines is not ingested or checked here, as the kernel is considered a special beast. 

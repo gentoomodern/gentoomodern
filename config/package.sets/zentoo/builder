@@ -7,3 +7,4 @@ sys-kernel/gentoo-sources
 sys-kernel/linux-firmware
 dev-vcs/git
 app-eselect/eselect-repository
+sys-fs/squashfs-tools

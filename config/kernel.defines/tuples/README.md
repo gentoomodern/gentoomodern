@@ -2,7 +2,12 @@ Kernels are defined as a tuple consisting with syntax `` source-package, kconfig
 
 For example:
 
+virthost
 ```
 sys-kernel/gentoo-sources, virtualization-server
-sys-kernel/custom-sources-found-from-research-in-local-repo, kernel-security-mitigations-TESTING
+```
+
+testing
+```
+sys-kernel/custom-sources-found-from-usenix-or-ieee-or-acm-or-defcon, kernel-security-mitigations-TESTING
 ```

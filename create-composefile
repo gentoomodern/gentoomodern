@@ -22,6 +22,8 @@ def zentoo_config(is_builder_arg):
     results.append('    - /dev:/dev\n')
     results.append('    - /proc:/proc\n')
     results.append('    - /sys:/sys:ro\n')
+    #results.append('    - tmpfs:/tmp\n')
+    #results.append('    - tmpfs:/var/tmp\n')
     # These are the parts that have different permissions between the two types of containers
     binpkg_str =    '    - binpkgs:/var/cache/binpkgs'
     distfiles_str = '    - distfiles:/var/cache/distfiles'
