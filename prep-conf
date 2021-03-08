@@ -34,7 +34,7 @@ get_flagname_test()
 def ingest_conf(file_content_list, variables_to_flags: Dict[str, Dict[bool, List[str]]]):
     for line in file_content_list:
         print('ZENTOO DEBUG - line: ' + line)
-        line = re.sub('[=|\'|"]+', ' ', line) # Strip out troublesome characters
+        line = re.sub('(=|\'|")+', ' ', line) # Strip out troublesome characters
         variable_name = re.match('^[\S]+', line).group()
         print('ZENTOO DEBUG - line (cleaned): ' + line)
         print('ZENTOO DEBUG - variable name: ' + variable_name)
@@ -42,7 +42,7 @@ def ingest_conf(file_content_list, variables_to_flags: Dict[str, Dict[bool, List
         print('ZENTOO DEBUG - flags string: ' + flags_str)
         if not variable_name in variables_to_flags:
             variables_to_flags[variable_name] = dict()
-        
+
         if True not in variables_to_flags[variable_name]:
             variables_to_flags[variable_name][True] = dict()
             variables_to_flags[variable_name][True] = []
@@ -54,14 +54,14 @@ def ingest_conf(file_content_list, variables_to_flags: Dict[str, Dict[bool, List
         for candidate_flag in flags_str.split():
             if not candidate_flag.strip() == '':
                 print('Examining flag ' + candidate_flag)
-                
+
                 flag_abs = get_flagname(candidate_flag)
 
                 if flag_abs == candidate_flag:
                     is_setting = True
                 else:
                     is_setting = False
-                
+
                 if is_setting:
                     if flag_abs in variables_to_flags[variable_name][True]:
                         continue
@@ -84,30 +84,27 @@ def ingest_conf_test():
     desired = { 'AB': { True: ['nice-enough'], False: ['awful'] } }
 
     results = dict()
-   # test_1 = ['AB="-awful nice-enough"', 'AB=-awful']
-   # if not ingest_conf(test_1, results):
-   #     sys.exit('Failed ingest_conf: testset1. Should return true.')
-   # if not results == desired:
-   #     print(results)
-   #     sys.exit('Failed ingest_conf: testset1. Bad results.')
-   # test_2 = ['AB = -awful nice-enough -awful']
-   # if not ingest_conf(test_2, results):
-   #   sys.exit('Failed ingest_conf: testset2. Should return true.')
-   # if not results == desired:
-   #     sys.exit('Failed ingest_conf: testset2. Bad results.')
+    test_1 = ['AB=\'-awful nice-enough\'', 'AB=-awful']
+    if not ingest_conf(test_1, results):
+        sys.exit('Failed ingest_conf: testset1. Should return true.')
+    if not results == desired:
+        sys.exit('Failed ingest_conf: testset1. Bad results.')
+    test_2 = ['AB = -awful nice-enough -awful']
+    if not ingest_conf(test_2, results):
+        sys.exit('Failed ingest_conf: testset2. Should return true.')
+    if not results == desired:
+       sys.exit('Failed ingest_conf: testset2. Bad results.')
 
     test_3 = ['AB="-awful nice-enough awful"']
     if ingest_conf(test_3, results):
-        print(results)
         sys.exit('Failed ingest_conf: testset3 (yes and no). Should return false.')
     if not results == desired:
-        print(results)
         sys.exit('Failed ingest_conf: testset3 (yes and no). Bad results.')
 
-   #  test_4 = "AB='nice-enough -awful nice-enough nice-enough'"
-   #  if not ingest_conf(test_4, results):
-   #      sys.exit('Failed ingest_conf: testset4. Should return true.')
-   #  if not results == desired:
-   #      sys.exit('Failed ingest_conf: testset4. Results: ' + (results))
+    test_4 = ["AB='nice-enough -awful nice-enough nice-enough'"]
+    if not ingest_conf(test_4, results):
+        sys.exit('Failed ingest_conf: testset4. Should return true.')
+    if not results == desired:
+        sys.exit('Failed ingest_conf: testset4. Bad results.')
 
 ingest_conf_test()
