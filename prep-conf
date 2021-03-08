@@ -31,63 +31,72 @@ get_flagname_test()
 
 # This deduplicates keywords and verifies for set/unset combinations.
 # TODO: Merge with ingest_*()???
-def ingest_conf(file_content_list, variables_to_flags):
+def ingest_conf(file_content_list, variables_to_flags: Dict[str, Dict[bool, List[str]]]):
     for line in file_content_list:
         print('ZENTOO DEBUG - line: ' + line)
         line = re.sub('[=|\'|"]+', ' ', line) # Strip out troublesome characters
         variable_name = re.match('^[\S]+', line).group()
-        print ('ZENTOO DEBUG - line (cleaned): ' + line)
-
-        print ('ZENTOO DEBUG - variable name: ' + variable_name)
-        
+        print('ZENTOO DEBUG - line (cleaned): ' + line)
+        print('ZENTOO DEBUG - variable name: ' + variable_name)
         flags_str = re.sub(variable_name, '', line)
         print('ZENTOO DEBUG - flags string: ' + flags_str)
+        if not variable_name in variables_to_flags:
+            variables_to_flags[variable_name] = dict()
         
-        if variable_name in variables_to_flags.keys(): # Handle the case involving flags being added to an existing variable
-            for candidate_flag in flags_str.split(' '):
-                if candidate_flag.strip() == '':
-                    break
-                if candidate_flag in variables_to_flags[variable_name]:
-                    break
-                fully_qualified_flag = get_flagname(candidate_flag)
-                if fully_qualified_flag in variables_to_flags[variable_name]:
-                    print(msg_prefix + ' Variable ' + variable_name  + "'s flag " + fully_qualified_flag + ' cannot be both  set and unset.')
-                    return False
+        if True not in variables_to_flags[variable_name]:
+            variables_to_flags[variable_name][True] = dict()
+        if False not in variables_to_flags[variable_name]:
+            variables_to_flags[variable_name][False] = dict()
+
+        is_setting = False
+        for candidate_flag in flags_str.split():
+            if not candidate_flag.strip() == '':
+                print('Examining flag ' + candidate_flag)
+                
+                flag_abs = get_flagname(candidate_flag)
+
+                if flag_abs == candidate_flag:
+                    is_setting = True
                 else:
-                    variables_to_flags[variable_name].append(candidate_flag)
-        else: # We insert by reading whitespace-separated contents.
-            variables_to_flags[variable_name] = []
-            for flag in flags_str.split(' '):
-                if not flag.strip() == '':
-                    variables_to_flags[variable_name].append(flag)
-    return True
+                    is_setting = False
+                
+                if is_setting:
+                    if flag_abs in variables_to_flags[variable_name][True]:
+                    elif flag_abs in variables_to_flags[variable_name][False]:
+                    else:
+            
+                if not is_setting:
+                    if flag_abs in variables_to_flags[variable_name][True]:
+                    elif flag_abs in variables_to_flags[variable_name][False]:
+                    else:
+        return True
 
 
 # Determine equivalence partitions.
 def ingest_conf_test():
     desired = { 'AB': ['-awful', 'nice-enough'] }
 
-    test_1 = ['AB="-awful nice-enough"']
-    results = {}
-    if not ingest_conf(test_1, results):
-        sys.exit('Failed ingest_conf: testset1. Should return true.')
+    results = dict()
+   # test_1 = ['AB="-awful nice-enough"', 'AB=-awful']
+   # if not ingest_conf(test_1, results):
+   #     sys.exit('Failed ingest_conf: testset1. Should return true.')
+   # if not results == desired:
+   #     print(results)
+   #     sys.exit('Failed ingest_conf: testset1. Bad results.')
+   # test_2 = ['AB = -awful nice-enough -awful']
+   # if not ingest_conf(test_2, results):
+   #   sys.exit('Failed ingest_conf: testset2. Should return true.')
+   # if not results == desired:
+   #     sys.exit('Failed ingest_conf: testset2. Bad results.')
+
+    test_3 = ['AB="-awful nice-enough awful"']
+    if ingest_conf(test_3, results):
+        print(results)
+        sys.exit('Failed ingest_conf: testset3 (yes and no). Should return false.')
     if not results == desired:
         print(results)
-        sys.exit('Failed ingest_conf: testset1. Bad results')
-    else:
-        sys.exit('ingest_conf test 1: SUCCESS!')
-   # test_2 = 'AB = -awful nice-enough -awful'
-   # if not ingest_conf(test_2, results):
-   #    sys.exit('Failed ingest_conf: testset2. Should return true.')
-   # if not results == desired:
-   #     sys.exit('Failed ingest_conf: testset2. Results: ' + print(results))
+        sys.exit('Failed ingest_conf: testset3 (yes and no). Bad results.')
 
-   # test_3 = 'AB="-awful nice-enough awful"'
-   # if ingest_conf(test_3, results):
-   #     sys.exit('Failed ingest_conf: testset3 (yes and no). Should return false.')
-   # if not results == desired:
-   #     sys.exit('Failed ingest_conf: testset3 (yes and no). Results: ' + print(results))
-   
    #  test_4 = "AB='nice-enough -awful nice-enough nice-enough'"
    #  if not ingest_conf(test_4, results):
    #      sys.exit('Failed ingest_conf: testset4. Should return true.')
