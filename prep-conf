@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 import os, sys, re
-from include.common import read_file_lines, write_file_lines
+from include.common import read_by_tokens, read_file_lines, write_file_lines
 from typing import Dict, List, Set
 
 msg_prefix       = '[Zentoo.prep-conf] '
-config_path      = './config/'
+config_dir      = './config/'
 stage_path       = config_dir + 'stage.defines/'
 cpu_path         = config_dir + 'cpu.defines/'
 pkgset_path      = config_dir + 'portage.global/'
@@ -33,19 +33,33 @@ get_flagname_test()
 # TODO: Merge with ingest_*()???
 def ingest_conf(file_content_list, variables_to_flags):
     for line in file_content_list:
-        variable_name = re.sub('[^=]', '', re.match('^[\S^=]$', line))   # The inner one keeps the = sign, the outer one strips it.
-        fresh_flags_str = re.sub(('(\'|\")', '', re.match('?<==', line)) # Using a lookbehind
+        print('ZENTOO DEBUG - line: ' + line)
+        line = re.sub('[=|\'|"]+', ' ', line) # Strip out troublesome characters
+        variable_name = re.match('^[\S]+', line).group()
+        print ('ZENTOO DEBUG - line (cleaned): ' + line)
+
+        print ('ZENTOO DEBUG - variable name: ' + variable_name)
+        
+        flags_str = re.sub(variable_name, '', line)
+        print('ZENTOO DEBUG - flags string: ' + flags_str)
+        
         if variable_name in variables_to_flags.keys(): # Handle the case involving flags being added to an existing variable
-            for candidate_flag in read_by_tokens(fresh_flags_str):
+            for candidate_flag in flags_str.split(' '):
+                if candidate_flag.strip() == '':
+                    break
+                if candidate_flag in variables_to_flags[variable_name]:
+                    break
                 fully_qualified_flag = get_flagname(candidate_flag)
                 if fully_qualified_flag in variables_to_flags[variable_name]:
-                    print('in variable ' + variable_name  + ', flag ' + fully_qualified_flag + ' cannot both be set and unset.')
+                    print(msg_prefix + ' Variable ' + variable_name  + "'s flag " + fully_qualified_flag + ' cannot be both  set and unset.')
                     return False
                 else:
-                    packages_to_flags[package_name] += candidate_flag
+                    variables_to_flags[variable_name].append(candidate_flag)
         else: # We insert by reading whitespace-separated contents.
-            for flag in read_by_tokens(fresh_flags_str): 
-                packages_to_flags[package_name] += flag
+            variables_to_flags[variable_name] = []
+            for flag in flags_str.split(' '):
+                if not flag.strip() == '':
+                    variables_to_flags[variable_name].append(flag)
     return True
 
 
@@ -53,102 +67,31 @@ def ingest_conf(file_content_list, variables_to_flags):
 def ingest_conf_test():
     desired = { 'AB': ['-awful', 'nice-enough'] }
 
-    test_1 = 'AB= -awful nice-enough'
+    test_1 = ['AB="-awful nice-enough"']
+    results = {}
     if not ingest_conf(test_1, results):
         sys.exit('Failed ingest_conf: testset1. Should return true.')
     if not results == desired:
-        sys.exit('Failed ingest_conf: testset1. Results: ' + results)
-   
-    test_2 = 'AB = -awful nice-enough -awful'
-    if not ingest_conf(test_2, results):
-        sys.exit('Failed ingest_conf: testset2. Should return true.')
-    if not results == desired:
-        sys.exit('Failed ingest_conf: testset2. Results: ' + results)
+        print(results)
+        sys.exit('Failed ingest_conf: testset1. Bad results')
+    else:
+        sys.exit('ingest_conf test 1: SUCCESS!')
+   # test_2 = 'AB = -awful nice-enough -awful'
+   # if not ingest_conf(test_2, results):
+   #    sys.exit('Failed ingest_conf: testset2. Should return true.')
+   # if not results == desired:
+   #     sys.exit('Failed ingest_conf: testset2. Results: ' + print(results))
 
-    test_3 = 'AB="-awful nice-enough awful"'
-    if ingest_conf(test_3, results):
-        sys.exit('Failed ingest_conf: testset3 (yes and no). Should return false.')
-    if not results == desired:
-        sys.exit('Failed ingest_conf: testset3 (yes and no). Results: ' + results)
+   # test_3 = 'AB="-awful nice-enough awful"'
+   # if ingest_conf(test_3, results):
+   #     sys.exit('Failed ingest_conf: testset3 (yes and no). Should return false.')
+   # if not results == desired:
+   #     sys.exit('Failed ingest_conf: testset3 (yes and no). Results: ' + print(results))
    
-    test_4 = "AB='nice-enough -awful nice-enough nice-enough'"
-    if not ingest_conf(test_4, results):
-        sys.exit('Failed ingest_conf: testset4. Should return true.')
-    if not results == desired:
-        sys.exit('Failed ingest_conf: testset4. Results: ' + results)
+   #  test_4 = "AB='nice-enough -awful nice-enough nice-enough'"
+   #  if not ingest_conf(test_4, results):
+   #      sys.exit('Failed ingest_conf: testset4. Should return true.')
+   #  if not results == desired:
+   #      sys.exit('Failed ingest_conf: testset4. Results: ' + (results))
 
 ingest_conf_test()
-
-# This also deduplicates/checks for simultaneous set/unset, keeps the = sign and doesn't factor quotation marks... Portage will punish your sins if you err!
-def ingest_flags(file_content_list, packages_to_flags):
-    for line in file_content_list:
-        package_name = line.split()[0].strip()
-        if package_name in packages_to_flags.keys(): # If we have that file scooped up.
-            for candidate_flag in read_by_tokens(line.split([1:])): # This is the set of existing values for the aforementioned file.
-                fully_qualified_flag = get_flagname(candidate_flag)
-                if fully_qualified_flag in packages_to_flags[package_name]:
-                    print('for package ' + + ', use-flag ' + fully_qualified_flag + ' cannot be both true and false.')
-                    return False
-                if flag not in packages_to_flags[package_name]:
-                    packages_to_flags[package_name] += candidate_flag
-        else: # We insert by reading whitespace-separated contents.
-            for flag in read_by_tokens(lines.split([1:])):
-                flagset += flag
-            packages_to_flags[package_name] = flagset
-    return True
-
-
-def ingest_flags_test():
-    desired = { 'zentoo-testing/goof': ['silly', '-sensible'] }
-    test_1 = 'zentoo-testing/goof silly -sensible'
-    if not ingest_flags(test_1, results):
-        sys.exit('Failed ingest_flags: testset1. Should return true.')
-    if not results == desired
-        sys.exit('Failed ingest_flags: testset1. Results: ' + results)
-
-ingest_flags_test()
-
-# Parse args
-#if len(sys.argv) == 2:
-#    stage_name = sys.argv[2].strip()
-#    stage_path += stage_name
-#    cpu_found = sets_found = flags_found = hooks_found = False
-    # Do we even have a stage-name? If not, buh-bye!
-#    if not os.path.isdir(stage_path): 
-#       sys.exit(msg_prefix + stage_path + ' directory not found.')
-    #####
-    # CPU-related configuration gets handled now.
-    #####
-#    cpu_str = 'cpu'
-#    if os.path.isfile(stage_path + cpu_str):
-        # If we have a cpu configuration file. Otherwise, use default (non cpu-optimized.)
-#        cpu_name = read_file_lines(stage_path + cpu_str)[0]
-#        cpu_path += cpu_name
-#        if os.path.isdir(cpu_path): # Oops we tried to point to a nonexistent CPU config...
-#            cpu_def_found = True
-#        else:
-#            sys.exit(msg_prefix + 'CPU definition dir ' + cpu_path + ' not found.')
-    #####
-    # Package sets are dealt with more loosely than the others here - if the file exists we copy it in.
-    # There is a good possibility that users are using their own sets, defined in their own stages or even by a script.
-    # Zentoo would have no way of knowing about them, unless they were placed in somehow. As such we don't check for their existence - Portage does!
-    # However, this is a potential optimization for the future but for now we head onto dealing with the package flags...
-    #####
-   
-    #####
-    # Package flags
-    #####
-   
-#    flagset_str = 'flags'
-    # Flags are fun: Not only do we read them a bit differently, but we also deduplicate them. Let's see what happens!
-#    if os.path.isdir(stage_path + flagset_str):
-#         flagset_def_found = True
-#         flagset_name = read_file_lines(stage_path + flagset_str)[0]
-#         flagset_path += flagset_name
-#         makeconf_path = flagset_path + '/make.conf/'
-
-#   if os.path.isfile(stage_path + 'hooks'): # Here, we can only verify the user hasn't specified a nonexistent set of hooks.
-#         hooks_name = read_file_line()
-#         hooks_def_found = True
-# else:
-#     sys.exit('prep-conf <stage-name>\n\tTakes its argument from the pathname of a folder in ' + stage_defines_str)
