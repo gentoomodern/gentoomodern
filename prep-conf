@@ -33,13 +33,13 @@ get_flagname_test()
 # TODO: Merge with ingest_*()???
 def ingest_conf(file_content_list, variables_to_flags: Dict[str, Dict[bool, List[str]]]):
     for line in file_content_list:
-        print('ZENTOO DEBUG - line: ' + line)
+        #print('ZENTOO DEBUG - line: ' + line)
         line = re.sub('(=|\'|")+', ' ', line) # Strip out troublesome characters
         variable_name = re.match('^[\S]+', line).group()
-        print('ZENTOO DEBUG - line (cleaned): ' + line)
-        print('ZENTOO DEBUG - variable name: ' + variable_name)
+        #print('ZENTOO DEBUG - line (cleaned): ' + line)
+        #print('ZENTOO DEBUG - variable name: ' + variable_name)
         flags_str = re.sub(variable_name, '', line)
-        print('ZENTOO DEBUG - flags string: ' + flags_str)
+        #print('ZENTOO DEBUG - flags string: ' + flags_str)
         if not variable_name in variables_to_flags:
             variables_to_flags[variable_name] = dict()
 
@@ -53,7 +53,7 @@ def ingest_conf(file_content_list, variables_to_flags: Dict[str, Dict[bool, List
         is_setting = False
         for candidate_flag in flags_str.split():
             if not candidate_flag.strip() == '':
-                print('Examining flag ' + candidate_flag)
+               # print('Examining flag ' + candidate_flag)
 
                 flag_abs = get_flagname(candidate_flag)
 
