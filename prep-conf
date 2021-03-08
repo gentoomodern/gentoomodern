@@ -45,8 +45,10 @@ def ingest_conf(file_content_list, variables_to_flags: Dict[str, Dict[bool, List
         
         if True not in variables_to_flags[variable_name]:
             variables_to_flags[variable_name][True] = dict()
+            variables_to_flags[variable_name][True] = []
         if False not in variables_to_flags[variable_name]:
             variables_to_flags[variable_name][False] = dict()
+            variables_to_flags[variable_name][False] = []
 
         is_setting = False
         for candidate_flag in flags_str.split():
@@ -62,19 +64,24 @@ def ingest_conf(file_content_list, variables_to_flags: Dict[str, Dict[bool, List
                 
                 if is_setting:
                     if flag_abs in variables_to_flags[variable_name][True]:
+                        continue
                     elif flag_abs in variables_to_flags[variable_name][False]:
+                        return False
                     else:
-            
+                        variables_to_flags[variable_name][True].append(flag_abs)
                 if not is_setting:
                     if flag_abs in variables_to_flags[variable_name][True]:
+                        return False
                     elif flag_abs in variables_to_flags[variable_name][False]:
+                        continue
                     else:
-        return True
+                        variables_to_flags[variable_name][False].append(flag_abs)
+    return True
 
 
 # Determine equivalence partitions.
 def ingest_conf_test():
-    desired = { 'AB': ['-awful', 'nice-enough'] }
+    desired = { 'AB': { True: ['nice-enough'], False: ['awful'] } }
 
     results = dict()
    # test_1 = ['AB="-awful nice-enough"', 'AB=-awful']
