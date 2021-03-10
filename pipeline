@@ -98,17 +98,18 @@ def checkout_config(local_conf):
         for variable in portage_vars[filepath]:
             current_line = variable
             if uses_equals_sign:
-                current_line += '="'
+                current_line += '= '
             else:
                 current_line += ' '
             for flag in portage_vars[filepath][variable][True]:
+                current_line += flag
                 current_line += ' '
-                current_line += flag
             for flag in portage_vars[filepath][variable][False]:
-                current_line += ' -'
+                current_line += '-'
                 current_line += flag
-            if uses_equals_sign:
-                current_line +='"'
+                current_line += ' '
+            #if uses_equals_sign:
+                # current_line += '"'
             current_line += '\n'
             lines.append(current_line)
         write_file_lines(prefix + filename, lines)

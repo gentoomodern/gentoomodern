@@ -43,7 +43,7 @@ def ingest_conf(file_content_list, variables_to_flags: Dict[str, Dict[bool, List
         if debug:
             print('ZENTOO DEBUG - line (cleaned): ' + line)
             print('ZENTOO DEBUG - variable name: ' + variable_name)
-        flags_str = re.sub('^' + variable_name, '', line)
+        flags_str = re.sub('^' + re.escape(variable_name), '', line)
         if debug:
             print('ZENTOO DEBUG - flags string: ' + flags_str)
         if not variable_name in variables_to_flags:
