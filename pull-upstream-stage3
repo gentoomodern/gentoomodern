@@ -5,16 +5,16 @@ import sys, os
 custom_http = False
 custom_key = False
 
-if len(sys.argv) >= 3:
+if len(sys.argv) > 2:
     arch = sys.argv[1].strip()
     tag = sys.argv[2].strip()
-if len(sys.argv) >= 4:
+if len(sys.argv) > 3:
     custom_http = True
     http = sys.argv[3].strip()
-if len(sys.argv) >= 5:
+if len(sys.argv) == 4:
     custom_key = True
     signing_key = sys.argv[4].strip()
-else:
+if len(sys.argv) < 2 or len(sys.argv) > 4:
     sys.exit('Usage: pull-stage3 <arch> <tag> [http-server] [stage3-signing-key]\n\tUpstream support:\n\t\tarchitectures: amd64|arm64|armv5tel|armv6j_hardfp|armv7a_hardfp|ppc64le|s390x|x86\n\t\tlatest|hardened|hardened-nomultilib|musl-hardened|musl-vanilla|nomultilib|systemd|uclibc-hardened|uclibc-vanilla')
 
 # tags_to_arches = {
@@ -31,7 +31,7 @@ else:
 
 # arches_to_tag = { v: k for k, v in tags_to_arches.items() }
 
-infile = open('include/docker/zentoo-stage3/Dockerfile.in')
+infile = open('include/dockerfiles/zentoo-stage3/step1.Dockerfile')
 lines = infile.readlines()
 header = lines[0].strip() + arch + '-' + tag
 lines[0] = header
@@ -45,19 +45,20 @@ attempt_msg_prefix = '[Zentoo.pull-stage3] Attempted to pull stage3 of arch "'
 tag_msg = '" wih tag, "' 
 build_arg = ' --build-arg '
 sys_cmd_head = 'docker image rm localhost:5000/zentoo-stage3:latest & cd work/zentoo-stage3 && docker build '
-sys_cmd_tail = ' -t localhost:5000/zentoo-stage3 .'
+sys_cmd_tail = ' -t zentoo-bootstrap .'
+common_args = build_arg + 'ARCH=' + arch + build_arg + 'MICROARCH=' + arch + build_arg + 'SUFFIX=' + tag + ' '
 if len(sys.argv) == 3:
-    code = os.system(sys_cmd_head + sys_cmd_tail)
+    code = os.system(sys_cmd_head + common_args + sys_cmd_tail)
     print(attempt_msg_prefix + arch + tag_msg + tag + '" from gentoo\'s upstream')
 if len(sys.argv) == 4:
     http_msg = '" from custom http-server "'
-    code = os.system(sys_cmd_head + http + build_arg + 'DIST=' + http + sys_cmd_tail)
+    code = os.system(sys_cmd_head + common_args + http + build_arg + 'DIST=' + http + sys_cmd_tail)
     print(attempt_msg_prefix + arch +  tag_msg + tag + http_msg + http +  '"')
 if len(sys.argv) == 5:
-    code = os.system(sys_cmd_head + http + build_arg + 'DIST=' + http + build_arg + 'KEY=' + signing_key + sys_cmd_tail)
+    code = os.system(sys_cmd_head + common_args + http + build_arg + 'DIST=' + http + build_arg + 'KEY=' + signing_key + sys_cmd_tail)
     print(attempt_msg_prefix + arch +  arch + tag_msg + tag + http_msg + http +  '", and custom signing-key "' + signing_key + '"')
 
-
+code = os.system('cp include/dockerfiles/zentoo-stage3/step2.Dockerfile work/zentoo-stage3/Dockerfile && cd work/zentoo-stage3 && docker build -t localhost:5000/zentoo-stage3:latest .')
 if code != 0:
-    sys.exit('[Zentoo.pull-stage3] Application ended with error code ' + code)
+    sys.exit('[Zentoo.pull-stage3] Application ended with error code ' + str(code))
 

@@ -13,12 +13,12 @@ services:
     - ebuilds:/var/db/repos/gentoo
     - stages:/mnt/stages:ro
     - kernels:/mnt/kernels
-    - ./work//portage/gentoo.conf:/etc/portage/gentoo.conf:ro
-    - ./work//portage/package.license:/etc/portage/package.license:ro
-    - ./work//portage/make.conf:/etc/portage/make.conf:ro
-    - ./work//portage/package.use:/etc/portage/package.use:ro
-    - ./work//portage/patches:/etc/portage/patches:ro
-    - ./work//portage/sets:/etc/portage/sets:ro
+    - ./work/portage/gentoo.conf:/etc/portage/gentoo.conf:ro
+    - ./work/portage/package.license:/etc/portage/package.license:ro
+    - ./work/portage/make.conf:/etc/portage/make.conf:ro
+    - ./work/portage/package.use:/etc/portage/package.use:ro
+    - ./work/portage/patches:/etc/portage/patches:ro
+    - ./work/portage/sets:/etc/portage/sets:ro
     tmpfs:
       - /mnt/temp
   zentoo-packer:
@@ -34,12 +34,12 @@ services:
     - ebuilds:/var/db/repos/gentoo:ro
     - stages:/mnt/stages
     - kernels:/mnt/kernels:ro
-    - ./work//portage/gentoo.conf:/etc/portage/gentoo.conf:ro
-    - ./work//portage/package.license:/etc/portage/package.license:ro
-    - ./work//portage/make.conf:/etc/portage/make.conf:ro
-    - ./work//portage/package.use:/etc/portage/package.use:ro
-    - ./work//portage/patches:/etc/portage/patches:ro
-    - ./work//portage/sets:/etc/portage/sets:ro
+    - ./work/portage/gentoo.conf:/etc/portage/gentoo.conf:ro
+    - ./work/portage/package.license:/etc/portage/package.license:ro
+    - ./work/portage/make.conf:/etc/portage/make.conf:ro
+    - ./work/portage/package.use:/etc/portage/package.use:ro
+    - ./work/portage/patches:/etc/portage/patches:ro
+    - ./work/portage/sets:/etc/portage/sets:ro
     tmpfs:
       - /mnt/temp
 networks:

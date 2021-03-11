@@ -45,7 +45,7 @@ def zentoo_config(is_builder_arg):
         results.append(kernels_str + ':ro\n')
     # Here we loop over the all the files in the config/portage directory and add them 
     portage = '/portage/'
-    portage_cfg = './work/' + portage
+    portage_cfg = './work' + portage
     portage_tgt = '/etc' + portage
     files = [f for f in os.listdir(portage_cfg) if os.path.isfile(os.path.join(portage_cfg, f))]
     for f in files:

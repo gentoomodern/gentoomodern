@@ -4,7 +4,8 @@
 FROM scratch
 
 WORKDIR /
-COPY --from=zentoo-bootstrap:latest /gentoo /
-RUN mkdir /mnt/{stages, kernels, user-data, data-out}
+COPY --from=zentoo-bootstrap /gentoo /
+RUN mkdir /mnt/{stages, kernels, user-data, data-out} && \
+	rm -rf /etc/portage/package.use
 CMD ["/bin/bash"]
 
