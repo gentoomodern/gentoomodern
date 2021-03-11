@@ -1,233 +1,61 @@
 #!/usr/bin/env python3
 
 import sys, os, re
-
+from include.munging import stage3_config, read_by_tokens, read_file_lines, write_file_lines
 from typing import Dict, List, Set
-from include.common import read_file_lines, write_file_lines
-from include.prepconfig import ingest_conf
 
-dont_munge_files = ('bashrc', 'modules')
-dont_munge_dirs = ('sets', 'patches')
-stage_parts = ('cpu','packages','flags','profile')
 
-buildmaster               = 'zentoo-builder'
-rebuild_emptytree         = 'emerge -uDkq --changed-use --emptytree @'
-portage_includes_dir      = './include/portage.defaults'
-portage_global_conf_dir   = './config/portage.global'
-portage_local_conf_dir    = './config/portage.locals'
-cpu_conf_dir              = './config/cpu.defines'
-stage_conf_dir            = './config/stage.defines'
+builder               = 'zentoo-builder'
+rebuild_emptytree         = 'emerge -uDkq --changed-use --emptytree @world'
+#portage_includes_dir      = './include/portage.defaults'
+#portage_global_conf_dir   = './config/portage.global'
+#portage_local_conf_dir    = './config/portage.locals'
+#cpu_conf_dir              = './config/cpu.defines'
+#stage_conf_dir            = './config/stage.defines'
 
 msg_prefix = '[Zentoo.pipeline] '
 
 def run_container(root, command):
     return 'docker-compose run ' + root + ' ' + command
 
-
-# def create_mutable_container(root, name):
-     # TODO:
-     # Make temp Dockerfile
-     # Build our Dockerfile
-     # Assign the name
-
-# Ok, this is gonna be fun...
-# First (string) key represents the filename
-# Second (string) key is the variable/package atom
-# Third (bool) key is whether or not the flags (up next) is off or on
-# Our flags are held in a list: Depending on whether or not there is a negative sign in-front, a flag is found in a list referenced by the key of True or False. For variables with flags such as -march=..., it will be interpreted as a negative, so you must drain both lists.
-def collect_portage_vars(config_dir, config_name, portage_environment : Dict[str, Dict[str, Dict[bool, List[str]]]]):
-    for (dirpath, dirnames, filenames) in os.walk(config_dir):
-        print('Walking over ' + dirpath)
-        for f in filenames:
-            if not f in dont_munge_files and not dirpath in dont_munge_dirs:
-                print('Ingesting ' + f)
-                lines = read_file_lines(dirpath + '/' + f)
-                # We need to strip the global directory information in order to have the (local) config filenames all indexing into their proper key. This means lots of nested regexps. Huh.
-               
-                cleaned_filename = f
-                cleaned_filename = re.sub(re.escape(portage_includes_dir),    '', cleaned_filename)
-                cleaned_filename = re.sub(re.escape(portage_global_conf_dir), '', cleaned_filename)
-                cleaned_filename = re.sub(re.escape(portage_local_conf_dir),  '', cleaned_filename)
-                cleaned_filename = re.sub(re.escape(cpu_conf_dir),            '', cleaned_filename)
-                cleaned_filename = re.sub('^' + re.escape(config_name),       '', cleaned_filename)
-                cleaned_filename = re.sub('^/',                               '', cleaned_filename)
-                if not cleaned_filename == '': # Blank names mess things up.
-                    if cleaned_filename in portage_environment:
-                        ingest_conf(lines, portage_environment[cleaned_filename], True)
-                    else:
-                        portage_environment[cleaned_filename] = dict()
-                        ingest_conf(lines, portage_environment[cleaned_filename], True)
-            print('Done ingesting ' + cleaned_filename)
-
-
-def checkout_config(cpu_conf = '', flags_conf = ''):
-    custom_cpu = False
-    custom_flags = False
-    # Verify existence of directories
-    print('Checking portage includes')
-    if not os.path.isdir(portage_includes_dir):
-        print('Global (immutable, site-wide) Portage/flags config directory at ' + portage_includes_dir + ' does not exist.')
-        return False
-    print('Checking portage globals')
-    if not os.path.isdir(portage_global_conf_dir):
-        print('Global (user-defined) Portage/flags config directory at ' + portage_global_conf_dir + ' does not exist.')
-        return False
-    if not cpu_conf == '':
-        if os.path.isdir(cpu_conf_dir + '/' + cpu_conf):
-            custom_cpu = True
-        else:
-            print('The user-provided CPU config directory at ' + cpu_conf_dir + '/' + cpu_conf + ' does not exist.')
-            return False
-    print('Checking portage locals')
-    if os.path.isdir(portage_local_conf_dir + '/' + flags_conf):
-        custom_flags = True
-    else:
-        print('The user-provided local Portage/flags directory at ' + portage_local_conf_dir + '/' + flags_conf  + ' does not exist.')
-        return False
-
-    print('Setting up work env')
-    sync_patches_str = ''
-    if os.path.isdir(portage_local_conf_dir + '/patches'):
-        sync_patches_str += ' && rsync -aHXqv ' + portage_local_conf_dir + '/patches/* ./work/portage/patches'
-    if os.path.isdir(portage_global_conf_dir + '/patches'):
-        sync_patches_str += ' && rsync -aHVqv ' + portage_global_conf_dir + '/' + flags_conf + '/patches/* ./work/portage/patches'
-    code = os.system('rm -rf ./work/portage/* && mkdir -p ./work/portage/sets && mkdir -p ./work/portage/patches && rsync -aHXqv ./config/package.sets/* ./work/portage/sets ' + sync_patches_str)
-    if not code == 0:
-        return False
-    for d in (portage_local_conf_dir, portage_global_conf_dir, portage_includes_dir):
-        code = os.system('cp ' + d + '/bashrc work/portage')
-        if code == 0: ## To ensure the operation happens in-line with the rest of the script
-            continue
-    portage_vars = dict()
-    collect_portage_vars(portage_includes_dir, '', portage_vars)
-    collect_portage_vars(portage_global_conf_dir, '', portage_vars)
-    if custom_cpu:
-        collect_portage_vars(cpu_conf_dir + '/' + cpu_conf, cpu_conf, portage_vars)
-    if custom_flags:
-        collect_portage_vars(portage_local_conf_dir + '/' + flags_conf, flags_conf, portage_vars)
-    for filepath in portage_vars:
-        print('File ' + filepath)
-        expanded_filepath = filepath.split('/')
-        print(expanded_filepath)
-        print('Expanded filepath (list) length = ' + str(len(expanded_filepath)))
-        prefix = './work/portage/'
-        if len(expanded_filepath) > 1:
-            print('Going into deeper waters')
-            for p in expanded_filepath[:-1]:
-                prefix += p
-                prefix += '/'
-                print('prefix = ' + prefix)
-                if not os.path.isdir(prefix):
-                    print('Making directory ' + prefix)
-                    os.mkdir(prefix)
-        lines = []
-        filename = ''
-        if len(expanded_filepath) > 1:
-            filename = expanded_filepath[-1]
-        else:
-            filename = filepath
-        uses_equals_sign = False
-        if filename[-5:] == '.conf':
-            uses_equals_sign = True
-        for variable in portage_vars[filepath]:
-            current_line = variable
-            if uses_equals_sign:
-                current_line += '= '
-            else:
-                current_line += ' '
-            for flag in portage_vars[filepath][variable][True]:
-                current_line += flag
-                current_line += ' '
-            for flag in portage_vars[filepath][variable][False]:
-                current_line += '-'
-                current_line += flag
-                current_line += ' '
-            #if uses_equals_sign:
-                # current_line += '"'
-            current_line += '\n'
-            lines.append(current_line)
-        write_file_lines(prefix + filename, lines)
-
-
-
-
-    return True
-
-
-
-def assemble_stage3_config(user_stage):
-    has_custom_cpu = False
-    has_custom_flags = False
-    has_custom_packages = False
-    has_custom_profile = False
-    cpu_conf = ''
-    flags_conf = ''
-    packages_conf = ''
-    profiles_conf = ''
-    flags_conf_dir = ''
-    user_stage_conf_dir = stage_conf_dir + '/' + user_stage
-    if not os.path.isdir(user_stage_conf_dir):
-        print(msg_prefix + 'Could not find stage definitions directory: ' + user_stage_conf_dir)
-        return False
-    if os.path.isfile(user_stage_conf_dir + '/cpu'):
-        has_custom_cpu = True
-        cpu_conf = read_file_lines(user_stage_conf_dir + '/cpu')[0].strip()
-        if not os.path.isdir(cpu_conf_dir + '/' + cpu_conf):
-            print(msg_prefix + 'CPU config directory ' + cpu_conf_dir + '/' + cpu_conf + ' does not exist.')
-            return False
-    if os.path.isfile(user_stage_conf_dir + '/flags'):
-        has_custom_flags = True
-        flags_conf = read_file_lines(user_stage_conf_dir + '/flags')[0].strip()
-        if not os.path.isdir(portage_local_conf_dir + '/' + flags_conf):
-            print(msg_prefix + 'Flags config directory ' + portage_local_conf_dir + '/' + flags_conf + ' does not exist')
-            return False
-    if os.path.isfile(user_stage_conf_dir + '/packages'):
-        has_custom_packages = True
-        packages_conf = read_file_lines(user_stage_conf_dir + '/packages')[0].strip()
-    if os.path.isfile(stage_conf_dir + '/profile'):
-        has_custom_profile = True
-        profile_conf = read_file_lines(user_stage_conf_dir + '/profile')[0].strip()
-    
-    code = checkout_config(cpu_conf, flags_conf)
-   
-    if code == False:
-        return False
-
-
-    return True
-
-
 def build(packageset):
     return 'emerge -uDkq --changed-use @' + packageset
-
 
 def install(packageset):
     return "FEATURES='usepkgonly' " + build(packageset)
 
-
-#code = checkout_config('zentoo/builder')
-
-code = assemble_stage3_config('zentoo/bootstrap')
-if code == False:
-    print("Error!")
-
-
-
-
-
-
-#TODO: Optimize into a single docker-compose run
+#TODO: Optimize into a single "docker-compose run"
 
 # We run the initial bootstrap
-#code = os.system("docker-compose down && docker-compose up -d")
-#if code != 0:
-#    sys.exit("Could not run Docker Compose!")
-#code = os.system(checkout_config("bootstrap") + " && " + run_container(buildmaster, "bash -c '" + rebuild_emptytree + "'"))
+code = os.system("docker-compose down && docker-compose up -d")
+if code != 0:
+    sys.exit("Could not run Docker Compose!")
+#for build in build_list:
 
-# We can now recompile libcap with its default options again.
-#if code == 0:
-#    code = os.system(checkout_config("")  + " && " + run_container(buildmaster, build("zentoo/build-server")))
+todo = dict()
+# Switch to our original bootstrap config (fixes a recursive dep)
+code = stage3_config('zentoo/bootstrap', todo)
+if code == False:
+    print("Error! Bootstrap config failed.")
 
+# Rebuild all packages to be made
+code = os.system(run_container(builder, rebuild_emptytree))
+if not code == 0:
+    sys.exit('Could not run bootstrap container build')
 
-# Now, we loop over the files defining what we'll build
+todo = dict()
+# Checkout to our build-master configuration
+code = stage3_config('zentoo/build-master', todo)
+if code == False:
+    sys.exit("Error! Build-master config failed!")
 
+# Build that buildserver!
+code = os.system(run_container(builder, build("zentoo/build-server")))
+if not code == 0:
+    sys.exit('Could not run build-server build')
+
+# Now, we loop over the file defining what we'll build
+build_list = read_file_lines('./config/stages.build')
+
+#for build in build_list:
+    

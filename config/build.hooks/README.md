@@ -11,19 +11,13 @@ In this folder are definitions for build-time hooks. This system is completely o
 
 (Happens outside chroot)
 - ``5-rm``: Removes individual files.
-- ``6-empty``: rm -rf's entire subdirectories, with root privileges.
+- ``6-empty``: rm -rf's entire subdirectories, using root privileges.
 
 Finally, in ``tuple.defines`` we assemble our subset of hooks and refer to that handle, instead of having to assemble a multipart list every time.
 
 Notes:
 - The number prefixed to the subdirectly indicates its place in the sequence of activities.
-- Hierachical/recursive definitions were strongly considered; I ultimately decided against them as we already get to use sets.
-- Should you need to share scripts/data between hooks, place them into the ``config/user-data`` and they'll be mounted under ``/mnt/user-data`` in the dockerized stage3. They'll also be available mounted in the install chroot under that same directory...
-- Steps 1, 2, 3 are commands and these can get directly executed from the shell; order matters. Steps 0, 4, 5, 6 are lists and they get redundant items removed.
-- We also support loading of newline-separated lists in order to support dynamically-generated content. You can also place them into ``config/user-data`` as above, to have them be sourced in another list by using ``. /mnt/user-data/my-subdirectory/my-list``. However, we do _not_ support the synomymous ``source`` keyword, so as not to clash with any possible end-users' configs.
-- Inspired by Portage, the set specifier ``@`` is parsed by our tools and recognized here. For non-idempotent scripts, the order in which these sets get used matters. However, lists merely get their items tested for redundancy prior to having used.
-
-
-```
-
-```
+- Hierachical/recursive definitions were strongly considered; I ultimately decided against them as we already get to use sets, and didn't want to duplicate the functionality. At some point this may change!
+- Should you need to share scripts/data between hooks, place them into ``config/user-data`` and they'll be mounted under ``/mnt/user-data`` in the dockerized stage3. They'll also be available mounted in the installation chroot under the same directory name.
+- Steps 1, 2, 3 are commands and these can get directly executed from the shell; order matters. Steps 0, 4, 5, 6 are lists and they get redundant items removed. To prevent surprises, use-flags are checked to see whether or not we have them both set and unset. Even if Portage handles them in last-in priority, our multi-build pipeline would otherwise silently create unexpected configurations by virtue of managing multiple configs. Performing the test and throwing up an error allows the user to fix any ambiguity.
+- We will soon be supporting the set keyword ``@``, so please consider it reserved.

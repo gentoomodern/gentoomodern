@@ -1,1 +1,2 @@
 default/linux/amd64/17.0/musl/hardened/selinux
+default/linux/amd64/17.1/hardened/nomultilib
