@@ -5,13 +5,8 @@ from include.munging import stage3_config, read_by_tokens, read_file_lines, writ
 from typing import Dict, List, Set
 
 
-builder               = 'zentoo-builder'
-rebuild_emptytree         = 'emerge -uDkq --changed-use --emptytree @world'
-#portage_includes_dir      = './include/portage.defaults'
-#portage_global_conf_dir   = './config/portage.global'
-#portage_local_conf_dir    = './config/portage.locals'
-#cpu_conf_dir              = './config/cpu.defines'
-#stage_conf_dir            = './config/stage.defines'
+builder           = 'zentoo-builder'
+rebuild_emptytree = 'emerge -uDkqa --changed-use --emptytree @world'
 
 msg_prefix = '[Zentoo.pipeline] '
 
@@ -27,9 +22,9 @@ def install(packageset):
 #TODO: Optimize into a single "docker-compose run"
 
 # We run the initial bootstrap
-code = os.system("docker-compose down && docker-compose up -d")
-if code != 0:
-    sys.exit("Could not run Docker Compose!")
+#code = os.system("docker-compose down && docker-compose up -d")
+#if code != 0:
+#    sys.exit("Could not run Docker Compose!")
 #for build in build_list:
 
 todo = dict()
@@ -45,12 +40,12 @@ if not code == 0:
 
 todo = dict()
 # Checkout to our build-master configuration
-code = stage3_config('zentoo/build-master', todo)
+code = stage3_config('zentoo/builder', todo)
 if code == False:
     sys.exit("Error! Build-master config failed!")
 
 # Build that buildserver!
-code = os.system(run_container(builder, build("zentoo/build-server")))
+code = os.system(run_container(builder, build("zentoo/builder")))
 if not code == 0:
     sys.exit('Could not run build-server build')
 

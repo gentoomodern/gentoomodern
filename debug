@@ -1,0 +1,38 @@
+Checking portage includes
+Checking portage globals
+Checking for the existence of local flagsets
+['zentoo/bootstrap\n']
+Setting up work env
+Walking over ./include/portage.defaults/ With local config name 
+Walking over (cleaned) 
+Filepath: package.license, Filepath (cleaned): package.license
+Filepath: make.conf, Filepath (cleaned): make.conf
+Walking over ./include/portage.defaults/repos.conf With local config name 
+Walking over (cleaned) repos.conf
+Filepath: gentoo.conf, Filepath (cleaned): repos.conf/gentoo.conf
+Walking over ./include/portage.defaults/ With local config name 
+Walking over (cleaned) 
+Filepath: package.license, Filepath (cleaned): package.license
+Filepath: make.conf, Filepath (cleaned): make.conf
+Walking over ./include/portage.defaults/repos.conf With local config name 
+Walking over (cleaned) repos.conf
+Filepath: gentoo.conf, Filepath (cleaned): repos.conf/gentoo.conf
+Walking over ./config/portage.global/ With local config name 
+Walking over (cleaned) 
+Filepath: make.conf, Filepath (cleaned): make.conf
+Walking over ./config/portage.global/ With local config name 
+Walking over (cleaned) 
+Filepath: make.conf, Filepath (cleaned): make.conf
+Walking over ./config/cpu.defines/intel-xeon-e3-12x1-v3 With local config name intel-xeon-e3-12x1-v3
+Walking over (cleaned) 
+Filepath: make.conf, Filepath (cleaned): make.conf
+Collecting vars with flagset zentoo/bootstrap
+Walking over ./config/portage.locals/zentoo/bootstrap With local config name zentoo/bootstrap
+Walking over (cleaned) 
+Filepath: package.use, Filepath (cleaned): package.use
+Walking over ./config/portage.locals/zentoo/bootstrap With local config name zentoo/bootstrap
+Walking over (cleaned) 
+Filepath: package.use, Filepath (cleaned): package.use
+{'package.license': {'sys-kernel/linux-firmware*': {True: [], False: ['linux-fw-redistributable', 'no-source-code']}}, 'make.conf': {'ZENTOO_MARCH_FLAGS': {True: [], False: []}, 'ZENTOO_COMMON_FLAGS': {True: [], False: ['pipe', 'O2', '${ZENTOO_MARCH_FLAG}']}, 'ZENTOO_CFLAGS': {True: [], False: []}, 'ZENTOO_CXXFLAGS': {True: [], False: []}, 'ZENTOO_FCFLAGS': {True: [], False: []}, 'ZENTOO_FFLAGS': {True: [], False: []}, 'COMMON_FLAGS=${ZENTOO_COMMON_FLAGS}': {True: [], False: []}, 'CFLAGS=${COMMON_FLAGS}': {True: [], False: ['${ZENTOO_CFLAGS}']}, 'CXXFLAGS=${COMMON_FLAGS}': {True: [], False: ['${ZENTOO_CXXFLAGS}']}, 'FCFLAGS=${COMMON_FLAGS}': {True: [], False: ['${ZENTOO_FCFLAGS}']}, 'FFLAGS=${COMMON_FLAGS}': {True: [], False: ['${ZENTOO_FFLAGS}']}, 'PORTDIR=/var/db/repos/gentoo': {True: [], False: []}, 'DISTDIR=/var/cache/distfiles': {True: [], False: []}, 'PKGDIR=/var/cache/binpkgs': {True: [], False: []}, 'FEATURES=binpkg-multi-instance': {True: [], False: ['buildpkg', 'userpriv', 'usersync', 'xattr', 'parallel-fetch', 'pid-sandbox', 'ipc-sandbox', 'network-sandbox']}, 'LC_MESSAGES=C': {True: [], False: []}, 'COMMON_FLAGS=-pipe': {True: [], False: ['O2', '${ZENTOO_COMMON_FLAGS}']}}, 'repos.conf/gentoo.conf': {'[gentoo]': {True: [], False: []}, 'location': {True: [], False: ['/var/db/repos/gentoo']}, 'sync-type': {True: [], False: ['rsync']}, 'sync-uri': {True: [], False: ['rsync://rsync.gentoo.org/gentoo-portage']}, 'sync-rsync-verify-jobs': {True: [], False: ['1']}, 'sync-rsync-verify-metamanifest': {True: [], False: ['yes']}, 'sync-rsync-verify-max-age': {True: [], False: ['24']}, 'sync-openpgp-key-path': {True: [], False: ['/usr/share/openpgp-keys/gentoo-release.asc']}, 'sync-openpgp-keyserver': {True: [], False: ['hkps://keys.gentoo.org']}, 'sync-openpgp-key-refresh-retry-count': {True: [], False: ['40']}, 'sync-openpgp-key-refresh-retry-overall-timeout': {True: [], False: ['1200']}, 'sync-openpgp-key-refresh-retry-delay-exp-base': {True: [], False: ['2']}, 'sync-openpgp-key-refresh-retry-delay-max': {True: [], False: ['60']}, 'sync-openpgp-key-refresh-retry-delay-mult': {True: [], False: ['4']}, 'sync-webrsync-verify-signature': {True: [], False: ['yes']}}, 'package.use': {'sys-libs/libcap': {True: [], False: ['pam']}}}
+{'package.license': {'sys-kernel/linux-firmware*': ['linux-fw-redistributable', 'no-source-code']}, 'make.conf': {'ZENTOO_MARCH_FLAGS': [''], 'ZENTOO_COMMON_FLAGS': ['', '-pipe', '-O2', '${ZENTOO_MARCH_FLAG}'], 'ZENTOO_CFLAGS': [''], 'ZENTOO_CXXFLAGS': [''], 'ZENTOO_FCFLAGS': [''], 'ZENTOO_FFLAGS': [''], 'COMMON_FLAGS=${ZENTOO_COMMON_FLAGS}': [], 'CFLAGS=${COMMON_FLAGS}': ['${ZENTOO_CFLAGS}'], 'CXXFLAGS=${COMMON_FLAGS}': ['${ZENTOO_CXXFLAGS}'], 'FCFLAGS=${COMMON_FLAGS}': ['${ZENTOO_FCFLAGS}'], 'FFLAGS=${COMMON_FLAGS}': ['${ZENTOO_FFLAGS}'], 'PORTDIR=/var/db/repos/gentoo': [], 'DISTDIR=/var/cache/distfiles': [], 'PKGDIR=/var/cache/binpkgs': [], 'FEATURES=binpkg-multi-instance': ['buildpkg', 'userpriv', 'usersync', 'xattr', 'parallel-fetch', '-pid-sandbox', '-ipc-sandbox', '-network-sandbox'], 'LC_MESSAGES=C': [], 'COMMON_FLAGS=-pipe': ['-O2', '${ZENTOO_COMMON_FLAGS}'], 'ZENTOO_FLAGS_COMMON=-march=core-avx2': [], 'CPU_FLAGS_X86=aes': ['avx', 'avx2', 'f16c', 'fma3', 'mmx', 'mmxext', 'pclmul', 'popcnt', 'rdrand', 'sse', 'sse2', 'sse3', 'sse4_1', 'sse4_2', 'ssse3']}, 'repos.conf/gentoo.conf': {'[gentoo]': [], 'location': ['', '/var/db/repos/gentoo'], 'sync-type': ['', 'rsync'], 'sync-uri': ['', 'rsync://rsync.gentoo.org/gentoo-portage'], 'sync-rsync-verify-jobs': ['', '1'], 'sync-rsync-verify-metamanifest': ['', 'yes'], 'sync-rsync-verify-max-age': ['', '24'], 'sync-openpgp-key-path': ['', '/usr/share/openpgp-keys/gentoo-release.asc'], 'sync-openpgp-keyserver': ['', 'hkps://keys.gentoo.org'], 'sync-openpgp-key-refresh-retry-count': ['', '40'], 'sync-openpgp-key-refresh-retry-overall-timeout': ['', '1200'], 'sync-openpgp-key-refresh-retry-delay-exp-base': ['', '2'], 'sync-openpgp-key-refresh-retry-delay-max': ['', '60'], 'sync-openpgp-key-refresh-retry-delay-mult': ['', '4'], 'sync-webrsync-verify-signature': ['', 'yes']}, 'package.use': {'sys-libs/libcap': ['-pam']}}
+{'package.license': 'sys-kernel/linux-firmware* -linux-fw-redistributable -no-source-code', 'make.conf': 'COMMON_FLAGS=-pipe', 'repos.conf/gentoo.conf': 'sync-webrsync-verify-signature -yes', 'package.use': 'sys-libs/libcap -pam'}

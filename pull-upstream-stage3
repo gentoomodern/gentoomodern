@@ -44,7 +44,7 @@ outfile.close()
 attempt_msg_prefix = '[Zentoo.pull-stage3] Attempted to pull stage3 of arch "' 
 tag_msg = '" wih tag, "' 
 build_arg = ' --build-arg '
-sys_cmd_head = 'docker image rm localhost:5000/zentoo-stage3:latest & cd work/zentoo-stage3 && docker build '
+sys_cmd_head = 'docker image rm localhost:5000/zentoo-stage3:latest & docker image rm zentoo-bootstrap & cd work/zentoo-stage3 && docker build '
 sys_cmd_tail = ' -t zentoo-bootstrap .'
 common_args = build_arg + 'ARCH=' + arch + build_arg + 'MICROARCH=' + arch + build_arg + 'SUFFIX=' + tag + ' '
 if len(sys.argv) == 3:
