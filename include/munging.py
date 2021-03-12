@@ -21,7 +21,6 @@ flags_include_path = './include/portage.defaults/'
 
 
 
-
 def read_file_lines(filename):
     f = open(filename)
     lines = f.readlines()
@@ -39,6 +38,7 @@ def read_by_tokens(obj):
     for line in obj:
         for token in line.split():
             yield token
+
 
 def get_flagname(flag_str):
     return re.sub('^(-)+', '', flag_str)
@@ -198,6 +198,8 @@ def collect_package_flags(local_config_dir, local_config_name, package_flags_env
         print('Walking over (cleaned) ' + cleaned_dirpath)
         if cleaned_dirpath in dont_munge_pkgflag_dirs:
             continue
+        if not os.path.exists(output_path + cleaned_dirpath):
+            os.mkdir(output_path + cleaned_dirpath)
         for f in filenames:
             if f in dont_munge_pkgflag_files:
                 continue
@@ -208,7 +210,7 @@ def collect_package_flags(local_config_dir, local_config_name, package_flags_env
                 cleaned_filepath = cleaned_filepath[1:]
             print('Filepath: ' + f + ', Filepath (cleaned): ' + cleaned_filepath)
             lines = read_file_lines(dirpath + '/' + f)
-           # We need to strip the global directory information in order to have the (local) config filenames all indexing into their proper key. This means lots of nested regexps. Huh.
+            # We need to strip the global directory information in order to have the (local) config filenames all indexing into their proper key. This means lots of nested regexps. Huh.
             if not cleaned_filepath == '': # Blank names mess things up.
                 if cleaned_filepath in package_flags_environment:
                     ingest_pkgflag_config(lines, package_flags_environment[cleaned_filepath])
@@ -229,6 +231,8 @@ def collect_portage_vars(local_config_dir, local_config_name, portage_conf_envir
         print('Walking over (cleaned) ' + cleaned_dirpath)
         if cleaned_dirpath in dont_munge_pkgflag_dirs:
             continue
+        if not os.path.exists(output_path + cleaned_dirpath):
+            os.mkdir(output_path + cleaned_dirpath)
         for f in filenames:
             if f in dont_munge_pkgflag_files:
                 continue
@@ -252,24 +256,23 @@ def collect_portage_vars(local_config_dir, local_config_name, portage_conf_envir
 # In this, we create all the folders necessary to recreate our desired portage filestructure.
 def create_output_directory_structure(filepaths : List[str], debug = False):
     for fpath in filepaths: 
-        if debug:
-            print('File ' + fpath)
+        #if debug:
+        print('File ' + fpath)
         expanded_fpath = fpath.split('/')
-        if debug:
-            print(expanded_fpath)
-            print('Expanded fpath (list) length = ' + str(len(expanded_fpath)))
+        #if debug:
+        print(expanded_fpath)
+        print('Expanded fpath (list) length = ' + str(len(expanded_fpath)))
         prefix = output_path
         if len(expanded_fpath) > 1: # If we're still considering a directory and not a file
-            if debug:
-                print('Going deeper into the filestructure') # TODO: Make more sense
-            for p in expanded_fpath[:-1]: # The last element is the filename itself
+            #if debug:
+            print('Going deeper into the filestructure') # TODO: Make more sense
+            for p in expanded_fpath: # The last element is the filename itself
                 prefix += '/'
                 prefix += p
-                if debug:
-                    print('prefix = ' + prefix)
+                print('prefix = ' + prefix)
                 if not os.path.isdir(prefix):
-                    if debug:
-                        print('Making directory ' + prefix)
+                    #if debug:
+                    print('Making directory ' + prefix)
                     os.mkdir(prefix) # Now we finally make our directory. Is there a better way to do this???
 
 
@@ -346,12 +349,11 @@ def checkout_config(cpu_conf = 'zentoo/default', flags_conf : List[str] = [], de
             flg = flg.strip()
             if flg == '':
                 continue
-            #if flg[0] == '@':
-            #    flg = flg[2:]
+            if flg[0] == '@':
+                flg = flg[1:]
             if os.path.isdir(flagset_path + flg):
                 custom_flags = True
                 flagsets_to_add.append(flg)
-
             else:
                 print('The user-provided local Portage/flags directory at ' + flagset_path + flg  + ' does not exist.')
                 return False
@@ -402,13 +404,13 @@ def checkout_config(cpu_conf = 'zentoo/default', flags_conf : List[str] = [], de
         all_files += f
 
     # Make the paths needed to recreate
-    create_output_directory_structure(all_files)
+    #create_output_directory_structure(all_files)
 
     # Now we can put back everything into their respective files.
     files_to_contents = recreate_output_files(portage_vars, package_vars, True)
     print(files_to_contents)
     for v in files_to_contents:
-        write_file_lines(v, files_to_contents[v])
+        write_file_lines(output_path + v, files_to_contents[v])
 
     return True
 
