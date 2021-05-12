@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import sys, os, re
-from include.munging import stage3_config, read_by_tokens, read_file_lines, write_file_lines
+from include.munging import stage3_config
+from GentooMuchCommon import read_file_lines, write_file_lines, read_by_tokens
 from typing import Dict, List, Set
 
 
