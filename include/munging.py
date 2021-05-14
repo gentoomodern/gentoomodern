@@ -19,9 +19,6 @@ def get_cleaned_path(dirpath, config_path):
     results = re.sub('^/'                                   , '', results)
     return results
 
-
-
-
 class stage3:
     def __init__(self):
         self.accumulators = dict() #[str, munger]

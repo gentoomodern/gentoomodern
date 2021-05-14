@@ -54,12 +54,13 @@ class stage_combiner:
             sys.exit(msg_prefix + 'flags config directory: ' + os.path.join(user_stage_path, 'flags') + ' does not exist.')
         #if not check_if_portage_sets_present(flags_conf):
         #     sys.exit('Could not find all attached flagsets')
+        #TODO Insert code to hoover up 
         if os.path.isfile(os.path.join(user_stage_path, '/packages')):
-            todo['packages'] = read_file_lines(os.path.join(user_stage_path, '/packages'))
+            self.todo['packages'] = read_file_lines(os.path.join(user_stage_path, '/packages'))
         if os.path.isfile(os.path.join(user_stage_path, '/profiles')):
-            todo['profiles'] = read_file_lines(os.path.join(user_stage_path, '/profiles'))
+            self.todo['profiles'] = read_file_lines(os.path.join(user_stage_path, '/profiles'))
         if os.path.isfile(os.path.join(user_stage_path, '/hooks')):
-            todo['hooks'] = read_file_lines(os.path.join(user_stage_path, '/hooks'))
+            self.todo['hooks'] = read_file_lines(os.path.join(user_stage_path, '/hooks'))
 
     def checkout_common_config(self, cpu_conf, flags_conf):
         # Verify existence of directories.
