@@ -52,7 +52,7 @@ def zentoo_config(is_builder_arg):
         if f != '.gitignore':
             results.append('    - ' + portage_cfg + f + ':' + portage_tgt + f + ':ro\n')
     # We also do the same for the directories
-    dirs = [f for f in os.listdir(portage_cfg) if os.path.isdir(os.path.join(portage_cfg, f))]
+    dirs = [dr for dr in os.listdir(portage_cfg) if os.path.isdir(os.path.join(portage_cfg, f))]
     for d in dirs:
         if d != '.git':
             results.append('    - ' + portage_cfg + d + ':' + portage_tgt + d + ':ro\n')

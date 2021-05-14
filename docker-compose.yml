@@ -16,9 +16,9 @@ services:
     - ./work/portage/gentoo.conf:/etc/portage/gentoo.conf:ro
     - ./work/portage/package.license:/etc/portage/package.license:ro
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
-    - ./work/portage/package.use:/etc/portage/package.use:ro
     - ./work/portage/patches:/etc/portage/patches:ro
     - ./work/portage/sets:/etc/portage/sets:ro
+    - ./work/portage/package.use:/etc/portage/package.use:ro
     tmpfs:
       - /mnt/temp
   zentoo-packer:
@@ -37,9 +37,9 @@ services:
     - ./work/portage/gentoo.conf:/etc/portage/gentoo.conf:ro
     - ./work/portage/package.license:/etc/portage/package.license:ro
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
-    - ./work/portage/package.use:/etc/portage/package.use:ro
     - ./work/portage/patches:/etc/portage/patches:ro
     - ./work/portage/sets:/etc/portage/sets:ro
+    - ./work/portage/package.use:/etc/portage/package.use:ro
     tmpfs:
       - /mnt/temp
 networks:

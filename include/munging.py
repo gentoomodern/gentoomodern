@@ -2,60 +2,56 @@
 
 import sys, os, re
 from typing import Dict, List, Set
-from GentooMuchCommon import read_file_lines, write_file_lines, read_by_tokens
+from .gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, output_path, config_dir, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path
+debug = True
 
 stage_parts = ('cpu', 'packages', 'flags', 'profile')
-dont_munge_files = (['', 'bashrc'], ['', 'modules'], ['', 'README.md'], ['', 'mirrors'], ['', 'color.map')
+dont_munge_files = (['', 'bashrc'], ['', 'modules'], ['', 'README.md'], ['', 'mirrors'], ['', 'color.map'])
 dont_munge_dirs = ('sets', 'patches', 'savedconfig')
 
-output_path        = './work/portage/'
-config_dir         = './config/'
-stage_path         = config_dir + 'stage.defines/'
-cpu_path           = config_dir + 'cpu.defines/'
-pkgset_path        = config_dir + 'package.sets/'
-flagset_path       = config_dir + 'portage.locals/'
-hooks_path         = config_dir + 'build.hooks/'
-kernel_path        = config_dir + 'kernel.defines/'
-global_flags_path  = config_dir + 'portage.global/'
-flags_include_path = './include/portage.defaults/'
-
-def create_output_directory(output_path, cleaned_dirpath):
-    cleaned_dirpath = get_cleaned_dirpath(dirpath, config_path_in, config_name_in)
-    os.mkdir(output_path + cleaned_dirpath)
-    if cleaned_dirpath in dont_munge_dirs:
-        if debug:
-            print("create_output_directory() - DEBUG - Skipping " + cleaned_dirpath)
-            return
-        if not os.path.exists(output_path + cleaned_dirpath):
-        if debug:
-            print('create_output_directory() - DEBUG - Ingesting ' + f)
-        cleaned_filepath = cleaned_dirpath + '/' + f
-        if cleaned_filepath[0] == '/':
-            cleaned_filepath = cleaned_filepath[1:]
-        if cleaned_filepath == '': # Blank names mess things up.
-            continue
-        if debug:
-            print('create_output_directory() - DEBUG - Filepath: ' + f + ', Filepath (cleaned): ' + cleaned_filepath)
-
-def get_cleaned_dirpath(dirpath, config_path, config_name):
-    results = re.sub(re.escape(flags_include_path)       , '', dirpath)
-    results = re.sub(re.escape(global_flags_path)        , '', results)
-    results = re.sub(re.escape(flagset_path)             , '', results)
-    results = re.sub(re.escape(cpu_path)                 , '', results)
-    results = re.sub(re.escape(config_path)              , '', results)
-    results = re.sub(re.escape(config_name)              , '', results)
-    results = re.sub('^/'                                , '', results)
+# TODO: Write a test or two
+def get_cleaned_path(dirpath, config_path):
+    results = dirpath 
+    results = re.sub(re.escape(global_config_path)          , '', results)
+    results = re.sub(re.escape(local_config_basepath)       , '', results)
+    results = re.sub(re.escape(cpu_path)                    , '', results)
+    results = re.sub(re.escape(config_path)                 , '', results)
+    results = re.sub('^/'                                   , '', results)
     return results
 
-def stage3_config(portage_config_path_in, config_name_in):
-    for (dirpath, dirnames, filenames) in os.walk(portage_config_path_in):
-        lines = read_file_lines(dirpath + '/' + f) # Here we do our actual file-reading
-        if not ingest_file(lines):
-            print("stage3_config() - ERROR - Could not ingest " + cleaned_filepath)
-            return False
-        if debug:
-            print('Done ingesting ' + cleaned_filepath)
-    return True
+
+
+
+class stage3:
+    def __init__(self):
+        self.accumulators = dict() #[str, munger]
+
+    def ingest(self, local_path):
+        for (dirpath, dirnames, filenames) in os.walk(local_path):
+            for d in dirnames:
+                #cleaned_dirpath = get_cleaned_path(d, local_path)
+                if debug:
+                    print(get_cleaned_path(os.path.join(dirpath, d), local_path))
+                if not os.path.exists(output_path + d):
+                    os.mkdir(os.path.join(output_path, d))
+                    #if debug:
+                    #    print('Creating directory ' + d + ' in work/portage')
+            for f in filenames:
+                if debug:
+                    print(os.path.join(dirpath, f))
+                current_file = get_cleaned_dirpath(os.path.join(dirpath, f), local_path)
+                if not current_file in self.accumulators:
+                    self.accumulators[current_file] = munger()
+                for line in read_file_lines(current_file): # Here we do our actual file-reading
+                    if not self.accumulators[current_file].ingest(line):
+                        system.exit('stage3.setup() - ERROR - Could not ingest ' + current_file + ' due to line : ' + line)
+                if debug:
+                    print('Done ingesting ' + current_file)
+
+    def writeout(self, path):
+        for m in self.accumulators:
+            os.path.mkdir(os.path.join(output_path, m.get_current_directory()))
+            write_file_lines(os.path.join(output_path, m.get_current_directory(), m.get_current_filename()), m.get_text())
 
 class munger:
     # This identifies and deduplicates flags
@@ -66,18 +62,36 @@ class munger:
         if atom == "":
             if debug:
                 print("munger.ingest() - DEBUG - Empty atom name. Skipping...") 
-            continue
-        flags_str = re.sub('^' + re.escape(atom), '', line)
-        # Now, we figure out whether or not the line gets passthrough or has its values held into dictionary.
-        if self.current_file == "make.conf" and self.current_directory == "":
-            if self.is_atom_portage_var(atom) 
-                self.ingest_use_flags(atom, flags_str)
-        elif self.is_file_pkg_flag_syntax():
-            self.ingest_use_flags(atom, flags_str)
-        elif self.is_file_simple_atom_syntax():
-             self.ingest_atom(atom)
         else:
-            self.unmodified_lines.append(line)
+            flags_str = re.sub('^' + re.escape(atom), '', line)
+            # Now, we figure out whether or not the line gets passthrough or has its values held into dictionary.
+            if self.current_file == "make.conf" and self.current_directory == "":
+                if self.is_atom_portage_var(atom):
+                    self.ingest_use_flags(atom, flags_str)
+            elif self.is_file_pkg_flag_syntax():
+                self.ingest_use_flags(atom, flags_str)
+            elif self.is_file_simple_atom_syntax():
+                self.ingest_atom(atom)
+            else:
+                self.unmodified_lines.append(line)
+
+    def get_text(self):
+        results = self.unmodified_lines
+        if self.current_dir == '' and self.current_file == 'make.conf':
+            results.append(self.get_text_make_conf_syntax())
+
+    def get_current_directory(self):
+        return self.current_directory
+
+    def get_current_filename(self):
+        return self.current_file
+
+    def __init__(self, current_dir, current_file):
+        self.use_flags = dict() #[str, Dict[bool, List[str]]] 
+        self.unmodified_lines = list() #[str]
+        self.atoms = set()
+        self.current_directory = current_dir
+        self.current_file = current_file
 
     def __is_atom_portage_var(self, atom):
         return bool(re.search('^USE[=]', atom)) or bool(re.search('^CPU_FLAGS_', atom)) or bool(re.search('^ACCEPT_', atom))
@@ -90,56 +104,22 @@ class munger:
             return False
 
     def __is_file_pkg_flags_syntax(self):
-        files = ('package.accept_keywords', 'package.use', )
+        files = ('package.accept_keywords', 'package.use', 'package.env')
         if self.current_directory == 'package.use' or (self.current_directory == '' and self.current_file in files):
             return True
         else:
             return False
-
-    def set_path(self, pathname):
-        self.current_directory = pathname
-
-    def __set_path_test(self, pathname):
-        old_path = self.current_directory
-        self.set_path(pathname)
-        if not self.current_directory == pathname:
-            system.exit("munger.set_path() - UNIT TEST FAIL")
-        self.current_directory = old_path
-
-    def set_file(self, filename):
-        self.current_file = filename
-
-    def __set_file_test(self, filename):
-        old_file = self.filename
-        self.set_file(filename)
-        if not self.filename == filename):
-            system.exit("munger.set_file() - UNIT TEST FAIL")
-        self.filename = old_file
-
-    def get_text(self):
-        results = self.unmodified_lines
-        if self.current_dir = '' and self.current_file == 'make.conf':
-            results.append(self.get_text_make_conf_syntax())
-        
-    def __init__(self):
-        self.use_flags = dict() #[str, Dict[bool, List[str]]] 
-        self.unmodified_lines = list() #[str]
-        self.atoms = set()
-        self.current_file = ""
-        self.current_directory = ""
-
-    # Stub
+    
     def __get_text_make_conf_syntax(self):
         results = unmodified_lines
         for atom in self.use_flags.keys():
             counter = 0
-            line = atom
-                line += '="'
+            line = atom + '='
             for flag in self.use_flags[atom][True]:
                 if counter > 0:
                     line += ' '
                 line += flag
-                counter++
+                counter += 1
             for flag in self.use_flags[atom][False]:
                 if counter > 0:
                     line += ' -'
@@ -150,7 +130,6 @@ class munger:
             results.append(line)
         return results
 
-    # Stub
     def __get_text_simple_atom_syntax(self):
         results = []
         for atom in self.atoms:
@@ -160,7 +139,7 @@ class munger:
     
     def __get_atom_name(self, line):
         if not re.match('(\S)+', line): # Only proceed if we don't have an empty line... Those make the regex engine crash
-            continue
+            return ""
         if self.debug:
             print('Inside munger - Line: ' + line)
         atom_name = re.match('^\S+', self.strip_quotes(line)).group() # Get the first block of non-whitespace characters
@@ -186,15 +165,14 @@ class munger:
             sys.exit('munger.get_canonical_flagname() - UNIT TEST FAIL - Empty flag.')
 
     def __ingest_atom(self, atom):
-        atoms.add(atom)
+        if not atom[0] == '#':
+            atoms.add(atom)
     
     def __ingest_use_flags(self, atom_name, flags_str):
         for candidate_flag in flags_str.split():
             candidate_flag = candidate_flag.strip()
             if debug:
                 print('munger.ingest_use_flags() - DEBUG - Examining flag "' + candidate_flag + '"')
-            if candidate_flag  == '': # Ensure we actually have text to work with
-                continue
             if candidate_flag[0] == '#': # Skip comments
                 break
             if candidate_flag == "" or candidate_flag == '=':
@@ -206,8 +184,8 @@ class munger:
                 continue
             elif flag_abs in self.use_flags[atom_name][not is_setting]: # If that flag is in the list for negatives, then adding a positive flag will only cause confusion.
                 return False
-            else:
-                self.use_flags[atom_name][is_setting].append(flag_abs) # We now can append anything that has passed the previous tests.
+            else: # We now can append anything that has passed the previous tests.
+                self.use_flags[atom_name][is_setting].append(flag_abs)
         return True
 
     def __ingest_use_flags_test(self):
