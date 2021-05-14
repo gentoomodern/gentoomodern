@@ -30,14 +30,14 @@ class stage3:
                 print('[munger] current (cleaned) path = ' + current_path)
                 current_file = os.path.join(current_path, f)
                 if debug:
-                    print('[stage3] Processing ' + current_file)
+                    print('[munger] Processing ' + current_file)
                 if not current_file in self.accumulators:
                     self.accumulators[current_file] = munger(current_path, f)
                 for line in read_file_lines(os.path.join(dirpath, f)): # Here we do our actual file-reading
                     self.accumulators[current_file].ingest(line)
                         # sys.exit('stage3.setup() - ERROR - Could not ingest ' + current_file + ' due to line : ' + line)
                 if debug:
-                    print('[stage3] Done ingesting ' + current_file)
+                    print('[munger] Done ingesting ' + current_file)
 
     def writeout(self):
         for m in self.accumulators.values():
@@ -52,7 +52,7 @@ class stage3:
                     write_file_lines(current_output_file, text)
                 else:
                     if debug:
-                        print("Empty file " + current_output_file + " when writing out")
+                        print("[munger] Empty file " + current_output_file + " when writing out")
 
 class munger:
     # This identifies and deduplicates flags
@@ -61,6 +61,7 @@ class munger:
     def ingest(self, line):
         atom = self.__get_atom_name(line)
         flags_str = re.sub('^' + re.escape(atom), '', line)
+        flags_str = self.__strip_quotes(flags_str)
         # Now, we figure out whether or not the line gets passthrough or has its values held into dictionary.
         if self.current_file == "make.conf" and self.current_directory == "" and self.__is_atom_portage_var(atom):
             atom = re.sub('=$', '', atom)
@@ -122,7 +123,7 @@ class munger:
         results = []
         for atom in self.use_flags.keys():
             counter = 0
-            line = atom + '='
+            line = atom + '="'
             for flag in self.use_flags[atom][True]:
                 if counter > 0:
                     line += ' '
@@ -134,7 +135,7 @@ class munger:
                 else:
                     line += '-'
                 line += flag
-                line += '"'
+            line += '"'
             results.append(line)
         return results
 

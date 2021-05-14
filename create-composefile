@@ -6,16 +6,16 @@ from include.munging import read_file_lines, write_file_lines
 builder_str = 'builder'
 packer_str = 'packer'
 
-def zentoo_config(is_builder_arg):
+def gentoomuch_config(is_builder_arg):
     # Our results will be a list of strings
     results = [] 
     # First, we define whether this'll be a builder or a packer
     if is_builder_arg:
-        results.append('  zentoo-' + builder_str + ':\n')
+        results.append('  gentoomuch-' + builder_str + ':\n')
     else:
-        results.append('  zentoo-' + packer_str + ':\n')
+        results.append('  gentoomuch-' + packer_str + ':\n')
     # We append the runiversal parts
-    results.append('    image: localhost:5000/zentoo-stage3\n')
+    results.append('    image: localhost:5000/gentoomuch-stage3\n')
     results.append('    networks:\n')
     results.append('    - backend\n')
     results.append('    volumes:\n')
@@ -79,12 +79,12 @@ lines = ['# Do not make changes to this file, as they will be overriden next tim
 # Here, we will write either one, the other, or both...
 if is_both == False:
     if is_builder:
-        lines.extend(zentoo_config(True))
+        lines.extend(gentoomuch_config(True))
     else:
-        lines.extend(zentoo_config(False))
+        lines.extend(gentoomuch_config(False))
 else:
-    lines.extend(zentoo_config(True))
-    lines.extend(zentoo_config(False))
+    lines.extend(gentoomuch_config(True))
+    lines.extend(gentoomuch_config(False))
 
 
 include_prefix = 'include/docker-compose/docker-compose.'

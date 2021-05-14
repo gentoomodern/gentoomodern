@@ -1,4 +1,3 @@
 #!/bin/sh
 #docker-compose down & docker-compose down & docker-compose up -d &&
-docker-compose run zentoo-builder /bin/bash
-
+docker-compose run gentoomuch-builder /bin/bash
