@@ -22,9 +22,6 @@ def build(packageset):
 def install(packageset):
     return "FEATURES='usepkgonly' " + build(packageset)
 
-
-
-
 # stage_defines_path          = config_dir + 'stage.defines/'
 # cpu_path                    = config_dir + 'cpu.defines/'
 # pkgset_path                 = config_dir + 'package.sets/'
@@ -33,13 +30,10 @@ def install(packageset):
 # kernel_path                 = config_dir + 'kernel.defines/'
 # global_config_path          = config_dir + 'portage.global/'
 
-
-
 class stage_combiner:
     def process_stage_defines(self, local_stage):
         # First, we ensure our target output directory is sane.
         self.prep()
-
         # Determine whether the stage defines path exists.
         local_stage_defines_path = stage_defines_path + local_stage
         if not os.path.isdir(local_stage_defines_path):
@@ -56,7 +50,7 @@ class stage_combiner:
         self.accum.ingest(local_cpu_path)
         # Now, we can pull in the globally-needed parts!
         self.checkout_common_config()
-        # We need to get to the file in which local portage directories are written 
+        # We need to get to the file in which local portage directories are written. 
         flags_defines_path = os.path.join(local_stage_defines_path, 'flags')
         if os.path.isfile(flags_defines_path):
             flags_conf = read_file_lines(flags_defines_path)
@@ -70,7 +64,7 @@ class stage_combiner:
                 sys.exit(msg_prefix + 'Local portage flags config directory' + combined_path + ' does not exist.')
             # Now ingest!
             self.accum.ingest(combined_path)
-        # We add info we must run post-build. These get used once build/assemble has run to completion.
+        # We add info we must run post-build.
         if os.path.isfile(os.path.join(local_stage_defines_path, '/packages')):
             self.todo['packages'] = read_file_lines(os.path.join(local_stage_defines_path, '/packages'))
         if os.path.isfile(os.path.join(local_stage_defines_path, '/profiles')):
@@ -91,11 +85,11 @@ class stage_combiner:
             sys.exit('Global Portage  config directory at ' + global_config_path + ' does not exist.')
         # Ingest that thing.
         self.accum.ingest(global_config_path)
-        # Here, we deal with the (package) sets and patches
+        # Here, we deal with the (package) sets and patches.
         rsync_cmd = 'rsync -aHVXq'
         sync_sets_str = rsync_cmd + ' ' + os.path.join(pkgset_path, '*') + ' '  + os.path.join(output_path, 'sets')
         sync_patches_str = rsync_cmd + ' ' + os.path.join(patches_path, '*') + ' ' + os.path.join(output_path, 'patches')
-        # A helper to print error messages without copying code
+        # A helper to print error messages without copying code.
         def print_rsync_error(tag):
             sys.exit("stage_combiner.checkout_common_config() - Could not rsync " + tag + "with error code: " + code)
         # We now add package sets. These are universal.
@@ -106,11 +100,9 @@ class stage_combiner:
         if not code == 0:
             print_rsync_error('patches')
 
-
-
     def __init__(self):
         self.todo = dict() # Dict[str, List[str]]
-        self.accum = stage()
+        self.accum = stage3()
 
 
 # Now, we loop over the file defining what we'll build.

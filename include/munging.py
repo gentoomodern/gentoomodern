@@ -5,7 +5,6 @@ from typing import Dict, List, Set
 from .gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, output_path, config_dir, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path
 debug = True
 
-stage_parts = ('cpu', 'packages', 'flags', 'profile')
 dont_munge_files = (['', 'bashrc'], ['', 'modules'], ['', 'README.md'], ['', 'mirrors'], ['', 'color.map'])
 dont_munge_dirs = ('sets', 'patches', 'savedconfig')
 
