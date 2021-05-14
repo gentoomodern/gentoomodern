@@ -80,7 +80,9 @@ class stage3_combiner:
             print('Prepping munged portagedir environment.')
         if not os.path.isdir(output_path):
             os.mkdir(output_path)
-        os.system('rm -rf ' + os.path.join(output_path, '*'))
+        code = os.system('rm -rf ' + os.path.join(output_path, '*'))
+        if not code == 0:
+            sys.exit('stage3_combiner - could not clean output dir')
 
     def __checkout_common_config(self):
         # Verify existence of global config directory.
@@ -117,9 +119,10 @@ class stage3_combiner:
 
 # Now, we loop over the file defining what we'll build.
 build_list = read_file_lines('./config/stages.build')
+#for l in build_list:
+l = 'gentoomuch/builder'
 combiner = stage3_combiner()
-for l in build_list:
-    combiner.process_stage_defines(l)
+combiner.process_stage_defines(l)
 #if not os.path.isdir(output_path):
 #    os.mkdir(output_path)
 #code = os.system('rm -rf ./work/portage/*')

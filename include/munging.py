@@ -34,7 +34,7 @@ class stage3:
                 if not current_file in self.accumulators:
                     self.accumulators[current_file] = munger(current_path, f)
                 for line in read_file_lines(os.path.join(dirpath, f)): # Here we do our actual file-reading
-                    self.accumulators[current_file].ingest(line.strip())
+                    self.accumulators[current_file].ingest(line)
                         # sys.exit('stage3.setup() - ERROR - Could not ingest ' + current_file + ' due to line : ' + line)
                 if debug:
                     print('[stage3] Done ingesting ' + current_file)
@@ -48,8 +48,8 @@ class stage3:
             current_output_file = os.path.join(current_output_dir, m.get_current_filename())
             if not os.path.isfile(current_output_file):
                 text = m.get_text()
-                if len(text) == 0:
-                    write_file_lines(current_output_file, m.get_text())
+                if len(text) > 0:
+                    write_file_lines(current_output_file, text)
                 else:
                     if debug:
                         print("Empty file " + current_output_file + " when writing out")
@@ -60,26 +60,31 @@ class munger:
     # This allows the user to avoid potential surprises.
     def ingest(self, line):
         atom = self.__get_atom_name(line)
-        if atom == "":
-            if debug:
-                print("munger.ingest() - DEBUG - Empty atom name. Skipping...") 
+        flags_str = re.sub('^' + re.escape(atom), '', line)
+        # Now, we figure out whether or not the line gets passthrough or has its values held into dictionary.
+        if self.current_file == "make.conf" and self.current_directory == "" and self.__is_atom_portage_var(atom):
+            atom = re.sub('=$', '', atom)
+            self.__ingest_use_flags(atom, flags_str)
+        elif self.__is_file_pkg_flags_syntax():
+            self.__ingest_use_flags(atom, flags_str)
+        elif self.__is_file_simple_atom_syntax():
+            self.__ingest_atom(atom)
         else:
-            flags_str = re.sub('^' + re.escape(atom), '', line)
-            # Now, we figure out whether or not the line gets passthrough or has its values held into dictionary.
-            if self.current_file == "make.conf" and self.current_directory == "":
-                if self.__is_atom_portage_var(atom):
-                    self.__ingest_use_flags(atom, flags_str)
-            elif self.__is_file_pkg_flags_syntax():
-                self.__ingest_use_flags(atom, flags_str)
-            elif self.__is_file_simple_atom_syntax():
-                self.__ingest_atom(atom)
-            else:
-                self.unmodified_lines.append(line)
+            self.unmodified_lines.append(line)
 
     def get_text(self):
-        results = self.unmodified_lines
+        results = []
+        for l in self.unmodified_lines:
+            results.append(l)
         if self.current_directory == '' and self.current_file == 'make.conf':
-            results.append(self.__get_text_make_conf_syntax())
+            for l in self.__get_text_make_conf_syntax():
+                results.append(l + '\n')
+        if self.__is_file_pkg_flags_syntax():
+            for l in self.__get_text_pkg_flags_syntax():
+                results.append(l + '\n')
+        if self.__is_file_simple_atom_syntax():
+            for l in self.__get_text_simple_atom_syntax():
+                results.append(l + '\n')
         return results
 
     def get_current_directory(self):
@@ -91,13 +96,13 @@ class munger:
     def __init__(self, current_dir, current_file):
         print('[munger] create with dir = ' + current_dir + ', and current file = ' + current_file)
         self.use_flags = dict() #[str, Dict[bool, List[str]]] 
-        self.unmodified_lines = list() #[str]
-        self.atoms = set()
+        self.unmodified_lines = list()#[] #[str]
+        self.atoms = set() # [str]
         self.current_directory = current_dir
         self.current_file = current_file
 
     def __is_atom_portage_var(self, atom):
-        return bool(re.search('^USE[=]', atom)) or bool(re.search('^CPU_FLAGS_', atom)) or bool(re.search('^ACCEPT_', atom))
+        return bool(re.search('^USE', atom)) or bool(re.search('^CPU_FLAGS_', atom)) or bool(re.search('^ACCEPT_', atom)) or bool(re.search('^FEATURES', atom))
 
     def __is_file_simple_atom_syntax(self):
         files = ('package.mask', 'package.unmask')
@@ -112,9 +117,9 @@ class munger:
             return True
         else:
             return False
-    
+
     def __get_text_make_conf_syntax(self):
-        results = self.unmodified_lines
+        results = []
         for atom in self.use_flags.keys():
             counter = 0
             line = atom + '='
@@ -130,6 +135,19 @@ class munger:
                     line += '-'
                 line += flag
                 line += '"'
+            results.append(line)
+        return results
+
+    def __get_text_pkg_flags_syntax(self):
+        results = []
+        for atom in self.use_flags.keys():
+            line = atom
+            for flag in self.use_flags[atom][True]:
+                line += ' '
+                line += flag
+            for flag in self.use_flags[atom][False]:
+                line += ' -'
+                line += flag
             results.append(line)
         return results
 
