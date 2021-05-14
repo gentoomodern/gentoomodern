@@ -1,1 +1,3 @@
-@zentoo/musl-wayland @zentoo/amd-videocards @zentoo/intel-videocards
+gentoomuch/musl-wayland
+gentoomuch/amd-videocards
+gentoomuch/intel-videocards

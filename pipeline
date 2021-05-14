@@ -2,14 +2,17 @@
 
 import sys, os, re
 from include.munging import stage3, munger
-from include.gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, output_path, config_dir, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path
+from include.gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, output_path, config_dir, stage_defines_path, cpu_path, pkgset_path, patches_path, local_config_basepath, hooks_path, kernel_path, global_config_path, get_cleaned_path
 from typing import Dict, List, Set
 
 
-builder           = 'zentoo-builder'
+builder           = 'gentoomuch-builder'
 rebuild_emptytree = 'emerge -uDkqa --changed-use --emptytree @world'
 
 msg_prefix = '[GentooMuch.pipeline] '
+
+sets_output_path = os.path.join(output_path, 'sets')
+patches_output_path = os.path.join(output_path, 'patches')
 
 debug = True
 
@@ -22,55 +25,55 @@ def build(packageset):
 def install(packageset):
     return "FEATURES='usepkgonly' " + build(packageset)
 
-# stage_defines_path          = config_dir + 'stage.defines/'
-# cpu_path                    = config_dir + 'cpu.defines/'
-# pkgset_path                 = config_dir + 'package.sets/'
-# local_config_basepath       = config_dir + 'portage.locals/'
-# hooks_path                  = config_dir + 'build.hooks/'
-# kernel_path                 = config_dir + 'kernel.defines/'
-# global_config_path          = config_dir + 'portage.global/'
-
-class stage_combiner:
+class stage3_combiner:
     def process_stage_defines(self, local_stage):
+        local_stage = local_stage.strip()
         # First, we ensure our target output directory is sane.
-        self.prep()
+        self.__prep()
         # Determine whether the stage defines path exists.
-        local_stage_defines_path = stage_defines_path + local_stage
+        local_stage_defines_path = os.path.join(stage_defines_path, local_stage)
         if not os.path.isdir(local_stage_defines_path):
             sys.exit(msg_prefix + 'Could not find stage definitions directory: ' + local_stage_defines_path)
         # Get CPU part of stage defines.
-        if not os.path.isfile(os.path.join(local_stage_defines_path, 'cpu')):
+        cpu_defines_path = os.path.join(local_stage_defines_path, 'cpu')
+        if not os.path.isfile(cpu_defines_path):
             sys.exit(msg_prefix + 'Could not find cpu defines file: ' + os.path.join(local_stage_defines_path, 'cpu'))
         cpu_conf = open(os.path.join(local_stage_defines_path, 'cpu')).read().strip()
         # Now we verify CPU-related info.
         local_cpu_path = os.path.join(cpu_path, cpu_conf)
         if not os.path.isdir(local_cpu_path):
             sys.exit(msg_prefix + 'CPU config directory: ' + local_cpu_path + ' does not exist.')
-        # Now ingest!
+        # Now ingest.
         self.accum.ingest(local_cpu_path)
-        # Now, we can pull in the globally-needed parts!
-        self.checkout_common_config()
+        # Now, we can pull in the globally-needed parts.
+        self.__checkout_common_config()
         # We need to get to the file in which local portage directories are written. 
         flags_defines_path = os.path.join(local_stage_defines_path, 'flags')
         if os.path.isfile(flags_defines_path):
             flags_conf = read_file_lines(flags_defines_path)
         else:
-            sys.exit(msg_prefix + 'Flags (Portage) config file: ' + flags_defines_path + ' does not exist.')
+            sys.exit(msg_prefix + 'Stage3 definition flag file: ' + flags_defines_path + ' does not exist.')
         # Now we can loop over all local portages, accumulating them.
         for local in flags_conf:
             combined_path = os.path.join(local_config_basepath, local.strip())
-            # Verify directory exists
+            # Verify directory exists.
             if not os.path.isdir(combined_path):
-                sys.exit(msg_prefix + 'Local portage flags config directory' + combined_path + ' does not exist.')
-            # Now ingest!
+                sys.exit(msg_prefix + 'Local portage flags config directory ' + combined_path + ' does not exist.')
+            # Now ingest.
+            print("stage3_combiner: Ingesting " + combined_path)
             self.accum.ingest(combined_path)
-        # We add info we must run post-build.
-        if os.path.isfile(os.path.join(local_stage_defines_path, '/packages')):
-            self.todo['packages'] = read_file_lines(os.path.join(local_stage_defines_path, '/packages'))
-        if os.path.isfile(os.path.join(local_stage_defines_path, '/profiles')):
-            self.todo['profiles'] = read_file_lines(os.path.join(local_stage_defines_path, '/profiles'))
-        if os.path.isfile(os.path.join(local_stage_defines_path, '/hooks')):
-            self.todo['hooks'] = read_file_lines(os.path.join(local_stage_defines_path, '/hooks'))
+        # We add info we must use post-munge.
+        combined_path = os.path.join(local_stage_defines_path, 'packages')
+        if os.path.isfile(combined_path):
+            self.todo['packages'] = read_file_lines(combined_path)
+        combined_path = os.path.join(local_stage_defines_path, 'profiles')
+        if os.path.isfile(combined_path):
+            self.todo['profiles'] = read_file_lines(combined_path)
+        combined_path = os.path.join(local_stage_defines_path, 'hooks')
+        if os.path.isfile(combined_path):
+            self.todo['hooks'] = read_file_lines(combined_path)
+        # Now we write-out the files themselves
+        self.accum.writeout()
 
     def __prep(self):
         if debug:
@@ -87,8 +90,8 @@ class stage_combiner:
         self.accum.ingest(global_config_path)
         # Here, we deal with the (package) sets and patches.
         rsync_cmd = 'rsync -aHVXq'
-        sync_sets_str = rsync_cmd + ' ' + os.path.join(pkgset_path, '*') + ' '  + os.path.join(output_path, 'sets')
-        sync_patches_str = rsync_cmd + ' ' + os.path.join(patches_path, '*') + ' ' + os.path.join(output_path, 'patches')
+        sync_sets_str = rsync_cmd + ' ' + os.path.join(pkgset_path, '*') + ' '  + sets_output_path
+        sync_patches_str = rsync_cmd + ' ' + os.path.join(patches_path, '*') + ' ' + patches_output_path
         # A helper to print error messages without copying code.
         def print_rsync_error(tag):
             sys.exit("stage_combiner.checkout_common_config() - Could not rsync " + tag + "with error code: " + code)
@@ -99,19 +102,28 @@ class stage_combiner:
         code = os.system(sync_patches_str)
         if not code == 0:
             print_rsync_error('patches')
+    
+    def __checkout_common_config_test(self):
+        self.__prep()
+        self.__checkout_common_config()
+        #for (basepath, dirname, filename) in os.walk(output_path):
+            #print(dirname + ':' + filename)
 
     def __init__(self):
         self.todo = dict() # Dict[str, List[str]]
         self.accum = stage3()
 
 
+
 # Now, we loop over the file defining what we'll build.
 build_list = read_file_lines('./config/stages.build')
-accum = stage3()
-if not os.path.isdir(output_path):
-    os.mkdir(output_path)
-code = os.system('rm -rf ./work/portage/*')
-accum.ingest('./config/portage.locals/zentoo/test')
+combiner = stage3_combiner()
+for l in build_list:
+    combiner.process_stage_defines(l)
+#if not os.path.isdir(output_path):
+#    os.mkdir(output_path)
+#code = os.system('rm -rf ./work/portage/*')
+#accum.ingest('./config/portage.locals/gentoomuch/test')
 #for line in build_list:
 #    # Travel to the directory
 #    #code = accum.ingest()
