@@ -36,72 +36,77 @@ def install(packageset):
 
 
 class stage_combiner:
-    # We run the initial bootstrap.
-    def ingest_stage_defines(self, user_stage):
-        os.system('rm -rf ./work/portage/*')
-        user_stage_path = stage_path + user_stage
-        if not os.path.isdir(user_stage_path):
-            sys.exit(msg_prefix + 'Could not find stage definitions directory: ' + user_stage_path)
-        if os.path.isfile(os.path.join(user_stage_path, 'cpu')):
-            cpu_conf = open(os.path.join(user_stage_path, 'cpu')).read().strip()
-        else:
-            sys.exit(msg_prefix + 'Could not find cpu defines file: ' + os.path.join(user_stage_path, 'cpu'))
-        if not os.path.isdir(os.path.join(cpu_path, cpu_conf)):
-            sys.exit(msg_prefix + 'CPU config directory: ' + os.path.join(cpu_path, cpu_conf) + ' does not exist.')
-        if os.path.isfile(os.path.join(user_stage_path, 'flags')):
-            flags_conf = read_file_lines(os.path.join(user_stage_path, 'flags'))
-        else:
-            sys.exit(msg_prefix + 'flags config directory: ' + os.path.join(user_stage_path, 'flags') + ' does not exist.')
-        #if not check_if_portage_sets_present(flags_conf):
-        #     sys.exit('Could not find all attached flagsets')
-        #TODO Insert code to hoover up 
-        if os.path.isfile(os.path.join(user_stage_path, '/packages')):
-            self.todo['packages'] = read_file_lines(os.path.join(user_stage_path, '/packages'))
-        if os.path.isfile(os.path.join(user_stage_path, '/profiles')):
-            self.todo['profiles'] = read_file_lines(os.path.join(user_stage_path, '/profiles'))
-        if os.path.isfile(os.path.join(user_stage_path, '/hooks')):
-            self.todo['hooks'] = read_file_lines(os.path.join(user_stage_path, '/hooks'))
+    def process_stage_defines(self, local_stage):
+        # First, we ensure our target output directory is sane.
+        self.prep()
 
-    def checkout_common_config(self, cpu_conf, flags_conf):
-        # Verify existence of directories.
-        if debug:
-            print('Checking Portage globals.')
-        if not os.path.isdir(global_flags_path):
-            sys.exit('Global (user-defined) Portage/flags config directory at ' + global_flags_path + ' does not exist.')
-        if not os.path.exists(output_path):
-            os.mkdir(output_path)
-        if os.path.isdir(os.path.join(cpu_path, cpu_conf)):
-            # Ingest config
-            print('Replace me') 
+        # Determine whether the stage defines path exists.
+        local_stage_defines_path = stage_defines_path + local_stage
+        if not os.path.isdir(local_stage_defines_path):
+            sys.exit(msg_prefix + 'Could not find stage definitions directory: ' + local_stage_defines_path)
+        # Get CPU part of stage defines.
+        if not os.path.isfile(os.path.join(local_stage_defines_path, 'cpu')):
+            sys.exit(msg_prefix + 'Could not find cpu defines file: ' + os.path.join(local_stage_defines_path, 'cpu'))
+        cpu_conf = open(os.path.join(local_stage_defines_path, 'cpu')).read().strip()
+        # Now we verify CPU-related info.
+        local_cpu_path = os.path.join(cpu_path, cpu_conf)
+        if not os.path.isdir(local_cpu_path):
+            sys.exit(msg_prefix + 'CPU config directory: ' + local_cpu_path + ' does not exist.')
+        # Now ingest!
+        self.accum.ingest(local_cpu_path)
+        # Now, we can pull in the globally-needed parts!
+        self.checkout_common_config()
+        # We need to get to the file in which local portage directories are written 
+        flags_defines_path = os.path.join(local_stage_defines_path, 'flags')
+        if os.path.isfile(flags_defines_path):
+            flags_conf = read_file_lines(flags_defines_path)
         else:
-            sys.exit('CPU config directory at ' + os.path.join(cpu_path, cpu_conf) + ' does not exist.')
+            sys.exit(msg_prefix + 'Flags (Portage) config file: ' + flags_defines_path + ' does not exist.')
+        # Now we can loop over all local portages, accumulating them.
+        for local in flags_conf:
+            combined_path = os.path.join(local_config_basepath, local.strip())
+            # Verify directory exists
+            if not os.path.isdir(combined_path):
+                sys.exit(msg_prefix + 'Local portage flags config directory' + combined_path + ' does not exist.')
+            # Now ingest!
+            self.accum.ingest(combined_path)
+        # We add info we must run post-build. These get used once build/assemble has run to completion.
+        if os.path.isfile(os.path.join(local_stage_defines_path, '/packages')):
+            self.todo['packages'] = read_file_lines(os.path.join(local_stage_defines_path, '/packages'))
+        if os.path.isfile(os.path.join(local_stage_defines_path, '/profiles')):
+            self.todo['profiles'] = read_file_lines(os.path.join(local_stage_defines_path, '/profiles'))
+        if os.path.isfile(os.path.join(local_stage_defines_path, '/hooks')):
+            self.todo['hooks'] = read_file_lines(os.path.join(local_stage_defines_path, '/hooks'))
+
+    def __prep(self):
         if debug:
-            print('Checking for the existence of local flagsets.')
-        flagsets_to_add = []
-        if len(flags_conf) > 0:
-            # Check out what's inside our list of flagset.
-            for flg in flags_conf:
-                flg = flg.strip()
-                if flg == '':
-                    continue
-                if flg[0] == '@':
-                    flg = flg[1:]
-                if os.path.isdir(os.path.join(flagset_path, flg)):
-                    flagsets_to_add.append(flg)
-                else:
-                    sys.exit('The user-provided local Portage/flags directory at ' + os.path.join(flagset_path, flg)  + ' does not exist.')
-        
-        print('Flags config: ' + flags_conf)
-        if debug:
-            print('Setting up work env.')
-        # Here, we deal with the sets and patches directories
-        rsync_cmd = 'rsync -aHVXqv'
-        sync_sets_str = rsync_cmd + ' ./config/sets/* ' + os.path.join(output_path, 'sets')
-        sync_patches_str = rsync_cmd + ' ./config/patches/* ' + os.path.join(output_path, 'patches')
+            print('Prepping munged portagedir environment.')
+        if not os.path.isdir(output_path):
+            os.mkdir(output_path)
+        os.system('rm -rf ' + os.path.join(output_path, '*'))
+
+    def __checkout_common_config(self):
+        # Verify existence of global config directory.
+        if not os.path.isdir(global_config_path):
+            sys.exit('Global Portage  config directory at ' + global_config_path + ' does not exist.')
+        # Ingest that thing.
+        self.accum.ingest(global_config_path)
+        # Here, we deal with the (package) sets and patches
+        rsync_cmd = 'rsync -aHVXq'
+        sync_sets_str = rsync_cmd + ' ' + os.path.join(pkgset_path, '*') + ' '  + os.path.join(output_path, 'sets')
+        sync_patches_str = rsync_cmd + ' ' + os.path.join(patches_path, '*') + ' ' + os.path.join(output_path, 'patches')
+        # A helper to print error messages without copying code
+        def print_rsync_error(tag):
+            sys.exit("stage_combiner.checkout_common_config() - Could not rsync " + tag + "with error code: " + code)
         # We now add package sets. These are universal.
-        code = os.system(sync_sets_str + ' && ' + sync_patches_str) 
+        code = os.system(sync_sets_str)
         if not code == 0:
-            sys.exit("stage3_config(): Could not rsync patches, with error code: " + code)
+            print_rsync_error('sets')
+        code = os.system(sync_patches_str)
+        if not code == 0:
+            print_rsync_error('patches')
+
+
 
     def __init__(self):
         self.todo = dict() # Dict[str, List[str]]
