@@ -56,7 +56,6 @@ class munger:
     def get_current_filename(self):
         return self.current_file
 
-
     # The argument atom refers to the first word in the config file. I do not know whether or not this terminology jives with the Gentoo upstream; I will double-check, as such this method may be renamed.
     def __is_atom_portage_var(self, atom):
         return bool(re.search('^USE', atom)) or bool(re.search('^CPU_FLAGS_', atom)) or bool(re.search('^ACCEPT_', atom)) or bool(re.search('^FEATURES', atom))

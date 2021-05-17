@@ -47,8 +47,8 @@ def output_config(container_type_str):
     ebuilds_str         = '    - ebuilds:/var/db/repos/gentoo'
     stages_str          = '    - stages:/mnt/stages'
     kernels_str         = '    - kernels:/mnt/kernels'
-    squashed_output_str = '    - work/squashed/squashed-portage:/mnt/squashed-portage'
-    squashed_mount_str  = '    - work/squashed/squashed-portage/mountpoint:/mnt/squashed-portage'
+    squashed_output_str = '    - ./work/squashed/squashed-portage:/mnt/squashed-portage'
+    squashed_mount_str  = '    - ./work/squashed/squashed-portage/mountpoint:/mnt/squashed-portage'
     # Here we actually write these differential parts into our list.
     if is_packer:
         results.append(binpkg_str + ':ro\n')
