@@ -7,8 +7,9 @@ WORKDIR /
 COPY --from=gentoomuch-bootstrap /gentoo /
 RUN mkdir /mnt/stages \
 && mkdir /mnt/kernels \
-&& mkdir /mnt/user-data\
+&& mkdir /mnt/user-data \
 && mkdir /mnt/data-out \
+&& mkdir /mnt/squashed-portage \
 && rm -rf /etc/portage/package.use \
 && mkdir /etc/portage/repos.conf \
 && mkdir /etc/portage/sets \

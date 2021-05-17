@@ -11,11 +11,11 @@ patches_path                = config_dir + 'patches/'
 local_config_basepath       = config_dir + 'portage.locals/'
 hooks_path                  = config_dir + 'build.hooks/'
 kernel_path                 = config_dir + 'kernel.defines/'
-global_config_path          = config_dir + 'portage.global/'
+global_config_path          = './include/portage.global/'
 
-#Stuff all scripts here should use
+# Stuff all scripts here should use
 
-#TODO: Move these convenience functions
+# TODO: Move these convenience functions
 def read_file_lines(filename):
     f = open(filename)
     lines = f.readlines()
@@ -33,9 +33,9 @@ def read_by_tokens(obj):
             yield token
 
 # TODO: Write a test or two
-def get_cleaned_path(dirpath, config_path):
-    results = dirpath 
-    results = re.sub(re.escape(config_path)                 , '', results)
+def get_cleaned_path(dirpath, local_config_path):
+    results = dirpath
+    results = re.sub(re.escape(local_config_path)           , '', results)
     results = re.sub(re.escape(output_path)                 , '', results)
     results = re.sub(re.escape(global_config_path)          , '', results)
     results = re.sub(re.escape(local_config_basepath)       , '', results)

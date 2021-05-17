@@ -1,0 +1,4 @@
+- I am using Python's unittest functionality to create and run tests.
+- All public methods and functions get tested, starting with the most detailed class and working our way up.
+- After these tests have all been written, I will introduce mutation tests to validate the tests themselves.
+- After all these tests have been written, I shall then write an installation test and run them against Ubuntu, Alpine, Debian, Fedora, OpenSUSE, Arch, and (of course) Gentoo. The multiplatform tests will be run in a virtual environment, both to ease portability and to solate against as many potential site-specific bugs as possible

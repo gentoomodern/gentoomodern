@@ -1,9 +1,14 @@
-# Do not make changes to this file, as they will be overriden next time ./create-composefile is called!
+# Do not make changes to this file, as they will be overriden upon the next build.
 services:
   gentoomuch-builder:
+    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a registry.
     image: localhost:5000/gentoomuch-stage3
     networks:
     - backend
+    tmpfs:
+    - /var/tmp
+    - /tmp
+    - /mnt/temp
     volumes:
     - /dev:/dev
     - /proc:/proc
@@ -13,15 +18,19 @@ services:
     - ebuilds:/var/db/repos/gentoo
     - stages:/mnt/stages:ro
     - kernels:/mnt/kernels
+    - work/portage:/mnt/squashed-portage:ro
     - ./work/portage/package.license:/etc/portage/package.license:ro
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
     - ./work/portage/package.use:/etc/portage/package.use:ro
-    tmpfs:
-      - /mnt/temp
   gentoomuch-packer:
+    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a registry.
     image: localhost:5000/gentoomuch-stage3
     networks:
     - backend
+    tmpfs:
+    - /var/tmp
+    - /tmp
+    - /mnt/temp
     volumes:
     - /dev:/dev
     - /proc:/proc
@@ -31,11 +40,32 @@ services:
     - ebuilds:/var/db/repos/gentoo:ro
     - stages:/mnt/stages
     - kernels:/mnt/kernels:ro
+    - work/portage:/mnt/squashed-portage:ro
     - ./work/portage/package.license:/etc/portage/package.license:ro
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
     - ./work/portage/package.use:/etc/portage/package.use:ro
+  gentoomuch-updater:
+    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a registry.
+    image: localhost:5000/gentoomuch-stage3
+    networks:
+    - backend
     tmpfs:
-      - /mnt/temp
+    - /var/tmp
+    - /tmp
+    - /mnt/temp
+    volumes:
+    - /dev:/dev
+    - /proc:/proc
+    - /sys:/sys:ro
+    - binpkgs:/var/cache/binpkgs
+    - distfiles:/var/cache/distfiles
+    - ebuilds:/var/db/repos/gentoo
+    - stages:/mnt/stages:ro
+    - kernels:/mnt/kernels
+    - work/portage:/mnt/squashed-portage
+    - ./work/portage/package.license:/etc/portage/package.license:ro
+    - ./work/portage/make.conf:/etc/portage/make.conf:ro
+    - ./work/portage/package.use:/etc/portage/package.use:ro
 networks:
 #  frontend:
 #    driver: overlay
