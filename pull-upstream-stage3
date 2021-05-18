@@ -6,7 +6,7 @@
 # Also, our build process is split into two Dockerfiles, found in includes/dockerfiles/gentoomuch-stage3: The first gets munged from step1, step2, and step3. The Second is recorded as step4.Dockerfile: It copies in the image created by the first and then created a few extra directories.
 
 import sys, os, re
-from include.gentoomuch_common import read_file_lines, write_file_lines
+from include.gentoomuch_common import read_file_lines, write_file_lines, arch_config_path
 
 # Support matrix
 # TODO: Keep in central file, turn into proper documentation/error messages
@@ -26,23 +26,23 @@ from include.gentoomuch_common import read_file_lines, write_file_lines
 #arches_to_tag = { v: k for k, v in tags_to_arches.items() }
 
 # WE BEGIN HERE...
+# Check if architecture file exists
+arch = open(arch_config_path).read().strip()
 # Handle arguments
 is_default_tag = False  
 custom_upstream = False
-if len(sys.argv) > 1: # We check the first argument, if it exists.
-    arch = sys.argv[1].strip()
-    if len(sys.argv) == 2: # Do we use the architecture's upstream default tag?
-        is_default_tag = True
-if len(sys.argv) > 2: # Or, do we use a custom upstream tag?
-    arch = sys.argv[1].strip()
-    tag = sys.argv[2].strip()
+if len(sys.argv) > 1: # Or, do we use a custom upstream tag?
+    tag = sys.argv[1].strip()
     if tag == 'latest':
         is_default_tag = True
-if len(sys.argv) > 3: # Do we have a custom upstream? This can save a great deal of time if you mirror these things to LAN/localhost when the internet connection isn't being used too much.
+if len(sys.argv) > 2: # Do we have a custom upstream? This can save a great deal of time if you mirror these things to LAN/localhost when the internet connection isn't being used too much.
     custom_upstream = True
-    upstream_url = sys.argv[3].strip()
-if len(sys.argv) <= 1 or len(sys.argv) > 4: # Too many or too few arguments.
+    upstream_url = sys.argv[2].strip()
+if len(sys.argv) == 1 or len(sys.argv) > 3: # Too many or too few arguments.
     sys.exit('Usage: pull-stage3 <arch> [tag] [upstream root (upstream_url://*, ftp://*)]')
+
+#TODO: Verify upstream support
+
 # These paths are used for working with our Dockerfile configs.
 dockerfile_input_path = 'include/dockerfiles/gentoomuch-stage3/'
 dockerfile_output_path = 'work/gentoomuch-stage3-dockerfiles/'
@@ -54,6 +54,7 @@ if is_default_tag: # We don't have a custom tag.
 else: # We do have a custom tag. Hurray!
     lines.extend(read_file_lines(os.path.join(dockerfile_input_path, 'step2.Dockerfile.fully-loaded')))
 lines.extend(read_file_lines(os.path.join(dockerfile_input_path, 'step3.Dockerfile')))
+print(lines)
 # We create the output directory if it isn't present.
 if not os.path.isdir(dockerfile_output_path):
     os.mkdir(dockerfile_output_path)

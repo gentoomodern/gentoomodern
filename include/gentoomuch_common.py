@@ -14,6 +14,12 @@ local_config_basepath       = config_dir + 'portage.locals/'
 hooks_path                  = config_dir + 'build.hooks/'
 kernel_path                 = config_dir + 'kernel.defines/'
 global_config_path          = './include/portage.global/'
+arch_config_path            = config_dir + 'arch'
+
+debug = True
+
+sets_output_path = './work/portage/sets'
+patches_output_path = './work/portage/patches'
 
 # TODO: Move these convenience functions
 def read_file_lines(filename):

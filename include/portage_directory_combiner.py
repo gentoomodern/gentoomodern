@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import sys, os 
-from .gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, output_path, config_dir, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, get_cleaned_path
+from .gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, output_path, config_dir, stage_defines_path, cpu_path, patches_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, get_cleaned_path, debug, patches_output_path, sets_output_path
+from .portage_directory import portage_directory
+
 
 class portage_directory_combiner:
     # todo: The other things we need to do after assembly.
@@ -9,8 +11,10 @@ class portage_directory_combiner:
     def __init__(self):
         self.todo = dict() # Dict[str, List[str]]
         self.accum = portage_directory()
+        self.msg_prefix = 'portage_stage_combiner::'
 
     def process_stage_defines(self, current_stage):
+        msg_prefix = self.msg_prefix + 'process_stage_defines() - '
         current_stage = current_stage.strip()
         # First, we ensure our target output directory is sane.
         self.__prep()
@@ -44,7 +48,7 @@ class portage_directory_combiner:
             if not os.path.isdir(combined_path):
                 sys.exit(msg_prefix + 'Local portage flags config directory ' + combined_path + ' does not exist.')
             # Now ingest.
-            print("portage_directory_combiner: Ingesting " + combined_path)
+            print(msg_prefix + "Ingesting " + combined_path)
             self.accum.ingest(combined_path)
         # We add info we must use post-munge.
         combined_path = os.path.join(current_stage_defines_path, 'packages')
@@ -60,18 +64,20 @@ class portage_directory_combiner:
         self.accum.writeout()
 
     def __prep(self):
+        msg_prefix = self.msg_prefix + '__prep() - '
         if debug:
-            print('Prepping munged portagedir environment.')
+            print(msg_prefix + 'Prepping munged portagedir environment.')
         if not os.path.isdir(output_path):
             os.mkdir(output_path)
         code = os.system('rm -rf ' + os.path.join(output_path, '*'))
         if not code == 0:
-            sys.exit('portage_directory_combiner - could not clean output dir')
+            sys.exit(msg_prefix + 'Could not clean output dir')
 
     def __checkout_common_config(self):
+        msg_prefix = self.msg_prefix + '__checkout_common_config() - '
         # Verify existence of global config directory.
         if not os.path.isdir(global_config_path):
-            sys.exit('Global Portage  config directory at ' + global_config_path + ' does not exist.')
+            sys.exit(msg_prefix + 'Global Portage  config directory at ' + global_config_path + ' does not exist.')
         # Ingest that thing.
         self.accum.ingest(global_config_path)
         # Here, we deal with the (package) sets and patches.
@@ -80,7 +86,7 @@ class portage_directory_combiner:
         sync_patches_str = rsync_cmd + ' ' + os.path.join(patches_path, '*') + ' ' + patches_output_path
         # A helper to print error messages without copying code.
         def print_rsync_error(tag):
-            sys.exit("stage_combiner.checkout_common_config() - Could not rsync " + tag + "with error code: " + code)
+            sys.exit(msg_prefix + "Could not rsync " + tag + "with error code: " + code)
         # We now add package sets. These are universal.
         code = os.system(sync_sets_str)
         if not code == 0:
