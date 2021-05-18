@@ -4,7 +4,8 @@ import sys, os
 from .gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, output_path, config_dir, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, get_cleaned_path
 
 class portage_directory_combiner:
-    
+    # todo: The other things we need to do after assembly.
+    # accum: Our Portagedir accumulator.
     def __init__(self):
         self.todo = dict() # Dict[str, List[str]]
         self.accum = portage_directory()
@@ -49,8 +50,8 @@ class portage_directory_combiner:
         combined_path = os.path.join(current_stage_defines_path, 'packages')
         if os.path.isfile(combined_path):
             self.todo['packages'] = read_file_lines(combined_path)
-        combined_path = os.path.join(current_stage_defines_path, 'profiles')
-        if os.path.isfile(combined_path):
+        # combined_path = os.path.join(current_stage_defines_path, 'profiles')
+        # if os.path.isfile(combined_path):
             self.todo['profiles'] = read_file_lines(combined_path)
         combined_path = os.path.join(current_stage_defines_path, 'hooks')
         if os.path.isfile(combined_path):

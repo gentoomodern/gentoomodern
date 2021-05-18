@@ -55,8 +55,6 @@ services:
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
     - ./work/portage/package.use:/etc/portage/package.use:ro
 networks:
-#  frontend:
-#    driver: overlay
   backend:
     driver: overlay
 

@@ -5,7 +5,7 @@
 # These routinely get reclaimed so the disc usage isn't really much of a problem.
 # Also, our build process is split into two Dockerfiles, found in includes/dockerfiles/gentoomuch-stage3: The first gets munged from step1, step2, and step3. The Second is recorded as step4.Dockerfile: It copies in the image created by the first and then created a few extra directories.
 
-import sys, os
+import sys, os, re
 from include.gentoomuch_common import read_file_lines, write_file_lines
 
 # Support matrix
@@ -13,7 +13,7 @@ from include.gentoomuch_common import read_file_lines, write_file_lines
 #tags_to_arches = {
 #    "latest": ["amd64","arm64","armv5tel","armv6j_hardfp","armv7a_hardfp","ppc64le","s390x","x86"]
 #    ,"hardened": ["amd64","x86"]
-#    ,"hardened-nomultilib": ["amd64"]
+#    ,"hardened+nomultilib": ["amd64"]
 #    ,"musl-hardened": ["amd64"]
 #    ,"musl-vanilla": ["amd64","x86"]
 #    ,"nomultilib": ["amd64"]
@@ -36,11 +36,13 @@ if len(sys.argv) > 1: # We check the first argument, if it exists.
 if len(sys.argv) > 2: # Or, do we use a custom upstream tag?
     arch = sys.argv[1].strip()
     tag = sys.argv[2].strip()
+    if tag == 'latest':
+        is_default_tag = True
 if len(sys.argv) > 3: # Do we have a custom upstream? This can save a great deal of time if you mirror these things to LAN/localhost when the internet connection isn't being used too much.
     custom_upstream = True
     upstream_url = sys.argv[3].strip()
 if len(sys.argv) <= 1 or len(sys.argv) > 4: # Too many or too few arguments.
-    sys.exit('Usage: pull-stage3 <arch> [tag] [upstream root (upstream_url://*,ftp://*)]')
+    sys.exit('Usage: pull-stage3 <arch> [tag] [upstream root (upstream_url://*, ftp://*)]')
 # These paths are used for working with our Dockerfile configs.
 dockerfile_input_path = 'include/dockerfiles/gentoomuch-stage3/'
 dockerfile_output_path = 'work/gentoomuch-stage3-dockerfiles/'
@@ -59,10 +61,15 @@ if not os.path.isdir(dockerfile_output_path):
 write_file_lines(os.path.join(dockerfile_output_path, 'Dockerfile'), lines)
 # These two are for the error and debug messages'
 attempt_msg_prefix = '[Gentoomuch.pull-stage3] Attempted to pull stage3 of arch "' 
-tag_msg = '" wih tag, "' 
+tag_msg = '", wih tag "' 
 # This is the image that gets used to build/pack by this tool.
 # The only purpose of the bootstrap Docker image is to download, verify, and unpack the upstream stage3. Then it gets copied from and destroyed.
-output_img_name = 'localhost:5000/gentoomuch-stage3:latest'
+
+output_img_tag = 'default'
+if not is_default_tag:
+    output_img_tag = tag
+    output_img_tag = re.sub(re.escape('+'), '-', tag)
+output_img_name = 'localhost:5000/gentoomuch-upstream-' + arch + ':' + output_img_tag
 bootstrap_img_name = 'gentoomuch-bootstrap'
 bootstrap_cmd_head = 'docker image rm ' + output_img_name + ' & docker image rm ' + bootstrap_img_name + ' & cd ' + dockerfile_output_path + ' && docker build '
 bootstrap_cmd_tail = ' -t gentoomuch-bootstrap .'

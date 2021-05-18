@@ -2,6 +2,8 @@
 
 import re
 
+# Stuff all scripts here should use
+
 output_path                 = './work/portage/'
 config_dir                  = './config/'
 stage_defines_path          = config_dir + 'stage.defines/'
@@ -12,8 +14,6 @@ local_config_basepath       = config_dir + 'portage.locals/'
 hooks_path                  = config_dir + 'build.hooks/'
 kernel_path                 = config_dir + 'kernel.defines/'
 global_config_path          = './include/portage.global/'
-
-# Stuff all scripts here should use
 
 # TODO: Move these convenience functions
 def read_file_lines(filename):
