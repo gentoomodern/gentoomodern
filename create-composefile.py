@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, sys
-from include.gentoomuch_common import read_file_lines, write_file_lines
+from include.gentoomuch_common import read_file_lines, write_file_lines, config_dir
 
 builder_str = 'builder'
 packer_str = 'packer'
@@ -9,15 +9,19 @@ updater_str = 'updater'
 
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
 def create_composefile(output_path):
+    if os.path.isfile(os.path.join(config_dir, 'arch')):
+        arch = open(os.path.join(config_dir, 'arch')).read().strip()
+    else:
+        sys.exit('Could not find Gentoomuch arch defines file.')
     lines = ['# Do not make changes to this file, as they will be overriden upon the next build.\n' , 'services:\n']
-    lines.extend(output_config(builder_str))
-    lines.extend(output_config(packer_str))
-    lines.extend(output_config(updater_str))
+    lines.extend(output_config(builder_str, arch))
+    lines.extend(output_config(packer_str, arch))
+    lines.extend(output_config(updater_str, arch))
     include_prefix = 'include/docker-compose/docker-compose.'
     lines.extend(read_file_lines(include_prefix + 'tail'))
     write_file_lines(os.path.join(output_path, 'docker-compose.yml'), lines)
 
-def output_config(container_type_str):
+def output_config(container_type_str, arch_arg):
     if not container_type_str == builder_str and not container_type_str == packer_str and not container_type_str == updater_str:
         sys.exit('Gentoomuch.create-composefile: Invalid container type argument \"' + updater_str  +  '\"')
     is_builder  = bool(container_type_str == builder_str)
@@ -29,7 +33,7 @@ def output_config(container_type_str):
     results.append('  gentoomuch-' + container_type_str + ':\n')
     # We append the universal parts.
     results.append('    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.\n')
-    results.append('    image: localhost:5000/gentoomuch-stage3\n')
+    results.append('    image: localhost:5000/gentoomuch-' + arch_arg + '-stage3\n')
     results.append('    networks:\n')
     results.append('    - backend\n')
     results.append('    volumes:\n')
