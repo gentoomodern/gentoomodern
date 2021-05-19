@@ -36,7 +36,7 @@ for i in dckr_imgs:
     if t in i.tags:
         print(t)
         print('GOTCHA')
-        i.tag(full_name + 'stage3' , 'latest')
+        i.tag(full_name + 'current' , 'latest')
         did_something = True
         break
 

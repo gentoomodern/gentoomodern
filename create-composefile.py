@@ -33,7 +33,7 @@ def output_config(container_type_str, arch_arg):
     results.append('  gentoomuch-' + container_type_str + ':\n')
     # We append the universal parts.
     results.append('    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.\n')
-    results.append('    image: localhost:5000/gentoomuch-' + arch_arg + '-stage3\n')
+    results.append('    image: localhost:5000/gentoomuch-' + arch_arg + '-current\n')
     results.append('    networks:\n')
     results.append('    - backend\n')
     results.append('    volumes:\n')

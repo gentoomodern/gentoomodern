@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+
+# This is a frontend to the portage_directory_combiner, allowing user to manually switch to one of the stage defines when needed.
+
+import os, sys
+from include.gentoomuch_common import read_file_lines, write_file_lines
+from include.portage_directory_combiner import portage_directory_combiner
+
+
