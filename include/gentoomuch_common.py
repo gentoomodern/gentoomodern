@@ -3,20 +3,22 @@
 import re
 
 # Stuff all scripts here should use
-
-output_path                 = './work/portage/'
-config_dir                  = './config/'
-stage_defines_path          = config_dir + 'stage.defines/'
-cpu_path                    = config_dir + 'cpu.defines/'
-pkgset_path                 = config_dir + 'package.sets/'
-patches_path                = config_dir + 'patches/'
-local_config_basepath       = config_dir + 'portage.locals/'
-hooks_path                  = config_dir + 'build.hooks/'
-kernel_path                 = config_dir + 'kernel.defines/'
-global_config_path          = './include/portage.global/'
-arch_config_path            = config_dir + 'arch'
-
 debug = True
+output_path                 = './work/'
+portage_output_path         = output_path + 'portage/'
+includes_path               = './include/'
+global_config_path          = includes_path + 'portage.global/'
+config_path                 = './config/'
+stage_defines_path          = config_path + 'stage.defines/'
+cpu_path                    = config_path + 'cpu.defines/'
+pkgset_path                 = config_path + 'package.sets/'
+patches_path                = config_path + 'patches/'
+local_config_basepath       = config_path + 'portage.locals/'
+hooks_path                  = config_path + 'build.hooks/'
+kernel_path                 = config_path + 'kernel.defines/'
+arch_config_path            = config_path + 'arch'
+current_basestage_path      = config_path + 'base-stage'
+current_portage_path        = config_path + 'user-stage'
 
 sets_output_path = './work/portage/sets'
 patches_output_path = './work/portage/patches'
@@ -42,7 +44,7 @@ def read_by_tokens(obj):
 def get_cleaned_path(dirpath, local_config_path):
     results = dirpath
     results = re.sub(re.escape(local_config_path)           , '', results)
-    results = re.sub(re.escape(output_path)                 , '', results)
+    results = re.sub(re.escape(portage_output_path)         , '', results)
     results = re.sub(re.escape(global_config_path)          , '', results)
     results = re.sub(re.escape(local_config_basepath)       , '', results)
     results = re.sub(re.escape(cpu_path)                    , '', results)

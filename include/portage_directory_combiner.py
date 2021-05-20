@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys, os 
-from .gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, output_path, config_dir, stage_defines_path, cpu_path, patches_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, get_cleaned_path, debug, patches_output_path, sets_output_path
+from .gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, portage_output_path, config_path, stage_defines_path, cpu_path, patches_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, get_cleaned_path, debug, patches_output_path, sets_output_path, debug, current_basestage_path, current_portage_path
 from .portage_directory import portage_directory
 
 
@@ -67,9 +67,9 @@ class portage_directory_combiner:
         msg_prefix = self.msg_prefix + '__prep() - '
         if debug:
             print(msg_prefix + 'Prepping munged portagedir environment.')
-        if not os.path.isdir(output_path):
-            os.mkdir(output_path)
-        code = os.system('rm -rf ' + os.path.join(output_path, '*'))
+        if not os.path.isdir(portage_output_path):
+            os.mkdir(portage_output_path)
+        code = os.system('rm -rf ' + os.path.join(portage_output_path, '*'))
         if not code == 0:
             sys.exit(msg_prefix + 'Could not clean output dir')
 

@@ -10,9 +10,10 @@ RUN mkdir /mnt/stages \
 && mkdir /mnt/user-data \
 && mkdir /mnt/data-out \
 && mkdir /mnt/squashed-portage \
+&& mkdir /mnt/gentoo \
 && rm -rf /etc/portage/package.use \
 && mkdir /etc/portage/repos.conf \
 && mkdir /etc/portage/sets \
-&& mkdir /etc/portage/patches
+&& mkdir /etc/portage/patches 
 CMD ["/bin/bash"]
 

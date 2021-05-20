@@ -3,6 +3,8 @@ services:
   gentoomuch-builder:
     # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.
     image: localhost:5000/gentoomuch-amd64-current
+    cap_add:
+    - CAP_SYS_ADMIN
     networks:
     - backend
     volumes:
@@ -12,15 +14,17 @@ services:
     - binpkgs:/var/cache/binpkgs
     - distfiles:/var/cache/distfiles
     - ebuilds:/var/db/repos/gentoo
-    - stages:/mnt/stages:ro
     - kernels:/mnt/kernels
     - ./work/squashed/mountpoint:/mnt/squashed-portage:ro
+    - ./work/stages:/mnt/stages:ro
     - ./work/portage/package.use:/etc/portage/package.use:ro
     - ./work/portage/package.license:/etc/portage/package.license:ro
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
   gentoomuch-packer:
     # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.
     image: localhost:5000/gentoomuch-amd64-current
+    cap_add:
+    - CAP_SYS_ADMIN
     networks:
     - backend
     volumes:
@@ -30,15 +34,17 @@ services:
     - binpkgs:/var/cache/binpkgs:ro
     - distfiles:/var/cache/distfiles:ro
     - ebuilds:/var/db/repos/gentoo:ro
-    - stages:/mnt/stages
     - kernels:/mnt/kernels:ro
     - ./work/squashed/mountpoint:/mnt/squashed-portage:ro
+    - ./work/stages:/mnt/stages
     - ./work/portage/package.use:/etc/portage/package.use:ro
     - ./work/portage/package.license:/etc/portage/package.license:ro
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
   gentoomuch-updater:
     # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.
     image: localhost:5000/gentoomuch-amd64-current
+    cap_add:
+    - CAP_SYS_ADMIN
     networks:
     - backend
     volumes:
@@ -48,9 +54,9 @@ services:
     - binpkgs:/var/cache/binpkgs
     - distfiles:/var/cache/distfiles
     - ebuilds:/var/db/repos/gentoo
-    - stages:/mnt/stages:ro
     - kernels:/mnt/kernels
     - ./work/squashed/blob:/mnt/squashed-portage
+    - ./work/stages:/mnt/stages:ro
     - ./work/portage/package.use:/etc/portage/package.use:ro
     - ./work/portage/package.license:/etc/portage/package.license:ro
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
@@ -67,7 +73,7 @@ volumes:
     driver: local
   binpkgs:
     driver: local
-  stages:
-    driver: local
   kernels:
     driver: local
+#  stage-packing:
+#    driver: local

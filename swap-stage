@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-
+# This sets the currently active basestage.
 import os, sys, docker
-from include.gentoomuch_common import read_file_lines, write_file_lines
+from include.gentoomuch_common import config_path, read_file_lines, write_file_lines, debug, current_basestage_path, current_portage_path
+
 # Definitions
+is_upstream = False
 upstream_txt = 'upstream'
 stage_txt = 'stage3'
-is_upstream = False
 usage_msg = 'Usage: switch-stage <tag> [' + upstream_txt +']'
+
 # Argument-handling
 if len(sys.argv) > 4 or len(sys.argv) < 2: # Or, do we use a custom upstream tag?
     sys.exit(usage_msg)
@@ -22,7 +24,8 @@ if os.path.isfile(arch_config_path):
     arch = open(arch_config_path).read().strip()
 else:
     sys.exit('Could not find config at ' + arch_config_path)
-print('ARCH = ' + arch + ', STAGE = ' + stage_txt + ', TAG = ' + tag_txt)
+if debug:
+    print('ARCH = ' + arch + ', STAGE = ' + stage_txt + ', TAG = ' + tag_txt)
 # We can finally start adding value
 dckr = docker.from_env()
 dckr_imgs = dckr.images.list()
@@ -34,12 +37,14 @@ for i in dckr_imgs:
     full_name = repo_base + '/' + image_name
     t = full_name + stage_txt + ':' + tag_txt
     if t in i.tags:
-        print(t)
-        print('GOTCHA')
+        if debug:
+            print(t)
+            print('GOTCHA')
         i.tag(full_name + 'current' , 'latest')
         did_something = True
         break
-
-
-if not did_something:
+if did_something:
+    if os.path.isdir(config_path):
+        open(current_basestage_path, 'w').write(tag_txt)
+else:
     print('Could not find correct Gentoomuch stage in Docker images')

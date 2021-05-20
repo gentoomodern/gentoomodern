@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, sys
-from include.gentoomuch_common import read_file_lines, write_file_lines, config_dir
+from include.gentoomuch_common import read_file_lines, write_file_lines, config_path
 
 builder_str = 'builder'
 packer_str = 'packer'
@@ -9,8 +9,8 @@ updater_str = 'updater'
 
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
 def create_composefile(output_path):
-    if os.path.isfile(os.path.join(config_dir, 'arch')):
-        arch = open(os.path.join(config_dir, 'arch')).read().strip()
+    if os.path.isfile(os.path.join(config_path, 'arch')):
+        arch = open(os.path.join(config_path, 'arch')).read().strip()
     else:
         sys.exit('Could not find Gentoomuch arch defines file.')
     lines = ['# Do not make changes to this file, as they will be overriden upon the next build.\n' , 'services:\n']
@@ -34,6 +34,8 @@ def output_config(container_type_str, arch_arg):
     # We append the universal parts.
     results.append('    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.\n')
     results.append('    image: localhost:5000/gentoomuch-' + arch_arg + '-current\n')
+    results.append('    cap_add:\n')
+    results.append('    - CAP_SYS_ADMIN\n')
     results.append('    networks:\n')
     results.append('    - backend\n')
     results.append('    volumes:\n')
@@ -44,32 +46,32 @@ def output_config(container_type_str, arch_arg):
     binpkg_str          = '    - binpkgs:/var/cache/binpkgs'
     distfiles_str       = '    - distfiles:/var/cache/distfiles'
     ebuilds_str         = '    - ebuilds:/var/db/repos/gentoo'
-    stages_str          = '    - stages:/mnt/stages'
     kernels_str         = '    - kernels:/mnt/kernels'
     squashed_output_str = '    - ./work/squashed/blob:/mnt/squashed-portage'
     squashed_mount_str  = '    - ./work/squashed/mountpoint:/mnt/squashed-portage'
+    stages_mount_str    = '    - ./work/stages:/mnt/stages'
     # Here we actually write these differential parts into our list.
     if is_packer:
         results.append(binpkg_str + ':ro\n')
         results.append(distfiles_str + ':ro\n')
         results.append(ebuilds_str + ':ro\n')
-        results.append(stages_str + '\n')
         results.append(kernels_str + ':ro\n')
         results.append(squashed_mount_str + ':ro\n')
+        results.append(stages_mount_str + '\n')
     if is_builder:
         results.append(binpkg_str + '\n')
         results.append(distfiles_str +'\n')
         results.append(ebuilds_str + '\n')
-        results.append(stages_str + ':ro\n')
         results.append(kernels_str + '\n')
         results.append(squashed_mount_str + ':ro\n')
+        results.append(stages_mount_str + ':ro\n')
     if is_updater:
         results.append(binpkg_str + '\n')
         results.append(distfiles_str +'\n')
         results.append(ebuilds_str + '\n')
-        results.append(stages_str + ':ro\n')
         results.append(kernels_str + '\n')
         results.append(squashed_output_str + '\n')
+        results.append(stages_mount_str + ':ro\n')
     # Here we loop over the all the files in the config/portage directory and add them.
     portage_cfg = './work/portage/'
     portage_tgt = '/etc/portage/'

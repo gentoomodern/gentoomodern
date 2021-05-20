@@ -11,7 +11,7 @@ volumes:
     driver: local
   binpkgs:
     driver: local
-  stages:
-    driver: local
   kernels:
     driver: local
+#  stage-packing:
+#    driver: local
