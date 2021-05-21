@@ -54,12 +54,11 @@ class portage_directory_combiner:
         combined_path = os.path.join(current_stage_defines_path, 'packages')
         if os.path.isfile(combined_path):
             self.todo['packages'] = read_file_lines(combined_path)
-        # combined_path = os.path.join(current_stage_defines_path, 'profiles')
-        # if os.path.isfile(combined_path):
-            self.todo['profiles'] = read_file_lines(combined_path)
+            write_file_lines('./config/packages', self.todo['packages'])
         combined_path = os.path.join(current_stage_defines_path, 'hooks')
         if os.path.isfile(combined_path):
             self.todo['hooks'] = read_file_lines(combined_path)
+            write_file_lines('./config/hooks', self.todo['hooks'])
         # Now we write-out the files themselves
         self.accum.writeout()
 
@@ -81,12 +80,16 @@ class portage_directory_combiner:
         # Ingest that thing.
         self.accum.ingest(global_config_path)
         # Here, we deal with the (package) sets and patches.
-        rsync_cmd = 'rsync -aHVXq'
-        sync_sets_str = rsync_cmd + ' ' + os.path.join(pkgset_path, '*') + ' '  + sets_output_path
-        sync_patches_str = rsync_cmd + ' ' + os.path.join(patches_path, '*') + ' ' + patches_output_path
+        rsync_cmd = 'rsync -aHXvq '
+        if not os.path.isdir(sets_output_path):
+            os.mkdir(sets_output_path)
+        if not os.path.isdir(patches_output_path):
+            os.mkdir(patches_output_path)
+        sync_sets_str = rsync_cmd + os.path.join(pkgset_path, '*') + ' ' + sets_output_path
+        sync_patches_str = rsync_cmd + os.path.join(patches_path, '*') + ' ' + patches_output_path
         # A helper to print error messages without copying code.
         def print_rsync_error(tag):
-            sys.exit(msg_prefix + "Could not rsync " + tag + "with error code: " + code)
+            sys.exit(msg_prefix + "Could not rsync " + tag + "with error code: " + str(code))
         # We now add package sets. These are universal.
         code = os.system(sync_sets_str)
         if not code == 0:

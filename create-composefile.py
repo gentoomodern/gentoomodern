@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, sys
+import os, sys, re
 from include.gentoomuch_common import read_file_lines, write_file_lines, config_path
 
 builder_str = 'builder'
@@ -73,17 +73,15 @@ def output_config(container_type_str, arch_arg):
         results.append(squashed_output_str + '\n')
         results.append(stages_mount_str + ':ro\n')
     # Here we loop over the all the files in the config/portage directory and add them.
-    portage_cfg = './work/portage/'
+    portage_cfg = 'work/portage/'
     portage_tgt = '/etc/portage/'
-    files = [f for f in os.listdir(portage_cfg) if os.path.isfile(os.path.join(portage_cfg, f))]
-    for f in files:
-        if f != '.gitignore':
-            results.append('    - ' + portage_cfg + f + ':' + portage_tgt + f + ':ro\n')
-    # We also do the same for the directories.
-    dirs = [dr for dr in os.listdir(portage_cfg) if os.path.isdir(os.path.join(portage_cfg, f))]
-    for d in dirs:
-        if d != '.git':
-            results.append('    - ' + portage_cfg + d + ':' + portage_tgt + d + ':ro\n')
+
+    for (dirpath, directories, files) in os.walk(portage_cfg):
+        for f in files:
+            if f != '.gitignore' and f != 'README.md':
+                dir_str = re.sub(re.escape('./'), '', dirpath) 
+                results.append('    - ./' + os.path.join(dir_str, f) + ':' + re.sub(re.escape('/work/portage'), '', os.path.join(portage_tgt, dir_str, f)) + ':ro\n')
+    
     # Finally, we return the list of string.
     return results
 
