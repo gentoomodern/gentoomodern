@@ -34,8 +34,6 @@ def output_config(container_type_str, arch_arg):
     # We append the universal parts.
     results.append('    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.\n')
     results.append('    image: localhost:5000/gentoomuch-' + arch_arg + '-current\n')
-    results.append('    cap_add:\n')
-    results.append('    - CAP_SYS_ADMIN\n')
     results.append('    networks:\n')
     results.append('    - backend\n')
     results.append('    volumes:\n')
@@ -81,7 +79,11 @@ def output_config(container_type_str, arch_arg):
             if f != '.gitignore' and f != 'README.md':
                 dir_str = re.sub(re.escape('./'), '', dirpath) 
                 results.append('    - ./' + os.path.join(dir_str, f) + ':' + re.sub(re.escape('/work/portage'), '', os.path.join(portage_tgt, dir_str, f)) + ':ro\n')
-    
+   
+    if is_packer:
+        results.append('    cap_add:\n')
+        results.append('    - CAP_SYS_ADMIN\n')
+
     # Finally, we return the list of string.
     return results
 

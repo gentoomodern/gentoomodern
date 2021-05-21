@@ -3,8 +3,6 @@ dev-util/ccache
 dev-util/cmake
 sys-devel/crossdev
 app-arch/cpio
-sys-kernel/gentoo-sources
-sys-kernel/linux-firmware
 dev-vcs/git
 app-eselect/eselect-repository
 sys-fs/squashfs-tools

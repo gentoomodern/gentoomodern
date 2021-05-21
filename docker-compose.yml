@@ -3,8 +3,6 @@ services:
   gentoomuch-builder:
     # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.
     image: localhost:5000/gentoomuch-amd64-current
-    cap_add:
-    - CAP_SYS_ADMIN
     networks:
     - backend
     volumes:
@@ -22,12 +20,11 @@ services:
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
     - ./work/portage/sets/gentoomuch/sway-desktop:/etc/portage/sets/gentoomuch/sway-desktop:ro
     - ./work/portage/sets/gentoomuch/builder:/etc/portage/sets/gentoomuch/builder:ro
+    - ./work/portage/sets/gentoomuch/.builder.swp:/etc/portage/sets/gentoomuch/.builder.swp:ro
     - ./work/portage/repos.conf/gentoo.conf:/etc/portage/repos.conf/gentoo.conf:ro
   gentoomuch-packer:
     # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.
     image: localhost:5000/gentoomuch-amd64-current
-    cap_add:
-    - CAP_SYS_ADMIN
     networks:
     - backend
     volumes:
@@ -45,12 +42,13 @@ services:
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
     - ./work/portage/sets/gentoomuch/sway-desktop:/etc/portage/sets/gentoomuch/sway-desktop:ro
     - ./work/portage/sets/gentoomuch/builder:/etc/portage/sets/gentoomuch/builder:ro
+    - ./work/portage/sets/gentoomuch/.builder.swp:/etc/portage/sets/gentoomuch/.builder.swp:ro
     - ./work/portage/repos.conf/gentoo.conf:/etc/portage/repos.conf/gentoo.conf:ro
+    cap_add:
+    - CAP_SYS_ADMIN
   gentoomuch-updater:
     # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.
     image: localhost:5000/gentoomuch-amd64-current
-    cap_add:
-    - CAP_SYS_ADMIN
     networks:
     - backend
     volumes:
@@ -68,6 +66,7 @@ services:
     - ./work/portage/make.conf:/etc/portage/make.conf:ro
     - ./work/portage/sets/gentoomuch/sway-desktop:/etc/portage/sets/gentoomuch/sway-desktop:ro
     - ./work/portage/sets/gentoomuch/builder:/etc/portage/sets/gentoomuch/builder:ro
+    - ./work/portage/sets/gentoomuch/.builder.swp:/etc/portage/sets/gentoomuch/.builder.swp:ro
     - ./work/portage/repos.conf/gentoo.conf:/etc/portage/repos.conf/gentoo.conf:ro
 networks:
 #  frontend:
