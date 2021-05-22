@@ -76,7 +76,7 @@ class portage_directory_combiner:
         msg_prefix = self.msg_prefix + '__checkout_common_config() - '
         # Verify existence of global config directory.
         if not os.path.isdir(global_config_path):
-            sys.exit(msg_prefix + 'Global Portage  config directory at ' + global_config_path + ' does not exist.')
+            sys.exit(msg_prefix + 'Global Portage config directory at ' + global_config_path + ' does not exist.')
         # Ingest that thing.
         self.accum.ingest(global_config_path)
         # Here, we deal with the (package) sets and patches.
@@ -89,7 +89,7 @@ class portage_directory_combiner:
         sync_patches_str = rsync_cmd + os.path.join(patches_path, '*') + ' ' + patches_output_path
         # A helper to print error messages without copying code.
         def print_rsync_error(tag):
-            sys.exit(msg_prefix + "Could not rsync " + tag + "with error code: " + str(code))
+            sys.exit(msg_prefix + "Could not rsync " + tag + " with error code: " + str(code))
         # We now add package sets. These are universal.
         code = os.system(sync_sets_str)
         if not code == 0:

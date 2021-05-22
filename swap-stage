@@ -38,8 +38,8 @@ for i in dckr_imgs:
     t = full_name + stage_txt + ':' + tag_txt
     if t in i.tags:
         if debug:
-            print(t)
-            print('GOTCHA')
+            # print(t)
+            # print('GOTCHA')
         i.tag(full_name + 'current' , 'latest')
         did_something = True
         break

@@ -6,8 +6,10 @@ import re
 debug = True
 output_path                 = './work/'
 portage_output_path         = output_path + 'portage/'
+stages_path                 = output_path + 'stages/'
 includes_path               = './include/'
 global_config_path          = includes_path + 'portage.global/'
+dockerfiles_path            = includes_path + 'dockerfiles/'
 config_path                 = './config/'
 stage_defines_path          = config_path + 'stage.defines/'
 cpu_path                    = config_path + 'cpu.defines/'
@@ -19,9 +21,8 @@ kernel_path                 = config_path + 'kernel.defines/'
 arch_config_path            = config_path + 'arch'
 current_basestage_path      = config_path + 'base-stage'
 current_portage_path        = config_path + 'user-stage'
-
-sets_output_path = './work/portage/sets'
-patches_output_path = './work/portage/patches'
+sets_output_path            = './work/portage/sets'
+patches_output_path         = './work/portage/patches'
 
 # TODO: Move these convenience functions
 def read_file_lines(filename):

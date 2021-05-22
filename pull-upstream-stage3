@@ -44,7 +44,7 @@ if len(sys.argv) == 1 or len(sys.argv) > 3: # Too many or too few arguments.
 #TODO: Verify upstream support
 
 # These paths are used for working with our Dockerfile configs.
-dockerfile_input_path = 'include/dockerfiles/gentoomuch-bootstrap/'
+dockerfile_input_path = 'include/dockerfiles'
 dockerfile_output_path = 'work/bootstrap/'
 # Bootstrap Phase:
 # We can now append all the Dockerfiles for the bootstrap phase, using a different file given whether or not we use a custom tag.
