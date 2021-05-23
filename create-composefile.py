@@ -18,7 +18,18 @@ def create_composefile(output_path):
     lines.extend(output_config(packer_str, arch))
     lines.extend(output_config(updater_str, arch))
     include_prefix = 'include/docker-compose/docker-compose.'
-    lines.extend(read_file_lines(include_prefix + 'tail'))
+    lines.append('networks:\n')
+    lines.append('  backend:\n')
+    lines.append('    driver: overlay\n')
+    lines.append('volumes:\n')
+    lines.append('  distfiles:\n')
+    lines.append('    driver: local\n')
+    lines.append('  ebuilds:\n')
+    lines.append('    driver: local\n')
+    lines.append('  binpkgs:\n')
+    lines.append('    driver: local\n')
+    lines.append('  kernels:\n')
+    lines.append('    driver: local\n')
     write_file_lines(os.path.join(output_path, 'docker-compose.yml'), lines)
 
 def output_config(container_type_str, arch_arg):
@@ -79,11 +90,10 @@ def output_config(container_type_str, arch_arg):
             if f != '.gitignore' and f != 'README.md':
                 dir_str = re.sub(re.escape('./'), '', dirpath) 
                 results.append('    - ./' + os.path.join(dir_str, f) + ':' + re.sub(re.escape('/work/portage'), '', os.path.join(portage_tgt, dir_str, f)) + ':ro\n')
-   
     if is_packer:
         results.append('    cap_add:\n')
         results.append('    - CAP_SYS_ADMIN\n')
-
+    
     # Finally, we return the list of string.
     return results
 
