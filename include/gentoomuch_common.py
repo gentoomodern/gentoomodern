@@ -5,8 +5,10 @@ import re
 # Stuff all scripts here should use
 debug = True
 output_path                 = './work/'
-portage_output_path         = output_path + 'portage/'
 stages_path                 = output_path + 'stages/'
+portage_output_path         = output_path + 'portage/'
+sets_output_path            = portage_output_path + 'sets/'
+patches_output_path         = portage_output_path + 'patches'
 includes_path               = './include/'
 global_config_path          = includes_path + 'portage.global/'
 dockerfiles_path            = includes_path + 'dockerfiles/'
@@ -21,8 +23,7 @@ kernel_path                 = config_path + 'kernel.defines/'
 arch_config_path            = config_path + 'arch'
 current_basestage_path      = config_path + 'base-stage'
 current_portage_path        = config_path + 'user-stage'
-sets_output_path            = './work/portage/sets'
-patches_output_path         = './work/portage/patches'
+image_tag_base              = 'localhost:5000/gentoomuch-'
 
 # TODO: Move these convenience functions
 def read_file_lines(filename):
@@ -51,3 +52,5 @@ def get_cleaned_path(dirpath, local_config_path):
     results = re.sub(re.escape(cpu_path)                    , '', results)
     results = re.sub('^/'                                   , '', results)
     return results
+
+

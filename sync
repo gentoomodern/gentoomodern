@@ -1,4 +1,0 @@
-#!/bin/sh
-docker-compose down &&
-docker-compose up -d &&
-docker-compose run gentoomuch-updater bash -c 'emerge --sync && emerge squashfs-tools && mksquashfs /var/db/repos/gentoo /mnt/squashed-portage/portage.squash'

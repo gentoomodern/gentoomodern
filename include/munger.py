@@ -3,14 +3,11 @@
 import sys, os, re
 from .gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, get_cleaned_path, debug
 
-debug = True
-
 dont_munge_files = (['', 'bashrc'], ['', 'modules'], ['', 'README.md'], ['', 'mirrors'], ['', 'color.map'])
 dont_munge_dirs = ('sets', 'patches', 'savedconfig')
 
 class munger:
     def __init__(self, current_dir, current_file):
-        print('[munger] create with dir = ' + current_dir + ', and current file = ' + current_file)
         self.use_flags = dict() #[str, Dict[bool, List[str]]] 
         self.unmodified_lines = list()#[] #[str]
         self.atoms = set() # [str]
@@ -117,8 +114,6 @@ class munger:
     def __get_atom_name(self, line):
         if not re.match('(\S)+', line): # Only proceed if we don't have an empty line... Those make the regex engine crash
             return ""
-        if debug:
-            print('Inside munger - Line: ' + line)
         atom_name = re.match('^\S+', self.__strip_quotes(line)).group() # Get the first block of non-whitespace characters
         if atom_name[0] == '#': # Skip comments
             return ""
@@ -138,8 +133,6 @@ class munger:
     def __ingest_use_flags(self, atom_name, flags_str):
         for candidate_flag in flags_str.split():
             candidate_flag = candidate_flag.strip()
-            if debug:
-                print('munger.ingest_use_flags() - DEBUG - Examining flag "' + candidate_flag + '"')
             if candidate_flag[0] == '#': # Skip comments
                 break
             if candidate_flag == "" or candidate_flag == '=':
