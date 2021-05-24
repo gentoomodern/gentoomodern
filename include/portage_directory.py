@@ -34,5 +34,3 @@ class portage_directory:
                 text = m.get_text()
                 if len(text) > 0:
                     write_file_lines(current_output_file, text)
-                else:
-

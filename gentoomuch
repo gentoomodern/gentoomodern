@@ -1,3 +1,17 @@
 #!/usr/bin/env python3
 
+import os, sys, re
 
+from include.gentoomuch_common import arch_config_path, uid_config_path, read_file_lines, write_file_lines, config_path, output_path
+from include.freshroot import freshroot
+from include.sync import sync
+from include.swap_stage import swap_stage
+from include.pull_stage import pull_stage
+from include.composefile import create_composefile
+
+arch = open(arch_config_path).read().strip()
+create_composefile(output_path)
+#pull_stage(arch, 'default')
+swap_stage(arch, 'default', 'gentoomuch/builder', True)
+#sync()
+freshroot()

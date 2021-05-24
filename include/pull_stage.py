@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-import os, sys
+import os, sys, re
+from .gentoomuch_common import read_file_lines, write_file_lines, image_tag_base
 
-
-def pull_stage3(arch, profile)
+def pull_stage(arch, profile = "default", upstream_url = ""):
     # These paths are used for working with our Dockerfile configs.
     dockerfile_input_path = 'include/dockerfiles/'
-    dockerfile_output_path = 'work/bootstrap/'
+    dockerfile_output_path = 'work/'
     # Bootstrap Phase:
     # We can now append all the Dockerfiles for the bootstrap phase, using a different file given whether or not we use a custom tag.
     lines = read_file_lines(os.path.join(dockerfile_input_path, 'step1.Dockerfile'))
-    if is_default_tag: # We don't have a custom tag.
+    is_default_profile = bool(profile == "default")
+    if is_default_profile: # We don't have a custom tag.
         lines.extend(read_file_lines(os.path.join(dockerfile_input_path, 'step2.Dockerfile.archonly')))
     else: # We do have a custom tag. Hurray!
         lines.extend(read_file_lines(os.path.join(dockerfile_input_path, 'step2.Dockerfile.fully-loaded')))
@@ -28,16 +29,16 @@ def pull_stage3(arch, profile)
     cleaned_profile = re.sub(re.escape('+'), '-', profile)
     # Names for images and stuff.
     bootstrap_img_name = 'gentoomuch-bootstrap'
-    output_img_name = image_base_tag + arch + '-' + cleaned_profile + ':upstream'
+    output_img_name = image_tag_base + arch + '-' + cleaned_profile + ':upstream'
     bootstrap_cmd_head = 'docker image rm ' + output_img_name + ' & docker image rm ' + bootstrap_img_name + ' & cd ' + dockerfile_output_path + ' && docker build '
     bootstrap_cmd_tail = ' -t gentoomuch-bootstrap .'
     # Now we set the command that gets run.
     common_args = '--build-arg ARCH=' + arch + ' --build-arg MICROARCH=' + arch
     #upstream_url_msg = " from custom upstream "
-    if not profile == 'default': # If we have a custom tag.
+    if not is_default_profile:
         common_args = common_args + ' --build-arg SUFFIX=' + profile + ' '
         # print(attempt_msg_prefix + arch + tag_msg + tag + '" from gentoo\'s upstream')
-    if custom_upstream: # If our upstream isn't the one defined in the Dockerfile.
+    if not upstream_url == "": # If our upstream isn't the one defined in the Dockerfile.
         common_args = common_args + ' --build-arg DIST=' + upstream_url
     # We build the bootstrap image.
     code = os.system(bootstrap_cmd_head + common_args + bootstrap_cmd_tail)

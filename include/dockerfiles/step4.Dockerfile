@@ -15,4 +15,5 @@ RUN mkdir /mnt/stages \
 && rm -rf /etc/portage/package.use \
 && mkdir /etc/portage/repos.conf \
 && mkdir /etc/portage/sets \
-&& mkdir /etc/portage/patches 
+&& mkdir /etc/portage/patches
+CMD /bin/bash

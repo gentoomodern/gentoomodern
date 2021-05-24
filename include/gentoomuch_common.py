@@ -8,7 +8,7 @@ output_path                 = './work/'
 stages_path                 = output_path + 'stages/'
 portage_output_path         = output_path + 'portage/'
 sets_output_path            = portage_output_path + 'sets/'
-patches_output_path         = portage_output_path + 'patches'
+patches_output_path         = portage_output_path + 'patches/'
 includes_path               = './include/'
 global_config_path          = includes_path + 'portage.global/'
 dockerfiles_path            = includes_path + 'dockerfiles/'
@@ -21,9 +21,10 @@ local_config_basepath       = config_path + 'portage.locals/'
 hooks_path                  = config_path + 'build.hooks/'
 kernel_path                 = config_path + 'kernel.defines/'
 arch_config_path            = config_path + 'arch'
-current_basestage_path      = config_path + 'base-stage'
-current_portage_path        = config_path + 'user-stage'
+uid_config_path             = config_path + 'uid'
+gid_config_path             = config_path + 'gid' # Need not exist
 image_tag_base              = 'localhost:5000/gentoomuch-'
+current_image_tag           = image_tag_base + 'current'
 
 # TODO: Move these convenience functions
 def read_file_lines(filename):
@@ -31,10 +32,15 @@ def read_file_lines(filename):
     lines = f.readlines()
     return lines
 
-def write_file_lines(filename, lines):
+def write_file_lines(filename, lines, uid = -1, gid = -1):
     f = open(filename, 'w')
     f.writelines(lines)
     f.close()
+    if uid > 0:
+        if gid < 0:
+            os.chown(filename, uid, uid)
+        else:
+            os.chown(filename, uid, gid)
 
 # https://stackoverflow.com/questions/16402525/python-read-whitespace-separated-strings-from-file-similar-to-readline
 def read_by_tokens(obj):
