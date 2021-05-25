@@ -58,6 +58,7 @@ else:
 
 # We can handle the single-verb commands
 if verb == 'sandbox':
+    create_composefile(output_path)
     freshroot()
 elif verb == 'pipeline':
     print('Running pipeline')
@@ -65,6 +66,7 @@ elif verb == 'pipeline':
     # Validate stage defines
     # Process stage defines
 elif verb == 'sync':
+    create_composefile(output_path)
     sync()
 elif verb == 'ls':
     if arg_len == 3:

@@ -24,7 +24,7 @@ arch_config_path            = config_path + 'arch'
 uid_config_path             = config_path + 'uid'
 gid_config_path             = config_path + 'gid' # Need not exist
 image_tag_base              = 'localhost:5000/gentoomuch-'
-active_image_tag            = image_tag_base + 'current:latest'
+active_image_tag            = image_tag_base + 'current'
 
 profiles_amd64 = { 'default', 'hardened+nomultilib', 'hardened-selinux+nomultilib', 'hardened-selinux', 'hardened', 'musl-hardened', 'musl-vanilla', 'nomultilib', 'systemd', 'uclibc-hardened', 'uclibc-vanilla', 'x32' }
 
