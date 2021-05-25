@@ -19,15 +19,31 @@ target = ''
 
 arg_len = len(sys.argv)
 
-def print_usage(verb = '', noun = ''):
-    usage = "Usage: gentoomuch "
-    print(usage + 'sandbox')
-    print(usage + 'pipeline')
-    print(usage + 'sync')
+usage = "Usage: gentoomuch "
+
+def print_usage_ls():
     print(usage + 'ls profile[s]')
     print(usage + 'ls stage[s]')
+
+def print_usage_set():
     print(usage + 'set profile <number|name>')
     print(usage + 'set stage <number|name>')
+
+def print_usage_sandbox():
+    print(usage + 'sandbox')
+
+def print_usage_pipeline():
+    print(usage + 'pipeline')
+
+def print_usage_sync():
+    print(usage + 'sync')
+
+def print_usage():
+    print_usage_sandbox()
+    print_usage_pipeline()
+    print_usage_sync()
+    print_usage_ls()
+    print_usage_set()
 
 if arg_len > 1:
     verb = sys.argv[1]
@@ -38,7 +54,46 @@ elif arg_len > 3:
     target = sys.argv[3]
 else:
     print_usage()
+    sys.exit()
+
+# We can handle the single-verb commands
+if verb == 'sandbox':
+    freshroot()
+elif verb == 'pipeline':
+    print('Running pipeline')
+    # Get stage defines from buildlist
+    # Validate stage defines
+    # Process stage defines
+elif verb == 'sync':
+    sync()
+elif verb == 'ls':
+    if arg_len == 3:
+        if re.search('profile[s]', noun):
+            print('Listing profiles')
+        elif re.search('stage[s]', noun):
+            print('Listing stages!')
+        else:
+            print_usage_ls()
+            sys.exit()
+    else:
+        print_usage_ls()
+        sys.exit()
+elif verb == 'set':
+    if noun == 'profile':
+        print("Setting profile")
+    elif noun == 'stage':
+        print("Setting stage")
+    else:
+        print_usage_set()
+        sys.exit()
+else:
+    print_usage()
+    sys.exit()
+
+
+
     stage = get_active_stage()
+
 
     arch = open(arch_config_path).read().strip()
 
