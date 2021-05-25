@@ -21,7 +21,7 @@ def swap_stage(arch, profile, stage_define, upstream = False):
     did_something = False
     for i in dckr_imgs:
         if t in i.tags:
-            print('GOTCHA: ' + t)
+            print('SWAPPING STAGE: ' + t)
             i.tag(active_image_tag) # We now actually tag the image we wanna use.
             did_something = True
             break

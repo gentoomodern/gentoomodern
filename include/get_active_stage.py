@@ -7,14 +7,15 @@ def get_active_stage():
     dckr = docker.from_env()
     for i in dckr.images.list():
         if active_image_tag in i.tags:
-            if len(i.tags) == 2:
-                for t in i.tags:
-                    if not t == active_image_tag:
-                        # TODO: Something
-                        parser = tag_parser()
-                        print(t)
-                        parser.parse(t)
-                        return parser
+            cleaned_tags = i.tags
+            cleaned_tags.remove(active_image_tag)
+            if len(cleaned_tags) > 1:
+                exit("Multiple active stages defined. This is an error")
+            for t in cleaned_tags:
+                print('GOT ACTIVE STAGE: ' + t)
+                parser = tag_parser()
+                parser.parse(t)
+                return parser
     exit("No active stage defined!")
 
 class tag_parser:
@@ -25,28 +26,48 @@ class tag_parser:
         self.upstream = False
 
     def parse(self, tag):
-        if tag == active_image_tag:
-            return
-        tag = re.sub(re.escape(image_tag_base), '', tag)
+        self.arch = ''
+        self.profile = ''
+        self.stage_define = ''
         self.upstream = False
-        self.arch = tag[:tag.find('-')]
-        tag = tag[tag.find('-') + 1:]
-        print(tag)
-        suffix = tag[tag.rfind(':') + 1:]
-        self.upstream = bool(suffix == 'upstream')
-        tag = tag[:tag.rfind(':')]
-        print(tag)
-        profile_found = False
-        for p in profiles_amd64_cleaned:
-            if tag.startswith(p):
+        # If we are dealing with localhost:5000/gentoomuch-current:latest
+        if tag == active_image_tag+':latest': 
+            return
+        # STATE OF INPUT:
+        # A) localhost:5000/gentoomuch-amd64-musl-hardened:upstream
+        # B) localhost:5000/gentoomuch-amd64-musl-hardened-custom-memalloc-test:latest
+        tag = re.sub(re.escape(image_tag_base), '', tag)
+        # STATE OF INPUT:
+        # A) amd64-musl-hardened:upstream
+        # B) amd64-musl-hardened-custom-memalloc-test:latest
+        self.arch = tag[:tag.find('-')] # amd64
+        tag = tag[tag.find('-') + 1:] # We strip off "amd64-" 
+        # STATE OF INPUT:
+        # A) musl-hardened:upstream
+        # B) musl-hardened-custom-memalloc-test:latest
+        suffix = tag[tag.rfind(':') + 1:] # A) upstream B) latest
+        self.upstream = bool(suffix == 'upstream') # We set upstream to True.
+        tag = tag[:tag.rfind(':')] # We strip off the suffix tag ":upstream" or ":latest" or whatever. 
+        # STATE OF INPUT:
+        # A) musl-hardened
+        # B) musl-hardened-custom-memalloc-test
+        profile_found = False # We start searching within our set of profiles. These are defined in gentoomuch_common.py
+        for p in profiles_amd64_cleaned: 
+            if tag.startswith(p): # If we match, we can set our data and break out.
                 self.profile = p
                 profile_found = True
                 break
-        if not profile_found:
+        if not profile_found: # If no valid profile is found, we can leave now.
             return
-        tag = tag[len(self.profile) + 1:]
-        print(tag)
-        self.stage_define = tag # What's left over
+        tag = tag[len(self.profile) + 1:] # We strip off "musl-hardened-"
+        # STATE OF INPUT:
+        # A)
+        # B) custom-memalloc-test
+        # print(tag)
+        self.stage_define = tag # What's left over: A) B) custom-memalloc-test
+
+    def str(self):
+        return self.arch + '-' + self.profile + (':upstream' if self.upstream else '-' + self.stage_define + ':latest')
 
     def arch(self):
         return self.arch
