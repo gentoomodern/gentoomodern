@@ -8,7 +8,7 @@ from include.sync import sync
 from include.swap_stage import swap_stage
 from include.pull_stage import pull_stage
 from include.composefile import create_composefile
-from include.get_current import get_stage_tuple
+from include.get_active_stage import get_active_stage
 
 verbs = ('ls', 'set', 'sync', 'pipeline', 'sandbox')
 nouns = ('profile', 'stage')
@@ -26,8 +26,8 @@ def print_usage(verb = '', noun = ''):
     print(usage + 'sync')
     print(usage + 'ls profile[s]')
     print(usage + 'ls stage[s]')
-    print(usage + 'set profile <id|name>')
-    print(usage + 'set stage <id|name>')
+    print(usage + 'set profile <number|name>')
+    print(usage + 'set stage <number|name>')
 
 if arg_len > 1:
     verb = sys.argv[1]
@@ -38,15 +38,18 @@ elif arg_len > 3:
     target = sys.argv[3]
 else:
     print_usage()
-    stage = get_stage_tuple()
-    sys.exit()
+    stage = get_active_stage()
 
-arch = open(arch_config_path).read().strip()
+    arch = open(arch_config_path).read().strip()
 
-create_composefile(output_path)
+    create_composefile(output_path)
 #pull_stage(arch, 'default')
-swap_stage(arch, 'default', 'gentoomuch/builder', True)
+    swap_stage(arch, 'default', 'gentoomuch/builder')
 #sync()
-freshroot()
-
+#freshroot()
+    active_stage = get_active_stage()
+    print('ARCH: ' + active_stage.arch)
+    print('PROFILE: ' + active_stage.profile)
+    print('STAGE_DEF: ' + active_stage.stage_define)
+    print('UPSTREAM ' + str(active_stage.upstream))
 # stage = get_stage_tuple()

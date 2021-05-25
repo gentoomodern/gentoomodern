@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, sys, re
-from include.gentoomuch_common import read_file_lines, write_file_lines, config_path, current_image_tag
+from include.gentoomuch_common import read_file_lines, write_file_lines, config_path, active_image_tag
 
 builder_str = 'builder'
 packer_str = 'packer'
@@ -40,7 +40,7 @@ def __output_config(container_type_str):
     results.append('  gentoomuch-' + container_type_str + ':\n')
     # We append the universal parts.
     results.append('    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.\n')
-    results.append('    image: ' + current_image_tag + ':latest\n')
+    results.append('    image: ' + active_image_tag + ':latest\n')
     results.append('    networks:\n')
     results.append('    - backend\n')
     results.append('    volumes:\n')

@@ -24,8 +24,14 @@ arch_config_path            = config_path + 'arch'
 uid_config_path             = config_path + 'uid'
 gid_config_path             = config_path + 'gid' # Need not exist
 image_tag_base              = 'localhost:5000/gentoomuch-'
-current_image_tag           = image_tag_base + 'current'
+active_image_tag            = image_tag_base + 'current:latest'
 
+profiles_amd64 = { 'default', 'hardened+nomultilib', 'hardened-selinux+nomultilib', 'hardened-selinux', 'hardened', 'musl-hardened', 'musl-vanilla', 'nomultilib', 'systemd', 'uclibc-hardened', 'uclibc-vanilla', 'x32' }
+
+profiles_amd64_cleaned = { re.sub(re.escape('+'), '-', p) for p in profiles_amd64 }
+
+
+profiles = {'default', 'hardened+nomultilib', '', '', '', '' }
 # TODO: Move these convenience functions
 def read_file_lines(filename):
     f = open(filename)
