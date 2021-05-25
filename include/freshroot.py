@@ -4,4 +4,4 @@ import os
 
 def freshroot():
     os.chdir('work')
-    os.system("docker-compose up --no-start && docker-compose run gentoomuch-builder /bin/bash")
+    os.system("docker-compose up --no-start && docker-compose run gentoomuch-builder /bin/bash -c 'env-update && . /etc/profile && export PS1=\"(" +  + ")\"'")

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import os, sys, re
-from .gentoomuch_common import read_file_lines, write_file_lines, image_tag_base
+from .gentoomuch_common import read_file_lines, write_file_lines, image_tag_base, output_path
 
 def pull_stage(arch, profile = "default", upstream_url = ""):
     # These paths are used for working with our Dockerfile configs.
     dockerfile_input_path = 'include/dockerfiles/'
-    dockerfile_output_path = 'work/'
+    dockerfile_output_path = output_path
     # Bootstrap Phase:
     # We can now append all the Dockerfiles for the bootstrap phase, using a different file given whether or not we use a custom tag.
     lines = read_file_lines(os.path.join(dockerfile_input_path, 'step1.Dockerfile'))
