@@ -42,8 +42,8 @@ def __output_config(container_type_str):
     # We append the universal parts.
     results.append('    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.\n')
     results.append('    image: ' + active_image_tag + '\n')
-    results.append('    environment:\n')
-    results.append('    - "PS1=' + get_active_stage().str() + '"\n')
+    #results.append('    environment:\n')
+    #results.append('    - "PS1=' + get_active_stage().str() + '"\n')
     results.append('    command: /bin/bash\n')
     results.append('    networks:\n')
     results.append('    - backend\n')

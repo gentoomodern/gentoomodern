@@ -7,6 +7,8 @@ debug = True
 output_path                 = './work/'
 stages_path                 = output_path + 'stages/'
 portage_output_path         = output_path + 'portage/'
+current_stage_path	    = output_path + 'current_stage'
+current_profile_path	    = output_path + 'current_profile'
 sets_output_path            = portage_output_path + 'sets/'
 patches_output_path         = portage_output_path + 'patches/'
 includes_path               = './include/'
@@ -26,12 +28,21 @@ gid_config_path             = config_path + 'gid' # Need not exist, only for cus
 image_tag_base              = 'localhost:5000/gentoomuch-'
 active_image_tag            = image_tag_base + 'current:latest'
 
-profiles_amd64 = { 'default', 'hardened+nomultilib', 'hardened-selinux+nomultilib', 'hardened-selinux', 'hardened', 'musl-hardened', 'musl-vanilla', 'nomultilib', 'systemd', 'uclibc-hardened', 'uclibc-vanilla', 'x32' }
 
-profiles_amd64_cleaned = { re.sub(re.escape('+'), '-', p) for p in profiles_amd64 }
+#def get_sed_str_upstream(arch, profile):
+#    return "sed 's/.*    PS1.*/    PS1=\"\u@ " + arch + '-' + profile + "-upstream\"/ "
+
+#def get_sed_str(arch, profile, stage):
+#    return "sed 's/.*    PS1.*/    PS1=\"\u@ " + arch + '-' + profile + '-' + stage  + "\"/ "
+
+profiles_amd64 = ( 'default', 'hardened+nomultilib', 'hardened-selinux+nomultilib', 'hardened-selinux', 'hardened', 'musl-hardened', 'musl-vanilla', 'nomultilib', 'systemd', 'uclibc-hardened', 'uclibc-vanilla', 'x32' )
 
 
-profiles = {'default', 'hardened+nomultilib', '', '', '', '' }
+def get_cleaned_profile(profile):
+    return re.sub(re.escape('+'), '-', profile) # Found that one out when working with musl+selinux...
+
+profiles_amd64_cleaned = { get_cleaned_profile(p) for p in profiles_amd64 }
+
 # TODO: Move these convenience functions
 def read_file_lines(filename):
     f = open(filename)
@@ -65,4 +76,5 @@ def get_cleaned_path(dirpath, local_config_path):
     results = re.sub('^/'                                   , '', results)
     return results
 
-
+#def get_cleaned_stagedef(stage_define):
+#	return re.sub('/', '\/', stage_define) # / gets intepreted as a repository in docker, so fix that up.
