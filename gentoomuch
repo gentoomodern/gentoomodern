@@ -19,51 +19,53 @@ set_str = 'set'
 sync_str = 'sync'
 pipeline_str = 'pipeline'
 freshroot_str = 'freshroot'
+bootstrap_str = 'bootstrap'
 profile_str = 'profile'
 stage_str = 'stage'
 
-verbs = (ls_str, set_str, sync_str, pipeline_str, freshroot_str)
-nouns = (profile_str, stage_str)
+nouns = (profile_str, stage_str, sync_str, pipeline_str, freshroot_str, bootstrap_str)
+verbs = (ls_str, set_str)
 
-verb = ''
 noun = ''
+verb = ''
 target = ''
 
 arg_len = len(sys.argv)
 
 usage = "Usage: gentoomuch "
 
-print(sys.argv)
 # Print usage messages.
-def print_usage_ls():
-    print(usage + ls_str + ' ' + profile_str)
-    print(usage + ls_str + ' ' + stage_str)
+def print_usage_stages():
+    print(usage + stage_str + ' ' + set_str +  ' <number|name>')
+    print(usage + stage_str + ' ' + ls_str +  ' <number|name>')
 
-def print_usage_set():
-    print(usage + set_str + ' ' + profile_str + ' <number|name>')
-    print(usage + set_str + ' ' + stage_str + ' <number|name>')
+def print_usage_profiles():
+    print(usage + profile_str + ' ' + set_str + ' <number|name>')
+    print(usage + profile_str + ' ' + ls_str +  ' <number|name>')
 
-def print_usage_sandbox():
-    print(usage + freshroot_str)
-
-def print_usage_pipeline():
-    print(usage + pipeline_str)
-
-def print_usage_sync():
-    print(usage + sync_str)
+def print_usage_bootstrap():
+    print(usage + bootstrap_str + ' <number|name>')
 
 def print_usage():
-    print_usage_sandbox()
-    print_usage_pipeline()
-    print_usage_sync()
-    print_usage_ls()
-    print_usage_set()
+    print(usage + freshroot_str)
+    print(usage + pipeline_str)
+    print(usage + sync_str)
 
 # Ingest arguments.
 if arg_len > 1:
-    verb = sys.argv[1]
+    noun = sys.argv[1]
+    if not noun in nouns:
+      print_usage()
+      exit()
 if arg_len > 2:
-    noun = sys.argv[2]
+    verb = sys.argv[2]
+    if not verb in verbs:
+      if noun == ls_str:
+        print_usage_ls()
+        exit()
+      if noun == set_str:
+        print_usage_set()
+        exit()
 if arg_len == 4: 
     target = sys.argv[3]
 if arg_len < 1 or arg_len > 4:
@@ -74,47 +76,42 @@ if arg_len < 1 or arg_len > 4:
 # First, we always create a fresh composefile.
 arch = open(arch_config_path).read().strip()
 create_composefile(output_path)
-#swap_stage(arch, 'default', 'gentoomuch/builder')
 # We can handle the single-verb commands.
-if verb == freshroot_str: # Create a fresh root
-#  swap_stage(arch, 'default', 'gentoomuch/builder')
-  print('FRESHROOT')
+if noun == freshroot_str: # Create a fresh root
+  # Swap_stage(arch, 'default', 'gentoomuch/builder')
   create_composefile(output_path)
   freshroot()
-elif verb == pipeline_str: # Run your pipelined builds
+elif noun == pipeline_str: # Run your pipelined builds
   print('Running pipeline')
   # Get stage defines from buildlist and build them.
   # TODO: Implement
-elif verb == sync_str: # Sync portage
-  print('SYNC')
+elif noun == sync_str: # Sync portage
   create_composefile(output_path)
   sync()
-elif verb == ls_str: # Listing things...
-  print('LS')
-  print(noun)
-  if noun == profile_str: # List system profiles.
-    print("PROFILE")
+elif noun == bootstrap_str:
+  # TODO: Implement
+  exit()
+elif noun == profile_str: # Profiles...
+  if verb == ls_str: # List system profiles.
     list_profiles()
     exit()
-  elif noun == stage_str: # Listing user-defined stages.
-    print ("STAGE")
+  elif verb == set_str: # Setting profiles.
+    if arg_len == 4:
+      set_profile(target)
+      exit()
+  else: # Error message
+    print_usage_profiles() 
+    exit()
+elif noun == stage_str: # Stages...
+  if verb == ls_str: # Set the profile.
     list_stages()
     exit()
+  elif verb == set_str: # Set the stage.
+    if arg_len == 4:
+      set_stage(target)
+      exit()
   else: # Error message
-    print_usage_ls() 
-    exit()
-elif verb == set_str: # Handle setting stuff...
-  print('SET')
-  if noun == profile_str: # Set the profile.
-    print("Setting profile")
-    set_profile(target)
-    exit()
-  elif noun == stage_str: # Set the stage.
-    print("Setting stage")
-    set_stage(target)
-    exit()
-  else: # Error message
-    print_usage_set()
+    print_usage_stages()
     exit()
 else: # Error message
   print_usage()
