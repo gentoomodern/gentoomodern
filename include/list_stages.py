@@ -1,18 +1,27 @@
 #!/usr/bin/env python3
 
 import os, re
-from include.gentoomuch_common import stage_defines_path, current_stage_path
+from include.gentoomuch_common import stage_defines_path, desired_stage_path
 
+# This lists stages
 def list_stages():
-  # Get currently active stage
-  if not os.path.isfile(current_stage_path):
-    exit('No stage path config file found at ' + current_stage_path)
-  current = open(current_stage_path).read().strip()
+  # Get currently active stage. Indexing by number is not allowed in this tool: indexing would break once a new stage gets defined, leading to user surprises. :(.
+  if not os.path.isfile(desired_stage_path):
+    exit('No current stage path config file found at ' + desired_stage_path)
+  current = open(desired_stage_path).read().strip()
   print("Listing user-defined stages:")
-  ctr = 1
-  for dirpath, dirs, files in os.walk(stage_defines_path):
+  for dirpath, dirs, files in sorted(os.walk(stage_defines_path)):
     if not dirs:
       d = re.sub(stage_defines_path, '', dirpath)
-      print(('[*] ' if d == current else '[ ] ') + str(ctr) + ' ' + d)
-      ctr += 1
-  exit()
+      print(('[*] ' if d == current else '[ ] ') + ' ' + d)
+
+#TODO Test
+#def get_stages():
+#  ctr = 1
+#  results {}
+#  for dirpath, dirs, files in sorted(os.walk(stage_defines_path)):
+#    if not dirs:
+#      d = re.sub(stage_defines_path, '', dirpath)
+#      results[ctr] = d
+#      ctr += 1
+#  return results

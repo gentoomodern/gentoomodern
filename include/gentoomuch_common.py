@@ -4,11 +4,13 @@ import re
 
 # Stuff all scripts here should use
 debug = True
-output_path                 = './work/'
+output_path                 = './gentoomuch-data/'
 stages_path                 = output_path + 'stages/'
 portage_output_path         = output_path + 'portage/'
-current_stage_path	    = output_path + 'current_stage'
-current_profile_path	    = output_path + 'current_profile'
+desired_stage_path	    = output_path + 'desired_stage'
+desired_profile_path	    = output_path + 'desired_profile'
+desired_packages_path       = output_path + 'desired_packages'
+desired_hooks_path          = output_path + 'desired_hooks'
 sets_output_path            = portage_output_path + 'sets/'
 patches_output_path         = portage_output_path + 'patches/'
 includes_path               = './include/'
@@ -27,19 +29,13 @@ uid_config_path             = config_path + 'uid'
 gid_config_path             = config_path + 'gid' # Need not exist, only for custom deployments
 image_tag_base              = 'localhost:5000/gentoomuch-'
 active_image_tag            = image_tag_base + 'current:latest'
-
-
-#def get_sed_str_upstream(arch, profile):
-#    return "sed 's/.*    PS1.*/    PS1=\"\u@ " + arch + '-' + profile + "-upstream\"/ "
-
-#def get_sed_str(arch, profile, stage):
-#    return "sed 's/.*    PS1.*/    PS1=\"\u@ " + arch + '-' + profile + '-' + stage  + "\"/ "
-
 profiles_amd64 = ( 'default', 'hardened+nomultilib', 'hardened-selinux+nomultilib', 'hardened-selinux', 'hardened', 'musl-hardened', 'musl-vanilla', 'nomultilib', 'systemd', 'uclibc-hardened', 'uclibc-vanilla', 'x32' )
 
+def get_cleaned_stage(profile):
+  return re.sub('/', '-', profile)
 
 def get_cleaned_profile(profile):
-    return re.sub(re.escape('+'), '-', profile) # Found that one out when working with musl+selinux...
+  return re.sub(re.escape('+'), '-', profile) # Found that one out when working with musl+selinux...
 
 profiles_amd64_cleaned = { get_cleaned_profile(p) for p in profiles_amd64 }
 

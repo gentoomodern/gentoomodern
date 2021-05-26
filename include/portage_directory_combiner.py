@@ -62,6 +62,9 @@ class portage_directory_combiner:
         # Now we write-out the files themselves
         self.accum.writeout()
 
+    def todo(self):
+      return self.todo
+
     def __prep(self):
         msg_prefix = self.msg_prefix + '__prep() - '
         if debug:

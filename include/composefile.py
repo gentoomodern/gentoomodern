@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, sys, re
-from include.gentoomuch_common import read_file_lines, write_file_lines, config_path, active_image_tag
+from include.gentoomuch_common import write_file_lines, output_path, config_path, active_image_tag
 from include.get_active_stage import get_active_stage, tag_parser
 
 builder_str = 'builder'
@@ -61,34 +61,32 @@ def __output_config(container_type_str):
     stages_mount_str    = '    - ./stages:/mnt/stages'
     # Here we actually write these differential parts into our list.
     if is_packer:
-        results.append(binpkg_str + ':ro\n')
-        results.append(distfiles_str + ':ro\n')
-        results.append(ebuilds_str + ':ro\n')
-        results.append(kernels_str + ':ro\n')
-        results.append(squashed_mount_str + ':ro\n')
-        results.append(stages_mount_str + '\n')
+      results.append(binpkg_str + ':ro\n')
+      results.append(distfiles_str + ':ro\n')
+      results.append(ebuilds_str + ':ro\n')
+      results.append(kernels_str + ':ro\n')
+      results.append(squashed_mount_str + ':ro\n')
+      results.append(stages_mount_str + '\n')
     if is_builder:
-        results.append(binpkg_str + '\n')
-        results.append(distfiles_str +'\n')
-        results.append(ebuilds_str + '\n')
-        results.append(kernels_str + '\n')
-        results.append(squashed_mount_str + ':ro\n')
-        results.append(stages_mount_str + ':ro\n')
+      results.append(binpkg_str + '\n')
+      results.append(distfiles_str +'\n')
+      results.append(ebuilds_str + '\n')
+      results.append(kernels_str + '\n')
+      results.append(squashed_mount_str + ':ro\n')
+      results.append(stages_mount_str + ':ro\n')
     if is_updater:
-        results.append(binpkg_str + '\n')
-        results.append(distfiles_str +'\n')
-        results.append(ebuilds_str + '\n')
-        results.append(kernels_str + '\n')
-        results.append(squashed_output_str + '\n')
-        results.append(stages_mount_str + ':ro\n')
+      results.append(binpkg_str + '\n')
+      results.append(distfiles_str +'\n')
+      results.append(ebuilds_str + '\n')
+      results.append(kernels_str + '\n')
+      results.append(squashed_output_str + '\n')
+      results.append(stages_mount_str + ':ro\n')
     # Here we loop over the all the files in the config/portage directory and add them.
     portage_tgt = '/etc/portage/'
-    for (dirpath, directories, files) in os.walk('work/portage'):
-        for f in files:
-            if not f[0] == '.' and not f == 'README.md':
-                #dir_str = re.sub(re.escape('./work'), '', dirpath) 
-                #results.append('    - ./' + os.path.join(dir_str, f) + ':' + re.sub(re.escape('/work/portage'), '', os.path.join(portage_tgt, dir_str, f)) + ':ro\n')
-                results.append('    - ./' + os.path.join(os.path.relpath(dirpath, 'work'), f) + ':' + os.path.join(portage_tgt, f) + ':ro\n')
+    for (dirpath, directories, files) in os.walk(output_path + 'portage'):
+      for f in files:
+        if not f[0] == '.' and not f == 'README.md':
+           results.append('    - ./' + os.path.join(os.path.relpath(dirpath, output_path), f) + ':' + os.path.join(portage_tgt, f) + ':ro\n')
     if is_packer:
         results.append('    cap_add:\n')
         results.append('    - CAP_SYS_ADMIN\n')

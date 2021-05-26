@@ -10,11 +10,7 @@ RUN mkdir /mnt/stages \
 && mkdir /mnt/kernels \
 && mkdir /mnt/user-data \
 && mkdir /mnt/data-out \
-#&& sed 's/.*    PS1.*/    PS1=\"\u@ " + arch + '-' + profile + "-upstream\"/ ' /etc/bashrc
 && mkdir /mnt/squashed-portage \
 && mkdir /mnt/gentoo \
-&& rm -rf /etc/portage/package.use \
-&& mkdir /etc/portage/repos.conf \
-&& mkdir /etc/portage/sets \
-&& mkdir /etc/portage/patches
+&& rm -rf /etc/portage/package.use
 CMD /bin/bash

@@ -31,7 +31,7 @@ class tag_parser:
         self.stage_define = ''
         self.upstream = False
         # If we are dealing with localhost:5000/gentoomuch-current:latest
-        if tag == active_image_tag+':latest': 
+        if tag == active_image_tag:
             return
         # STATE OF INPUT:
         # A) localhost:5000/gentoomuch-amd64-musl-hardened:upstream

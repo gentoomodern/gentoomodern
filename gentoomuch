@@ -2,7 +2,7 @@
 
 import os, sys, re
 
-from include.gentoomuch_common import arch_config_path, uid_config_path, read_file_lines, write_file_lines, config_path, output_path, profiles_amd64
+from include.gentoomuch_common import arch_config_path, config_path, output_path, profiles_amd64
 from include.freshroot import freshroot
 from include.sync import sync
 from include.swap_stage import swap_stage
@@ -13,6 +13,7 @@ from include.list_stages import list_stages
 from include.list_profiles import list_profiles
 from include.set_stage import set_stage
 from include.set_profile import set_profile
+from include.run_build import run_build
 
 ls_str = 'ls'
 set_str = 'set'
@@ -22,97 +23,112 @@ freshroot_str = 'freshroot'
 bootstrap_str = 'bootstrap'
 profile_str = 'profile'
 stage_str = 'stage'
+all_str = 'all'
 
-nouns = (profile_str, stage_str, sync_str, pipeline_str, freshroot_str, bootstrap_str)
+primary_commands = (profile_str, stage_str, sync_str, pipeline_str, freshroot_str, bootstrap_str)
+ls_and_set_commands = (profile_str, stage_str)
 verbs = (ls_str, set_str)
 
-noun = ''
-verb = ''
-target = ''
-
 arg_len = len(sys.argv)
-
 usage = "Usage: gentoomuch "
 
-# Print usage messages.
-def print_usage_stages():
-    print(usage + stage_str + ' ' + set_str +  ' <number|name>')
-    print(usage + stage_str + ' ' + ls_str +  ' <number|name>')
+def print_usage_stage_ls():
+  print(usage + stage_str + ' ' + ls_str)
 
-def print_usage_profiles():
-    print(usage + profile_str + ' ' + set_str + ' <number|name>')
-    print(usage + profile_str + ' ' + ls_str +  ' <number|name>')
+def print_usage_stage_set():
+  print(usage + stage_str + ' ' + set_str +  ' <name>')
+
+def print_usage_profile_ls():
+  print(usage + profile_str + ' ' + ls_str)
+
+def print_usage_profile_set():
+  print(usage + profile_str + ' ' + set_str + ' <number|name>')
+
+# Print usage messages.
+def print_usage_stage():
+  print_usage_stage_ls()
+  print_usage_stage_set()
+
+def print_usage_profile():
+  print_usage_profile_ls()
+  print_usage_profile_set()
 
 def print_usage_bootstrap():
-    print(usage + bootstrap_str + ' <number|name>')
+  print(usage + bootstrap_str + ' <number|name|"' + all_str +'">')
 
 def print_usage():
-    print(usage + freshroot_str)
-    print(usage + pipeline_str)
-    print(usage + sync_str)
+  print(usage + freshroot_str)
+  print(usage + pipeline_str)
+  print(usage + sync_str)
+  print_usage_bootstrap()
+  print_usage_profile()
+  print_usage_stage()
 
-# Ingest arguments.
-if arg_len > 1:
-    noun = sys.argv[1]
-    if not noun in nouns:
-      print_usage()
-      exit()
-if arg_len > 2:
-    verb = sys.argv[2]
-    if not verb in verbs:
-      if noun == ls_str:
-        print_usage_ls()
-        exit()
-      if noun == set_str:
-        print_usage_set()
-        exit()
-if arg_len == 4: 
-    target = sys.argv[3]
-if arg_len < 1 or arg_len > 4:
+# We do this every time!
+arch = open(arch_config_path).read().strip()
+
+# This handles the bootstrap of each stage, from upstream.
+def pull_sequence(profile):
+  pull_stage(arch, profile)
+  swap_stage(arch, profile, 'gentoomuch/builder', True)
+  create_composefile(output_path)
+  run_build(True)
+
+# Get first command
+prime_cmd = ''
+if len(sys.argv) > 1:
+  if sys.argv[1] in primary_commands:
+    prime_cmd = sys.argv[1]
+  else:
     print_usage()
     exit()
-
-# Let's do this!
-# First, we always create a fresh composefile.
-arch = open(arch_config_path).read().strip()
-create_composefile(output_path)
-# We can handle the single-verb commands.
-if noun == freshroot_str: # Create a fresh root
-  # Swap_stage(arch, 'default', 'gentoomuch/builder')
+# Stage definitions-related commands (ls/set)
+if prime_cmd == stage_str:
+  if sys.argv[2] == ls_str and len(sys.argv) == 3: # Listing stages
+    ls_stages()
+    exit()
+  elif sys.argv[2] == set_str and len(sys.argv) == 4: # Setting stage
+    set_stage(sys.argv[3])
+    exit()
+  else: # Error message for stages
+    print_usage_stage()
+    exit()
+# Profile-related command (ls/set)
+elif prime_cmd == profile_str:
+  if sys.argv[2] == ls_str and len(sys.argv) == 3: # Listing profiles
+    list_profiles()
+    exit()
+  elif sys.argv[2] == set_str and len(sys.argv) == 4: # Setting profile
+    set_profile(sys.argv[3])
+    exit()
+  else: # Error message for profile
+    print_usage_profile() 
+    exit()
+# Bootstrap a stage from an upstream tarball
+elif prime_cmd == bootstrap_str:
+  if sys.argv[2] in profiles_amd64:
+    pull_sequence(sys.argv[2])
+  elif sys.argv[2] == all_str:
+    for p in profiles_amd64:
+      pull_sequence(p)
+  else:
+    exit("Could not find profile " + sys.argv[2])
+# Deal with the freshroot command
+elif prime_cmd == freshroot_str: 
+  swap_stage(arch, 'default', 'gentoomuch/builder', True)
   create_composefile(output_path)
   freshroot()
-elif noun == pipeline_str: # Run your pipelined builds
+  exit()
+# Run pipelined builds
+elif prime_cmd == pipeline_str:
   print('Running pipeline')
   # Get stage defines from buildlist and build them.
   # TODO: Implement
-elif noun == sync_str: # Sync portage
+# Sync Portage tree.
+elif prime_cmd == sync_str:
+  swap_stage(arch, 'default', 'gentoomuch/builder', True)
   create_composefile(output_path)
   sync()
-elif noun == bootstrap_str:
-  # TODO: Implement
-  exit()
-elif noun == profile_str: # Profiles...
-  if verb == ls_str: # List system profiles.
-    list_profiles()
-    exit()
-  elif verb == set_str: # Setting profiles.
-    if arg_len == 4:
-      set_profile(target)
-      exit()
-  else: # Error message
-    print_usage_profiles() 
-    exit()
-elif noun == stage_str: # Stages...
-  if verb == ls_str: # Set the profile.
-    list_stages()
-    exit()
-  elif verb == set_str: # Set the stage.
-    if arg_len == 4:
-      set_stage(target)
-      exit()
-  else: # Error message
-    print_usage_stages()
-    exit()
-else: # Error message
+  #TODO: Remount SquashFS
+else:
   print_usage()
-  exit()
