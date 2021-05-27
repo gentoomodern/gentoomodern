@@ -72,12 +72,11 @@ arch = open(arch_config_path).read().strip()
 # This handles the bootstrap of each stage, from upstream.
 def pull_sequence(profile):
   pull_stage(arch, profile)
-  swap_stage(arch, profile, 'gentoomuch/builder', True)
+  swap_stage(arch, profile, 'gentoomuch/builder')
   run_build(True)
   srl = stage_serializer(arch, profile, 'gentoomuch/builder')
   srl.save_tarball()
   srl.containerize()
-  srl.delete_tarball()
 
 # Now, we get properly started.
 # Get the first command
@@ -91,7 +90,7 @@ if len(sys.argv) > 1:
 # Stage definitions-related commands (ls/set)
 if prime_cmd == stage_str:
   if sys.argv[2] == ls_str and len(sys.argv) == 3: # Listing stages
-    ls_stages()
+    list_stages()
     exit()
   elif sys.argv[2] == set_str and len(sys.argv) == 4: # Setting stage
     set_stage(sys.argv[3])
@@ -121,7 +120,7 @@ elif prime_cmd == bootstrap_str:
     exit("Could not find profile " + sys.argv[2])
 # Deal with the freshroot command
 elif prime_cmd == freshroot_str: 
-  swap_stage(arch, 'default', 'gentoomuch/builder', True)
+  swap_stage(arch, 'default', 'gentoomuch/builder')
   create_composefile(output_path)
   freshroot()
 # Run pipelined builds

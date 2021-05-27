@@ -5,7 +5,6 @@ from .gentoomuch_common import output_path, uid_config_path, gid_config_path
 
 def sync():
     squashed_path = '/mnt/squashed-portage/portage.squash'
-    backup_path = '/mnt/squashed-portage/portage/squash.bak'
     uid = open(uid_config_path).read().strip()
     has_gid = False
     if os.path.isfile(gid_config_path):

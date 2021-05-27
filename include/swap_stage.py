@@ -14,7 +14,8 @@ def swap_stage(arch, profile, stage_def, upstream = False):
   dckr = docker.from_env()
   dckr_imgs = dckr.images.list()
   did_something = False
-  t = get_docker_tag(arch, profile, stage_def, upstream)
+  print("DEBUG swap_stage... upstream = " + str(upstream))
+  t = get_docker_tag(arch, profile, stage_def, bool(upstream))
   for i in dckr_imgs:
     if t in i.tags:
       print('SWAPPING STAGE: ' + t)

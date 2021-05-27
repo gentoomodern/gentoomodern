@@ -15,8 +15,8 @@ def list_profiles():
   ctr = 1
   for p in profiles_amd64:
     if no_profile:
-      print('[ ] ' + str(ctr) + ' ' +  p)
+      print(' [ ] ' + str(ctr) + ' ' +  p)
     else:
-      print(('[*] ' if p == current else '[ ] ') + str(ctr) + ' ' + p)
+      print((' [*] ' if p == current else ' [ ] ') + str(ctr) + ' ' + p)
     ctr += 1
   exit()
