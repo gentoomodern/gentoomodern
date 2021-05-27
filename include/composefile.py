@@ -5,14 +5,12 @@ from include.gentoomuch_common import write_file_lines, output_path, config_path
 from include.get_active_stage import get_active_stage, tag_parser
 
 builder_str = 'builder'
-packer_str = 'packer'
 updater_str = 'updater'
 
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
-def create_composefile( output_path):
+def create_composefile(output_path):
     lines = ['# Do not make changes to this file, as they will be overriden upon the next build.\n' , 'services:\n']
     lines.extend(__output_config(builder_str))
-    lines.extend(__output_config(packer_str))
     lines.extend(__output_config(updater_str))
     include_prefix = 'include/docker-compose/docker-compose.'
     lines.append('networks:\n')
@@ -30,10 +28,9 @@ def create_composefile( output_path):
     write_file_lines(os.path.join(output_path, 'docker-compose.yml'), lines)
 
 def __output_config(container_type_str):
-    if not container_type_str == builder_str and not container_type_str == packer_str and not container_type_str == updater_str:
-        sys.exit('Gentoomuch.create-composefile: Invalid container type argument \"' + updater_str  +  '\"')
+    if not container_type_str == builder_str and not container_type_str == updater_str:
+        sys.exit('Gentoomuch.create-composefile: Invalid container type argument \"' + container_type_str  +  '\"')
     is_builder  = bool(container_type_str == builder_str)
-    is_packer   = bool(container_type_str == packer_str)
     is_updater  = bool(container_type_str == updater_str)
     # Our results will be a list of strings.
     results = [] 
@@ -58,34 +55,27 @@ def __output_config(container_type_str):
     squashed_mount_str  = '    - ./squashed/mountpoint:/mnt/squashed-portage'
     stages_mount_str    = '    - ./stages:/mnt/stages'
     # Here we actually write these differential parts into our list.
-    if is_packer:
-      results.append(binpkg_str + ':ro\n')
-      results.append(distfiles_str + ':ro\n')
-      results.append(ebuilds_str + ':ro\n')
-      results.append(kernels_str + ':ro\n')
-      results.append(squashed_mount_str + ':ro\n')
-      results.append(stages_mount_str + '\n')
     if is_builder:
-      results.append(binpkg_str + '\n')
-      results.append(distfiles_str +'\n')
-      results.append(ebuilds_str + '\n')
-      results.append(kernels_str + '\n')
-      results.append(squashed_mount_str + ':ro\n')
-      results.append(stages_mount_str + ':ro\n')
+        results.append(binpkg_str + '\n')
+        results.append(distfiles_str +'\n')
+        results.append(ebuilds_str + '\n')
+        results.append(kernels_str + '\n')
+        results.append(squashed_mount_str + '\n')
+        results.append(stages_mount_str + '\n')
     if is_updater:
-      results.append(binpkg_str + '\n')
-      results.append(distfiles_str +'\n')
-      results.append(ebuilds_str + '\n')
-      results.append(kernels_str + '\n')
-      results.append(squashed_output_str + '\n')
-      results.append(stages_mount_str + ':ro\n')
+        results.append(binpkg_str + '\n')
+        results.append(distfiles_str +'\n')
+        results.append(ebuilds_str + '\n')
+        results.append(kernels_str + '\n')
+        results.append(squashed_output_str + '\n')
+        results.append(stages_mount_str + ':ro\n')
     # Here we loop over the all the files in the config/portage directory and add them.
     portage_tgt = '/etc/portage/'
     for (dirpath, directories, files) in os.walk(output_path + 'portage'):
-      for f in files:
-        if not f[0] == '.' and not f == 'README.md':
-           results.append('    - ./' + os.path.join(os.path.relpath(dirpath, output_path), f) + ':' + os.path.join(portage_tgt, f) + ':ro\n')
-    if is_packer:
+        for f in files:
+            if not f[0] == '.' and not f == 'README.md':
+                results.append('    - ./' + os.path.join(os.path.relpath(dirpath, output_path), f) + ':' + os.path.join(portage_tgt, f) + ':ro\n')
+    if is_builder:
         results.append('    cap_add:\n')
         results.append('    - CAP_SYS_ADMIN\n')
         results.append('    - CAP_NET_ADMIN\n')
