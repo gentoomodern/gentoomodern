@@ -14,6 +14,8 @@ from include.list_profiles import list_profiles
 from include.set_stage import set_stage
 from include.set_profile import set_profile
 from include.run_build import run_build
+from include.get_docker_tag import get_docker_tag
+from include.stage_serializer import stage_serializer
 
 ls_str = 'ls'
 set_str = 'set'
@@ -29,9 +31,10 @@ primary_commands = (profile_str, stage_str, sync_str, pipeline_str, freshroot_st
 ls_and_set_commands = (profile_str, stage_str)
 verbs = (ls_str, set_str)
 
-arg_len = len(sys.argv)
-usage = "Usage: gentoomuch "
+# Here we define CLI help functions for when the user needs it.
+usage = "    gentoomuch "
 
+# Print usage messages.
 def print_usage_stage_ls():
   print(usage + stage_str + ' ' + ls_str)
 
@@ -44,7 +47,6 @@ def print_usage_profile_ls():
 def print_usage_profile_set():
   print(usage + profile_str + ' ' + set_str + ' <number|name>')
 
-# Print usage messages.
 def print_usage_stage():
   print_usage_stage_ls()
   print_usage_stage_set()
@@ -71,10 +73,14 @@ arch = open(arch_config_path).read().strip()
 def pull_sequence(profile):
   pull_stage(arch, profile)
   swap_stage(arch, profile, 'gentoomuch/builder', True)
-  create_composefile(output_path)
   run_build(True)
+  srl = stage_serializer(arch, profile, 'gentoomuch/builder')
+  srl.save_tarball()
+  srl.containerize()
+  srl.delete_tarball()
 
-# Get first command
+# Now, we get properly started.
+# Get the first command
 prime_cmd = ''
 if len(sys.argv) > 1:
   if sys.argv[1] in primary_commands:
@@ -118,7 +124,6 @@ elif prime_cmd == freshroot_str:
   swap_stage(arch, 'default', 'gentoomuch/builder', True)
   create_composefile(output_path)
   freshroot()
-  exit()
 # Run pipelined builds
 elif prime_cmd == pipeline_str:
   print('Running pipeline')

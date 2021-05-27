@@ -14,14 +14,3 @@ def list_stages():
     if not dirs:
       d = re.sub(stage_defines_path, '', dirpath)
       print(('[*] ' if d == current else '[ ] ') + ' ' + d)
-
-#TODO Test
-#def get_stages():
-#  ctr = 1
-#  results {}
-#  for dirpath, dirs, files in sorted(os.walk(stage_defines_path)):
-#    if not dirs:
-#      d = re.sub(stage_defines_path, '', dirpath)
-#      results[ctr] = d
-#      ctr += 1
-#  return results

@@ -2,9 +2,10 @@
 
 # This sets the currently active basestage.
 import os, sys, re, docker
-from include.gentoomuch_common import output_path, config_path, image_tag_base, active_image_tag, desired_packages_path, desired_hooks_path, get_cleaned_stage, get_cleaned_profile
-from include.portage_directory_combiner import portage_directory_combiner
-from include.get_docker_tag import get_docker_tag
+from .gentoomuch_common import output_path, config_path, image_tag_base, active_image_tag, desired_packages_path, desired_hooks_path, get_cleaned_stagedef, get_cleaned_profile
+from .portage_directory_combiner import portage_directory_combiner
+from .get_docker_tag import get_docker_tag
+from .composefile import create_composefile
 
 def swap_stage(arch, profile, stage_def, upstream = False):
   os.system('cd ' + output_path + ' && docker-compose down')
@@ -21,12 +22,13 @@ def swap_stage(arch, profile, stage_def, upstream = False):
       i.tag(active_image_tag) # We now actually tag the image we wanna use.
       did_something = True
       break
-    if not did_something:
-      sys.exit("Could not find docker image " + t)
+  if not did_something:
+    sys.exit("Could not find docker image " + t)
   if 'packages' in combiner.todo:
     if len(combiner.todo['packages']) > 1:
       write_file_lines(combiner.todo['packages'], desired_package_path)
   if 'hooks' in combiner.todo:
     if len(combiner.todo['hooks']) > 1:
       write_file_lines(combiner.todo['hooks'], desired_hooks_path)
+  create_composefile(output_path)
   os.system('cd ' + output_path + ' && docker-compose up --no-start')

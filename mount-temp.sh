@@ -1,8 +1,8 @@
 #!/bin/sh
-#umount ./work/portage &
-mount -t tmpfs none ./work/portage &&
-mount -t tmpfs none ./work/stages &&
-mount -t tmpfs none ./work/bootstrap &&
-chown -R 1000:1000 ./work/portage &&
-chown -R 1000:1000 ./work/stages &&
-chown -R 1000:1000 ./work/bootstrap
+#umount ./gentoomuch-data/portage &
+mount -t tmpfs none ./gentoomuch-data/portage &&
+mount -t tmpfs none ./gentoomuch-data/stages &&
+mount -t tmpfs none ./gentoomuch-data/bootstrap &&
+chown -R 1000:1000 ./gentoomuch-data/portage &&
+chown -R 1000:1000 ./gentoomuch-data/stages &&
+chown -R 1000:1000 ./gentoomuch-data/bootstrap

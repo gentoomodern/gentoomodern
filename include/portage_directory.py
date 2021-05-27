@@ -16,12 +16,13 @@ class portage_directory:
                 if not os.path.isdir(outdir):
                    os.mkdir(outdir)
             for f in filenames:
-                current_path = get_cleaned_path(dirpath, local_path)
-                current_file = os.path.join(current_path, f)
-                if not current_file in self.accumulators:
-                    self.accumulators[current_file] = munger(current_path, f)
-                for line in read_file_lines(os.path.join(dirpath, f)): # Here we do our actual file-reading
-                    self.accumulators[current_file].ingest(line)
+                if f[0] != '.':
+                    current_path = get_cleaned_path(dirpath, local_path)
+                    current_file = os.path.join(current_path, f)
+                    if not current_file in self.accumulators: # Add a munger object to prevent a crash
+                        self.accumulators[current_file] = munger(current_path, f)
+                    for line in read_file_lines(os.path.join(dirpath, f)): # Here we do our actual file-reading
+                        self.accumulators[current_file].ingest(line)
                         # sys.exit('portage_directory.setup() - ERROR - Could not ingest ' + current_file + ' due to line : ' + line)
 
     def writeout(self):

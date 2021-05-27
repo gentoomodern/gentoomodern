@@ -11,4 +11,4 @@ def sync():
     if os.path.isfile(gid_config_path):
         has_gid = True
         gid = open(gid_config_path).read().strip()
-    os.system("cd " + output_path + " && docker-compose up -no-start && docker-compose run gentoomuch-updater /bin/bash -c 'rm " + squashed_path + " & emerge --sync && emerge squashfs-tools && mksquashfs /var/db/repos/gentoo " + squashed_path + " -noappend -force-gid portage -force-uid portage && chown " + str(uid) + ":" + (str(gid) if has_gid else str(uid)) + ' ' + squashed_path + "'")
+    os.system("cd " + output_path + " && docker-compose run gentoomuch-updater /bin/bash -c 'rm " + squashed_path + " & emerge --sync && emerge squashfs-tools && mksquashfs /var/db/repos/gentoo " + squashed_path + " -noappend -force-gid portage -force-uid portage && chown " + str(uid) + ":" + (str(gid) if has_gid else str(uid)) + ' ' + squashed_path + "'")

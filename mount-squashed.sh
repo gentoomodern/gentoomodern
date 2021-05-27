@@ -1,2 +1,3 @@
 #!/bin/sh
-mount work/squashed/blob/portage.squash work/squashed/mountpoint -t squashfs -o loop
+umount gentoomuch-data/squashed/mountpoint &
+mount gentoomuch-data/squashed/blob/portage.squash gentoomuch-data/squashed/mountpoint -t squashfs -o loop
