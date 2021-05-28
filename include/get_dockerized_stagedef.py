@@ -3,5 +3,5 @@
 import re
 
 
-def get_cleaned_stagedef(profile):
+def get_dockerized_stagedef(profile):
   return re.sub('/', '-', profile)

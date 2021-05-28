@@ -3,5 +3,5 @@
 import re
 
 
-def get_cleaned_profile(profile):
+def get_dockerized_profile(profile):
   return re.sub(re.escape('+'), '-', profile) # Found that one out when working with musl+selinux...

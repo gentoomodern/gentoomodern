@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import re
-from .get_cleaned_profile import get_cleaned_profile
+from .get_dockerized_profile import get_dockerized_profile
 
 # Stuff all scripts here should use
 debug = True
@@ -30,10 +30,9 @@ uid_config_path             = config_path + 'uid'
 gid_config_path             = config_path + 'gid' # Need not exist, only for custom deployments
 image_tag_base              = 'localhost:5000/gentoomuch-'
 active_image_tag            = image_tag_base + 'current:latest'
-
 gentoo_signing_key          = "0xBB572E0E2D182910"
-
+gentoo_upstream_url         ="https://ftp-osl.osuosl.org/pub/gentoo/releases/"
 
 profiles_amd64 = ( 'default', 'hardened+nomultilib', 'hardened-selinux+nomultilib', 'hardened-selinux', 'hardened', 'musl-hardened', 'musl-vanilla', 'nomultilib', 'systemd', 'uclibc-hardened', 'uclibc-vanilla', 'x32' )
 
-profiles_amd64_cleaned = { get_cleaned_profile(p) for p in profiles_amd64 }
+profiles_amd64_cleaned = { get_dockerized_profile(p) for p in profiles_amd64 }
