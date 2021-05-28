@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import os
-from .gentoomuch_common import read_file_lines, desired_packages_path, output_path
+from .gentoomuch_common import desired_packages_path, output_path
+from .read_file_lines import read_file_lines
+
 
 def run_build(empty_tree : False):
   packages = []

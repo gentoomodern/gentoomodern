@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 import os
-from .gentoomuch_common import arch_config_path, output_path, desired_stage_path, desired_profile_path, get_cleaned_profile, get_cleaned_stagedef
+from .gentoomuch_common import arch_config_path, output_path, desired_stage_path, desired_profile_path
 #from .get_active_stage import get_active_stage, tag_parser
 from .swap_stage import swap_stage
 from .composefile import create_composefile
-
+from .get_cleaned_profile import get_cleaned_profile
+from .get_cleaned_stagedef import get_cleaned_stagedef
 def freshroot():
     arch = open(arch_config_path).read().strip()
     if os.path.isfile(desired_profile_path) and os.path.isfile(desired_stage_path):

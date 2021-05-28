@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
 import os, sys, re
-from include.gentoomuch_common import write_file_lines, output_path, config_path, active_image_tag
-from include.get_active_stage import get_active_stage, tag_parser
+from .gentoomuch_common import output_path, config_path, active_image_tag
+from .write_file_lines import write_file_lines
+from .get_active_stage import get_active_stage
+from .tag_parser import tag_parser
 
 builder_str = 'builder'
 updater_str = 'updater'
+
 
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
 def create_composefile(output_path):

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import os, sys, re
-from .gentoomuch_common import read_file_lines, write_file_lines, image_tag_base, output_path
+from .gentoomuch_common image_tag_base, output_path
+from .read_file_lines import read_file_lines
+from .write_file_lines import write_file_lines
+
 
 def pull_stage(arch, profile = "default", upstream_url = ""):
     # These paths are used for working with our Dockerfile configs.

@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 
 import sys, os, re
-from .gentoomuch_common import read_file_lines, write_file_lines, read_by_tokens, portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, get_cleaned_path, debug
+from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, debug
+from .read_file_lines import read_file_lines
+from .read_by_token import read_by_token
+from .write_file_lines import write_file_lines
+from .get_cleaned_path import get_cleaned_path
 
 dont_munge_files = (['', 'bashrc'], ['', 'modules'], ['', 'README.md'], ['', 'mirrors'], ['', 'color.map'])
 dont_munge_dirs = ('sets', 'patches', 'savedconfig')
+
 
 class munger:
     def __init__(self, current_dir, current_file):

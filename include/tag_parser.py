@@ -3,7 +3,9 @@
 import re, docker
 from .gentoomuch_common import image_tag_base, active_image_tag, profiles_amd64_cleaned
 
+
 class tag_parser:
+
     def __init__(self):
         self.arch = ''
         self.profile = ''

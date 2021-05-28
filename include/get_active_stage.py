@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-import re, docker
-from .gentoomuch_common import image_tag_base, active_image_tag, profiles_amd64_cleaned
+import docker
+from .gentoomuch_common import active_image_tag
 from .tag_parser import tag_parser
+
 
 def get_active_stage():
     dckr = docker.from_env()
@@ -11,10 +12,10 @@ def get_active_stage():
             cleaned_tags = i.tags
             cleaned_tags.remove(active_image_tag)
             if len(cleaned_tags) > 1:
-                exit("Multiple active stages defined. This is an error")
+                exit("ERROR: MULTIPLE ACTIVE STAGES DEFINED.")
             for t in cleaned_tags:
-                print('GOT ACTIVE STAGE: ' + t)
+                print('INFO: GOT ACTIVE STAGE: ' + t)
                 parser = tag_parser()
                 parser.parse(t)
                 return parser
-    exit("No active stage defined!")
+    exit("ERROR: NO ACTIVE STAGE DEFINED IN DOCKER ENVIRONMENT.")
