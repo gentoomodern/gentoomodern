@@ -2,8 +2,8 @@
 
 import os
 from .gentoomuch_common import stages_path
-from .get_cleaned_profile import get_cleaned_profile
-from .get_cleaned_stagedef import get_cleaned_stagedef
+from .get_dockerized_profile_name import get_dockerized_profile_name
+from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 from .get_docker_tag import get_docker_tag
 from .tarball_exists import tarball_exists
 from .stage_exists import stage_exists

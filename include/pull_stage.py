@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os, sys, re
-from .gentoomuch_common image_tag_base, output_path
+from .gentoomuch_common import image_tag_base, output_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
 

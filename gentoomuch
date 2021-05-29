@@ -12,8 +12,8 @@ from include.tag_parser import tag_parser
 from include.get_active_stage import get_active_stage
 from include.list_stages import list_stages
 from include.list_profiles import list_profiles
-from include.set_stage import set_stage
-from include.set_profile import set_profile
+from include.set_desired_stage import set_desired_stage
+from include.set_desired_profile import set_desired_profile
 from include.run_build import run_build
 from include.get_docker_tag import get_docker_tag
 from include.save_tarball import save_tarball

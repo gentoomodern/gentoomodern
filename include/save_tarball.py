@@ -4,8 +4,8 @@ import os, sys, docker, re
 from .gentoomuch_common import desired_packages_path, stages_path, output_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
-from .get_cleaned_profile import get_cleaned_profile
-from .get_cleaned_stagedef import get_cleaned_stagedef
+from .get_dockerized_profile_name import get_dockerized_profile_name
+from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 from .get_docker_tag import get_docker_tag
 from .swap_stage import swap_stage
 from .get_tarball_name import get_tarball_name

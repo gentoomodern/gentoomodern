@@ -3,8 +3,8 @@
 # This sets the currently active basestage.
 import os, sys, re, docker
 from .gentoomuch_common import output_path, config_path, image_tag_base, active_image_tag, desired_packages_path, desired_hooks_path
-from .get_cleaned_stagedef import get_cleaned_stagedef
-from .get_cleaned_profile import get_cleaned_profile
+from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
+from .get_dockerized_profile_name import get_dockerized_profile_name
 from .portage_directory_combiner import portage_directory_combiner
 from .get_docker_tag import get_docker_tag
 from .composefile import create_composefile

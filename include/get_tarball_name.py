@@ -2,7 +2,7 @@
 
 import re, docker
 from .get_dockerized_profile_name import get_dockerized_profile_name
-from .get_cleaned_stagedef import get_cleaned_stagedef
+from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 
 
 def get_tarball_name(arch, profile, stage_define, upstream = False, ext = 'xz'):

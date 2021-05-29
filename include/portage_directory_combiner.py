@@ -4,7 +4,7 @@ import sys, os
 from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, patches_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, debug, patches_output_path, sets_output_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
-from .read_by_tokens import read_by_tokens
+#from .read_by_token import read_by_token
 from .get_cleaned_path import get_cleaned_path
 from .portage_directory import portage_directory
 

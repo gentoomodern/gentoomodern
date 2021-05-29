@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import re, docker
-from .gentoomuch_common import image_tag_base, active_image_tag, profiles_amd64_cleaned
+from .gentoomuch_common import image_tag_base, active_image_tag, profiles_amd64_dockerized
 
 
 class tag_parser:
@@ -39,7 +39,7 @@ class tag_parser:
         # A) musl-hardened
         # B) musl-hardened-custom-memalloc-test
         profile_found = False # We start searching within our set of profiles. These are defined in gentoomuch_common.py
-        for p in profiles_amd64_cleaned: 
+        for p in profiles_amd64_dockerized: 
             if tag.startswith(p): # If we match, we can set our data and break out.
                 self.profile = p
                 profile_found = True

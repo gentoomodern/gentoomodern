@@ -8,11 +8,11 @@ debug = True
 # First one first.
 output_path                        = './gentoomuch-data/'
 stages_path                        = output_path + 'stages/'
-desired_stage_config_path	   = output_path + 'desired_stage'
-desired_profile_config_path	   = output_path + 'desired_profile'
-desired_packages_config_path       = output_path + 'desired_packages'
-desired_hooks_config_path          = output_path + 'desired_hooks'
-gpg_path                         = output_path + 'gpg/'
+desired_stage_path	           = output_path + 'desired_stage/'
+desired_profile_path	           = output_path + 'desired_profile/'
+desired_packages_path              = output_path + 'desired_packages/'
+desired_hooks_path                 = output_path + 'desired_hooks/'
+gpg_path                           = output_path + 'gpg/'
 # Portage-related
 portage_output_path                = output_path + 'portage/'
 sets_output_path                   = portage_output_path + 'sets/'
@@ -43,7 +43,7 @@ active_image_tag                   = image_tag_base + 'current:latest'
 # The key to sign upstream releases
 gentoo_signing_key                 = "0xBB572E0E2D182910"
 # The url to obtain upstream releases
-gentoo_upstream_url                = "https://ftp-osl.osuosl.org/pub/gentoo/releases/"
+gentoo_upstream_url                = "http://ftp-osl.osuosl.org/pub/gentoo/releases/"
 # Supported profiles (more platforms coming soon!)
 profiles_amd64 = ( 'default', 'hardened+nomultilib', 'hardened-selinux+nomultilib', 'hardened-selinux', 'hardened', 'musl-hardened', 'musl-vanilla', 'nomultilib', 'systemd', 'uclibc-hardened', 'uclibc-vanilla', 'x32' )
 # Names we can use when comparing strings to their Dockerized equivalents (no + or / symbols...)

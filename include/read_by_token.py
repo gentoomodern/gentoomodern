@@ -2,7 +2,7 @@
 
 
 # https://stackoverflow.com/questions/16402525/python-read-whitespace-separated-strings-from-file-similar-to-readline
-def read_by_tokens(obj):
+def read_by_token(obj):
     for line in obj:
         for token in line.split():
             yield token

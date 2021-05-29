@@ -5,8 +5,8 @@ from .gentoomuch_common import arch_config_path, output_path, desired_stage_path
 #from .get_active_stage import get_active_stage, tag_parser
 from .swap_stage import swap_stage
 from .composefile import create_composefile
-from .get_cleaned_profile import get_cleaned_profile
-from .get_cleaned_stagedef import get_cleaned_stagedef
+from .get_dockerized_profile_name import get_dockerized_profile_name
+from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 def freshroot():
     arch = open(arch_config_path).read().strip()
     if os.path.isfile(desired_profile_path) and os.path.isfile(desired_stage_path):
