@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, sys, re
-from .gentoomuch_common import output_path, config_path, active_image_tag
+from .gentoomuch_common import output_path, config_path, active_image_tag, stages_path
 from .write_file_lines import write_file_lines
 from .get_active_stage import get_active_stage
 from .tag_parser import tag_parser
@@ -49,7 +49,7 @@ def __output_config(container_type_str):
     results.append('    - /dev:/dev\n')
     results.append('    - /proc:/proc\n')
     results.append('    - /sys:/sys:ro\n')
-    # These are the parts that have different permissions between the two types of containers.
+    # These are parts that have different permissions between the two types of containers.
     binpkg_str          = '    - binpkgs:/var/cache/binpkgs'
     distfiles_str       = '    - distfiles:/var/cache/distfiles'
     ebuilds_str         = '    - ebuilds:/var/db/repos/gentoo'
@@ -72,6 +72,8 @@ def __output_config(container_type_str):
         results.append(kernels_str + '\n')
         results.append(squashed_output_str + '\n')
         results.append(stages_mount_str + ':ro\n')
+    # This one is added at the end for consistency of end-users' reading. It does NOT require multiple types of permissions.
+    results.append('    - ./emerge-logs:/var/log/portage\n')
     # Here we loop over the all the files in the config/portage directory and add them.
     portage_tgt = '/etc/portage/'
     for (dirpath, directories, files) in os.walk(output_path + 'portage'):

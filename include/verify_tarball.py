@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import os, gnupg, hashlib
-from .gentoomuch_common import upstream_stages_path, gpg_path, asc_ext
+from .gentoomuch_common import stages_path, gpg_path, asc_ext
 from .read_file_lines import read_file_lines
 
 
 def verify_tarball(filepath):
     gpg = gnupg.GPG(gnupghome = gpg_path)
-    filename = os.path.relpath(filepath, upstream_stages_path)
+    filename = os.path.relpath(filepath, stages_path)
     print("INFO: Verifying signature of file " +  filename)
     asc_file = open(filepath + asc_ext, 'rb').read()
     if not gpg.verify(asc_file):

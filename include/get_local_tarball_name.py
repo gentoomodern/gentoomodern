@@ -3,5 +3,6 @@
 from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 from .get_dockerized_profile_name import get_dockerized_profile_name
 
+
 def get_local_tarball_name(arch, profile, stagedef):
-    return arch + '-' + get_dockerized_profile_name(profile) + '-' + get_dockerized_stagedef_name(stagedef) + '.tar.zstd'
+    return arch + '-' + get_dockerized_profile_name(profile) + '-' + get_dockerized_stagedef_name(stagedef) + '.tar.gz'

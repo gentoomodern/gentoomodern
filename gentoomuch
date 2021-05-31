@@ -19,6 +19,8 @@ from include.run_build import run_build
 from include.get_docker_tag import get_docker_tag
 from include.save_tarball import save_tarball
 from include.download_tarball import download_tarball
+from include.setup_workdir import setup_workdir
+
 
 # Our commandline keywords
 ls_str = 'ls'
@@ -79,12 +81,14 @@ def print_usage():
 # We do this every time!
 arch = open(arch_config_path).read().strip()
 
-# This handles the bootstrap of each stage, from upstream.
+setup_workdir(arch)
+
+# This handles the bootstrap of each stage, built from upstream.
 def pull_sequence(profile):
-    download_tarball(arch, profile)
-    #swap_stage(arch, profile, 'gentoomuch/builder')
-    #run_build(True)
-    save_tarball(arch, profile, 'gentoomuch/builder', True)
+    if download_tarball(arch, profile):
+    # swap_stage(arch, profile, 'gentoomuch/builder')
+    # run_build(True)
+        save_tarball(arch, profile, 'gentoomuch/builder', bool(True))
 
 # Now, we get properly started.
 # Get the first command
@@ -109,7 +113,7 @@ if prime_cmd == stage_str:
 # Profile-related command (ls/set)
 elif prime_cmd == profile_str:
     if sys.argv[2] == ls_str and len(sys.argv) == 3: # Listing profiles
-        list_profiles()
+        list_profiles(arch)
         exit()
     elif sys.argv[2] == set_str and len(sys.argv) == 4: # Setting profile
         set_desired_profile(sys.argv[3])
@@ -123,10 +127,19 @@ elif prime_cmd == bootstrap_str:
     if len(sys.argv) > 2 and sys.argv[2] == all_str:
         for p in profiles_amd64:
             pull_sequence(p)
+    # If we have an profile argument that matches what we need.
     elif len(sys.argv) > 2 and sys.argv[2] in profiles_amd64:
         pull_sequence(sys.argv[2])
-    else:
+    # If we have a profile argument but no match.
+    elif len(sys.argv) > 2:
         exit("Could not find " + sys.argv[2] + " " + " in supported profiles.")
+    # We use the profile user has explicitly set as her desired default.
+    else:
+        if get_desired_profile()[0]:
+            pull_sequence(get_desired_profile()[1])
+        else:
+            exit("Tried to bootstrap, but no profile was set.")
+        
 # Deal with the freshroot command
 elif prime_cmd == freshroot_str: 
     #swap_stage(arch, 'default', 'gentoomuch/builder')

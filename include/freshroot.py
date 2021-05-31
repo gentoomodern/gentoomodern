@@ -7,6 +7,8 @@ from .swap_stage import swap_stage
 from .composefile import create_composefile
 from .get_dockerized_profile_name import get_dockerized_profile_name
 from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
+from .get_desired_profile import get_desired_profile
+from .get_desired_stage import get_desired_stage
 
 
 def freshroot():

@@ -5,11 +5,11 @@ from .gentoomuch_common import image_tag_base
 from .get_dockerized_profile_name import get_dockerized_profile_name
 from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 
-def get_docker_tag(arch, profile, stage_define, upstream):
+
+def get_docker_tag(arch, profile, stage_define, upstream : bool):
     cleaned_profile = get_dockerized_profile_name(profile) 
     cleaned_stage_define = get_dockerized_stagedef_name(stage_define) 
     tag_tail = ''
-    print("DEBUG: get_docker_tag: upstream = " + str(upstream))
     if upstream == True:
         tag_tail = arch + '-' + cleaned_profile + ':upstream' # We use the upstream stage3.
     else:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, urllib
-from .gentoomuch_common import gentoo_upstream_url, gentoo_signing_key, upstream_stages_path, asc_ext
+from .gentoomuch_common import gentoo_upstream_url, gentoo_signing_key, stages_path, asc_ext
 from .verify_tarball import verify_tarball
 from .containerize import containerize
 
@@ -46,22 +46,23 @@ def download_tarball(arch, profile):
         try:
             with urllib.request.urlopen(req) as response:
                 if suffix == '':
-                    with open(upstream_stages_path + fname + suffix, 'wb') as f:
+                    with open(stages_path + fname + suffix, 'wb') as f:
                         f.write(response.read())
-                        actual_size = os.stat(upstream_stages_path + fname + suffix).st_size
+                        actual_size = os.stat(stages_path + fname + suffix).st_size
                     if actual_size != fsize:
                         print('ERROR: Downloaded size mismatch for ' + fname + '.  Intended: ' + fsize + '. Actual: ' + actual_size)
                         return False
-                    print("INFO: Downloaded file " + upstream_stages_path + fname + suffix)
+                    print("INFO: Downloaded file " + stages_path + fname + suffix)
                 else:
-                    if os.path.isfile(os.path.join(upstream_stages_path, fname + suffix)):
-                        os.remove(os.path.join(upstream_stages_path, fname + suffix))
-                    with open(upstream_stages_path + fname + suffix, 'wb') as f:
+                    if os.path.isfile(os.path.join(stages_path, fname + suffix)):
+                        os.remove(os.path.join(stages_path, fname + suffix))
+                    with open(stages_path + fname + suffix, 'wb') as f:
                         f.write(response.read())
 
         except urllib.error.HTTPError as e:
             print("ERROR: " + fname + suffix + " not found at " + new_url + suffix)
             return False
-    if verify_tarball(upstream_stages_path + fname + suffix):
+    if verify_tarball(stages_path + fname + suffix):
         # Dockerize that thing, ya'll
-        containerize(fname + suffix, arch, profile, '', True)
+        print("INFO: Containerizing upstream tarball")
+        return containerize(fname + suffix, arch, profile, '', bool(True))

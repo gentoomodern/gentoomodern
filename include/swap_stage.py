@@ -10,7 +10,8 @@ from .get_docker_tag import get_docker_tag
 from .composefile import create_composefile
 from .write_file_lines import write_file_lines
 
-def swap_stage(arch, profile, stage_def, upstream = False):
+
+def swap_stage(arch, profile, stage_def, upstream : bool):
     os.system('cd ' + output_path + ' && docker-compose down')
     combiner = portage_directory_combiner()
     combiner.process_stage_defines(stage_def)

@@ -7,9 +7,9 @@ from .get_dockerized_profile_name import get_dockerized_profile_name
 #Stuff all scripts here should use
 debug				        =	True
 output_path				    =	'./gentoomuch-data/'
-local_stages_path		    =	output_path + 'local_stages/'
-upstream_stages_path	    =   output_path + 'upstream_stages/'
+stages_path		            =	output_path + 'stages/'
 gpg_path				    =   output_path + 'gpg/'
+emergelogs_path             =   output_path + 'emerge.logs/'
 desired_stage_path		    =   output_path + 'desired_stage'
 desired_profile_path	    =	output_path + 'desired_profile'
 desired_packages_path	    =	output_path + 'desired_packages'
