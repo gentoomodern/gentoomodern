@@ -5,7 +5,6 @@ from .gentoomuch_common import portage_output_path, config_path, stage_defines_p
 from .read_file_lines import read_file_lines
 from .read_by_token import read_by_token
 from .write_file_lines import write_file_lines
-from .get_cleaned_path import get_cleaned_path
 
 dont_munge_files = (['', 'bashrc'], ['', 'modules'], ['', 'README.md'], ['', 'mirrors'], ['', 'color.map'])
 dont_munge_dirs = ('sets', 'patches', 'savedconfig')

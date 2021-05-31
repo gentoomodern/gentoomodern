@@ -6,7 +6,6 @@ from include.gentoomuch_common import arch_config_path, config_path, output_path
 from include.freshroot import freshroot
 from include.sync import sync
 from include.swap_stage import swap_stage
-from include.pull_stage import pull_stage
 from include.composefile import create_composefile
 from include.tag_parser import tag_parser
 from include.get_active_stage import get_active_stage
@@ -14,10 +13,14 @@ from include.list_stages import list_stages
 from include.list_profiles import list_profiles
 from include.set_desired_stage import set_desired_stage
 from include.set_desired_profile import set_desired_profile
+from include.get_desired_stage import get_desired_stage
+from include.get_desired_profile import get_desired_profile
 from include.run_build import run_build
 from include.get_docker_tag import get_docker_tag
 from include.save_tarball import save_tarball
+from include.download_tarball import download_tarball
 
+# Our commandline keywords
 ls_str = 'ls'
 set_str = 'set'
 sync_str = 'sync'
@@ -28,9 +31,12 @@ profile_str = 'profile'
 stage_str = 'stage'
 all_str = 'all'
 
+# First word after the "gentoomuch" command.
 primary_commands = (profile_str, stage_str, sync_str, pipeline_str, freshroot_str, bootstrap_str)
-ls_and_set_commands = (profile_str, stage_str)
-verbs = (ls_str, set_str)
+# Commands you can use ls and set to visualize and manipulate.
+#ls_and_set_usedwiths = (profile_str, stage_str)
+# 
+#verbs = (ls_str, set_str)
 
 # Here we define CLI help functions for when the user needs it.
 usage = "    gentoomuch "
@@ -46,7 +52,7 @@ def print_usage_profile_ls():
     print(usage + profile_str + ' ' + ls_str)
 
 def print_usage_profile_set():
-    print(usage + profile_str + ' ' + set_str + ' <number|name>')
+    print(usage + profile_str + ' ' + set_str + ' <name>')
 
 def print_usage_stage():
     print_usage_stage_ls()
@@ -57,7 +63,10 @@ def print_usage_profile():
     print_usage_profile_set()
 
 def print_usage_bootstrap():
-    print(usage + bootstrap_str + ' <number|name|"' + all_str +'">')
+    print(usage + bootstrap_str + ' <name|"' + all_str +'">')
+
+def print_no_profile():
+    print("You need to set a base profile before continuing. Try:")
 
 def print_usage():
     print(usage + freshroot_str)
@@ -72,10 +81,10 @@ arch = open(arch_config_path).read().strip()
 
 # This handles the bootstrap of each stage, from upstream.
 def pull_sequence(profile):
-    #pull_stage(arch, profile)
+    download_tarball(arch, profile)
     #swap_stage(arch, profile, 'gentoomuch/builder')
     #run_build(True)
-    srl = save_tarball(arch, profile, 'gentoomuch/builder', True)
+    save_tarball(arch, profile, 'gentoomuch/builder', True)
 
 # Now, we get properly started.
 # Get the first command
@@ -92,7 +101,7 @@ if prime_cmd == stage_str:
         list_stages()
         exit()
     elif sys.argv[2] == set_str and len(sys.argv) == 4: # Setting stage
-        set_stage(sys.argv[3])
+        set_desired_stage(sys.argv[3])
         exit()
     else: # Error message for stages
         print_usage_stage()
@@ -103,20 +112,21 @@ elif prime_cmd == profile_str:
         list_profiles()
         exit()
     elif sys.argv[2] == set_str and len(sys.argv) == 4: # Setting profile
-        set_profile(sys.argv[3])
+        set_desired_profile(sys.argv[3])
         exit()
     else: # Error message for profile
         print_usage_profile() 
         exit()
 # Bootstrap a stage from an upstream tarball
 elif prime_cmd == bootstrap_str:
-    if sys.argv[2] in profiles_amd64:
-        pull_sequence(sys.argv[2])
-    elif sys.argv[2] == all_str:
+    # If we are to pull all stages and bootstrap. Risky and time-consuming.
+    if len(sys.argv) > 2 and sys.argv[2] == all_str:
         for p in profiles_amd64:
             pull_sequence(p)
+    elif len(sys.argv) > 2 and sys.argv[2] in profiles_amd64:
+        pull_sequence(sys.argv[2])
     else:
-        exit("Could not find profile " + sys.argv[2])
+        exit("Could not find " + sys.argv[2] + " " + " in supported profiles.")
 # Deal with the freshroot command
 elif prime_cmd == freshroot_str: 
     #swap_stage(arch, 'default', 'gentoomuch/builder')
@@ -129,7 +139,7 @@ elif prime_cmd == pipeline_str:
 # Sync Portage tree.
 elif prime_cmd == sync_str:
     swap_stage(arch, 'default', 'gentoomuch/builder', True)
-    create_composefile(output_path)
+    # create_composefile(output_path)
     sync()
     #TODO: Remount SquashFS
 else:

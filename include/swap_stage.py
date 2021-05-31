@@ -8,7 +8,7 @@ from .get_dockerized_profile_name import get_dockerized_profile_name
 from .portage_directory_combiner import portage_directory_combiner
 from .get_docker_tag import get_docker_tag
 from .composefile import create_composefile
-
+from .write_file_lines import write_file_lines
 
 def swap_stage(arch, profile, stage_def, upstream = False):
     os.system('cd ' + output_path + ' && docker-compose down')
@@ -18,7 +18,7 @@ def swap_stage(arch, profile, stage_def, upstream = False):
     dckr_imgs = dckr.images.list()
     found = False
     t = get_docker_tag(arch, profile, stage_def, bool(upstream))
-    print("ATTEMPTING TO SWAP: " + t)
+    # print("ATTEMPTING TO SWAP: " + t)
     for i in dckr_imgs:
         if t in i.tags:
             os.system('docker rmi ' + active_image_tag) # To ensure we don't suffer from duplicates.
@@ -29,10 +29,10 @@ def swap_stage(arch, profile, stage_def, upstream = False):
     if not found:
         sys.exit("FAILED TO SWAP STAGE: Could not find docker image " + t)
     if 'packages' in combiner.todo:
-        if len(combiner.todo['packages']) > 1:
-            write_file_lines(combiner.todo['packages'], desired_package_path)
+        if len(combiner.todo['packages']) > 0:
+            write_file_lines(desired_packages_path, combiner.todo['packages'])
     if 'hooks' in combiner.todo:
-        if len(combiner.todo['hooks']) > 1:
-            write_file_lines(combiner.todo['hooks'], desired_hooks_path)
+        if len(combiner.todo['hooks']) > 0:
+            write_file_lines(desired_hooks_path, combiner.todo['hooks'])
     create_composefile(output_path)
     os.system('cd ' + output_path + ' && docker-compose up --no-start')

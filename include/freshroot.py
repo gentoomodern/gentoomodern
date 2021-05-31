@@ -7,6 +7,8 @@ from .swap_stage import swap_stage
 from .composefile import create_composefile
 from .get_dockerized_profile_name import get_dockerized_profile_name
 from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
+
+
 def freshroot():
     arch = open(arch_config_path).read().strip()
     if os.path.isfile(desired_profile_path) and os.path.isfile(desired_stage_path):

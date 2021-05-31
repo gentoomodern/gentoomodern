@@ -4,8 +4,6 @@ import sys, os
 from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
-#from .read_by_token import read_by_token
-from .get_cleaned_path import get_cleaned_path
 from .munger import munger
 
 class portage_directory:
@@ -14,14 +12,14 @@ class portage_directory:
 
     def ingest(self, local_path):
         for (dirpath, dirnames, filenames) in os.walk(local_path):
-            current_path = get_cleaned_path(dirpath, local_path)
+            current_path = os.path.relpath(dirpath, local_path)
             for d in dirnames:
                 outdir = os.path.join(portage_output_path, d)
                 if not os.path.isdir(outdir):
                    os.mkdir(outdir)
             for f in filenames:
                 if f[0] != '.':
-                    current_path = get_cleaned_path(dirpath, local_path)
+                    current_path = os.path.relpath(dirpath, local_path)
                     current_file = os.path.join(current_path, f)
                     if not current_file in self.accumulators: # Add a munger object to prevent a crash
                         self.accumulators[current_file] = munger(current_path, f)

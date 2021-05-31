@@ -4,8 +4,6 @@ import sys, os
 from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, patches_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, debug, patches_output_path, sets_output_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
-#from .read_by_token import read_by_token
-from .get_cleaned_path import get_cleaned_path
 from .portage_directory import portage_directory
 
 
@@ -58,11 +56,11 @@ class portage_directory_combiner:
         combined_path = os.path.join(current_stage_defines_path, 'packages')
         if os.path.isfile(combined_path):
             self.todo['packages'] = read_file_lines(combined_path)
-            write_file_lines('./config/packages', self.todo['packages'])
+            #write_file_lines('./config/packages', self.todo['packages'])
         combined_path = os.path.join(current_stage_defines_path, 'hooks')
         if os.path.isfile(combined_path):
             self.todo['hooks'] = read_file_lines(combined_path)
-            write_file_lines('./config/hooks', self.todo['hooks'])
+            #write_file_lines('./config/hooks', self.todo['hooks'])
         # Now we write-out the files themselves
         self.accum.writeout()
 

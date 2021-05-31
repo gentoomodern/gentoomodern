@@ -5,9 +5,9 @@ from .gentoomuch_common import image_tag_base
 from .get_dockerized_profile_name import get_dockerized_profile_name
 from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 
-def get_docker_tag(arch, profile, stage_define, upstream = False):
-    cleaned_profile = get_dockerized_profile_name(profile) # Found that one out when working with musl+selinux...
-    cleaned_stage_define = get_dockerized_stagedef_name(stage_define) # / gets interpreted as a repository in docker, so fix that up.
+def get_docker_tag(arch, profile, stage_define, upstream):
+    cleaned_profile = get_dockerized_profile_name(profile) 
+    cleaned_stage_define = get_dockerized_stagedef_name(stage_define) 
     tag_tail = ''
     print("DEBUG: get_docker_tag: upstream = " + str(upstream))
     if upstream == True:

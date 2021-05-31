@@ -6,9 +6,9 @@ from .write_file_lines import write_file_lines
 from .get_active_stage import get_active_stage
 from .tag_parser import tag_parser
 
+
 builder_str = 'builder'
 updater_str = 'updater'
-
 
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
 def create_composefile(output_path):
@@ -77,7 +77,8 @@ def __output_config(container_type_str):
     for (dirpath, directories, files) in os.walk(output_path + 'portage'):
         for f in files:
             if not f[0] == '.' and not f == 'README.md':
-                results.append('    - ./' + os.path.join(os.path.relpath(dirpath, output_path), f) + ':' + os.path.join(portage_tgt, f) + ':ro\n')
+                rel_path = os.path.relpath(dirpath, output_path)
+                results.append('    - ./' + os.path.join(rel_path, f) + ':' + os.path.join('/etc/', rel_path, f) + ':ro\n')
     if is_builder:
         results.append('    cap_add:\n')
         results.append('    - CAP_SYS_ADMIN\n')
