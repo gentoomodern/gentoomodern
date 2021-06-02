@@ -13,7 +13,7 @@ def list_stages():
     print("Listing user-defined stages:")
     for dirpath, dirs, files in sorted(os.walk(stage_defines_path)):
         if not dirs:
-            d = re.sub(stage_defines_path, '', dirpath)
+            d = os.path.relpath(dirpath, stage_defines_path)
             if stage_set:
                 print((' [*] ' if d == desired else ' [ ] ') + ' ' + d)
             else:

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import docker
-import os
+import os, docker
 from include.gentoomuch_common import arch_config_path, desired_profile_path, profiles_amd64, output_path
 from .docker_stage_exists import docker_stage_exists
+
 
 def list_profiles(arch):
     no_profile = False

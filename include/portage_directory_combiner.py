@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys, os 
-from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, patches_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, debug, patches_output_path, sets_output_path
+from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, debug, sets_output_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
 from .portage_directory import portage_directory
@@ -88,10 +88,10 @@ class portage_directory_combiner:
         rsync_cmd = 'rsync -aHXvq '
         if not os.path.isdir(sets_output_path):
             os.mkdir(sets_output_path)
-        if not os.path.isdir(patches_output_path):
-            os.mkdir(patches_output_path)
+        #if not os.path.isdir(patches_output_path):
+        #    os.mkdir(patches_output_path)
         sync_sets_str = rsync_cmd + os.path.join(pkgset_path, '*') + ' ' + sets_output_path
-        sync_patches_str = rsync_cmd + os.path.join(patches_path, '*') + ' ' + patches_output_path
+        # sync_patches_str = rsync_cmd + os.path.join(patches_path, '*') + ' ' + patches_output_path
         # A helper to print error messages without copying code.
         def print_rsync_error(tag):
             sys.exit(msg_prefix + "Could not rsync " + tag + " with error code: " + str(code))
@@ -99,6 +99,6 @@ class portage_directory_combiner:
         code = os.system(sync_sets_str)
         if not code == 0:
             print_rsync_error('sets')
-        code = os.system(sync_patches_str)
-        if not code == 0:
-            print_rsync_error('patches')
+        #code = os.system(sync_patches_str)
+        #if not code == 0:
+        #    print_rsync_error('patches')

@@ -13,6 +13,9 @@ def download_tarball(arch, profile):
     if profile != 'default':
         tail += '-' + profile
     url_base = gentoo_upstream_url + arch + "/autobuilds/"
+    # This one is named all wierd. :P
+    if arch == 'amd64' and profile == 'x32':
+        tail = '-x32'
     bootstrap_url = url_base + "latest-stage3" + tail + ".txt"
     print("INFO: Obtaining seed file: " + bootstrap_url)
     req = urllib.request.Request(bootstrap_url)
@@ -39,30 +42,30 @@ def download_tarball(arch, profile):
     if not figured_it_out:
         print("ERROR: Could not munge stage3 path from seed.")
         return False
-
+    tarball_path = os.path.join(stages_path, fname)
+    print("TARBALL PATH " + tarball_path)
     for suffix in (asc_ext, ''):
         req = urllib.request.Request(new_url + suffix)
         print("INFO: Getting file " + fname + suffix + " from " + new_url + suffix)
         try:
             with urllib.request.urlopen(req) as response:
                 if suffix == '':
-                    with open(stages_path + fname + suffix, 'wb') as f:
+                    with open(tarball_path + suffix, 'wb') as f:
                         f.write(response.read())
-                        actual_size = os.stat(stages_path + fname + suffix).st_size
+                        actual_size = os.stat(tarball_path + suffix).st_size
                     if actual_size != fsize:
                         print('ERROR: Downloaded size mismatch for ' + fname + '.  Intended: ' + fsize + '. Actual: ' + actual_size)
                         return False
-                    print("INFO: Downloaded file " + stages_path + fname + suffix)
+                    print("INFO: Downloaded file " + tarball_path + suffix)
                 else:
-                    if os.path.isfile(os.path.join(stages_path, fname + suffix)):
-                        os.remove(os.path.join(stages_path, fname + suffix))
-                    with open(stages_path + fname + suffix, 'wb') as f:
+                    if os.path.isfile(tarball_path + suffix):
+                        os.remove(tarball_path + suffix)
+                    with open(tarball_path + suffix, 'wb') as f:
                         f.write(response.read())
-
         except urllib.error.HTTPError as e:
             print("ERROR: " + fname + suffix + " not found at " + new_url + suffix)
             return False
-    if verify_tarball(stages_path + fname + suffix):
+    if verify_tarball(tarball_path + suffix):
         # Dockerize that thing, ya'll
         print("INFO: Containerizing upstream tarball")
         return containerize(fname + suffix, arch, profile, '', bool(True))

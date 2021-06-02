@@ -20,12 +20,13 @@ from include.get_docker_tag import get_docker_tag
 from include.save_tarball import save_tarball
 from include.download_tarball import download_tarball
 from include.setup_workdir import setup_workdir
-
+from include.patches import prep_patch
 
 # Our commandline keywords
 ls_str = 'ls'
 set_str = 'set'
 sync_str = 'sync'
+patch_str = 'patch'
 pipeline_str = 'pipeline'
 freshroot_str = 'freshroot'
 bootstrap_str = 'bootstrap'
@@ -82,8 +83,9 @@ def print_usage():
 arch = open(arch_config_path).read().strip()
 
 setup_workdir(arch)
-
+#
 # This handles the bootstrap of each stage, built from upstream.
+#
 def pull_sequence(profile):
     if download_tarball(arch, profile):
     # swap_stage(arch, profile, 'gentoomuch/builder')
@@ -91,7 +93,9 @@ def pull_sequence(profile):
         save_tarball(arch, profile, 'gentoomuch/builder', bool(True))
 
 # Now, we get properly started.
-# Get the first command
+########################
+# Get the first command.
+########################
 prime_cmd = ''
 if len(sys.argv) > 1:
     if sys.argv[1] in primary_commands:
@@ -99,29 +103,41 @@ if len(sys.argv) > 1:
     else:
         print_usage()
         exit()
-# Stage definitions-related commands (ls/set)
+##############################################
+# Stage definitions-related commands (ls/set).
+##############################################
 if prime_cmd == stage_str:
     if sys.argv[2] == ls_str and len(sys.argv) == 3: # Listing stages
         list_stages()
         exit()
     elif sys.argv[2] == set_str and len(sys.argv) == 4: # Setting stage
-        set_desired_stage(sys.argv[3])
+        if not sys.argv[3].isnumeric():
+            set_desired_stage(sys.argv[3])
+        else:
+            print("You need to set a stage by name, as numbers will change over time.")
         exit()
     else: # Error message for stages
         print_usage_stage()
         exit()
-# Profile-related command (ls/set)
+###################################
+# Profile-related command (ls/set).
+###################################
 elif prime_cmd == profile_str:
     if sys.argv[2] == ls_str and len(sys.argv) == 3: # Listing profiles
         list_profiles(arch)
         exit()
     elif sys.argv[2] == set_str and len(sys.argv) == 4: # Setting profile
-        set_desired_profile(sys.argv[3])
+        if not sys.argv[3].isnumeric():
+            set_desired_profile(sys.argv[3])
+        else:
+            print("You need to set a profile by name.")
         exit()
     else: # Error message for profile
         print_usage_profile() 
         exit()
-# Bootstrap a stage from an upstream tarball
+#############################################
+# Bootstrap a stage from an upstream tarball.
+#############################################
 elif prime_cmd == bootstrap_str:
     # If we are to pull all stages and bootstrap. Risky and time-consuming.
     if len(sys.argv) > 2 and sys.argv[2] == all_str:
@@ -139,17 +155,50 @@ elif prime_cmd == bootstrap_str:
             pull_sequence(get_desired_profile()[1])
         else:
             exit("Tried to bootstrap, but no profile was set.")
-        
-# Deal with the freshroot command
+##################
+# Handle patching.
+##################
+elif prime_cmd == patch_cmd:
+    prep_str = 'prep'
+    save_str = 'save'
+    compile_str = 'compile'
+    if len(sys.argv) > 2:
+        action = sys.argv[2].strip()
+        if action == 'prep_str':
+            if len(sys.argv) > 5:
+                patchname = sys.argv[3]
+                packagename = sys.argv[4]
+                version = sys.argv[5]
+                repo_name = ''
+                force = False
+                has_custom_repo = False
+                for a in sys.argv[6:]:
+                    if a == '--force':
+                        force = True
+                    elif a == '--repo-name' and not has_custom_repo:
+                        has_custom_repo = True
+                    elif has_custom_repo:
+                        repo_name = a
+                    else:
+                        print(usage + prep_str ' ' + patchname + ' (for ' + packagename + '-' + version + ') - Unknown option: ' + a)
+            else:
+                print(usage + prep_str + ' <patch-name> <package> <version-str> [--force, --repo-name]')
+##################################
+# Deal with the freshroot command. 
+##################################
 elif prime_cmd == freshroot_str: 
     #swap_stage(arch, 'default', 'gentoomuch/builder')
     freshroot()
-# Run pipelined builds
+#######################
+# Run pipelined builds.
+#######################
 elif prime_cmd == pipeline_str:
     print('Running pipeline')
     # Get stage defines from buildlist and build them.
     # TODO: Implement
-# Sync Portage tree.
+####################
+# Sync Portage tree. 
+####################
 elif prime_cmd == sync_str:
     swap_stage(arch, 'default', 'gentoomuch/builder', True)
     # create_composefile(output_path)

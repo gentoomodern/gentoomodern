@@ -24,7 +24,7 @@ def containerize(tarball_name, arch, profile, stagedef, upstream: bool) -> bool:
     if os.path.isfile(os.path.join(stages_path, 'Dockerfile')):
         os.remove(os.path.join(stages_path, 'Dockerfile'))
     # Now create our dockerfile.
-    open(os.path.join(stages_path, 'Dockerfile'), 'w').write(bootstrap_dockerfile(tarball_name))
+    open(os.path.join(stages_path, 'Dockerfile'), 'w').write(bootstrap_dockerfile(tarball_name, profile))
     
     # We then import our bootstrap image, then build a new one using our dockerfile. Then we get rid of the old bootstrap image.
     code = os.system("cd " + stages_path + " && docker import " + tarball_name  + " " + bootstrap_tag + " && docker build -t " + desired_tag + " . && docker image rm -f " + bootstrap_tag + " &> /dev/null")
