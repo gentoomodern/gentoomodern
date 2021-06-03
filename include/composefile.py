@@ -76,7 +76,11 @@ def __output_config(container_type_str):
         results.append(squashed_output_str + '\n')
         results.append(stages_mount_str + ':ro\n')
     if is_patcher:
-        results.append('    - ./' + patches_workdir.split('/')[-1] + ':' + patches_mountpoint + '\n')
+        patches_path = ''
+        for d in patches_workdir.split('/')[1:]:
+            patches_path += d + '/'
+        patches_path = patches_path[0:-1]
+        results.append('    - ./' + patches_path + ':' + patches_mountpoint + '\n')
     # This one is added at the end for consistency of end-users' reading; it does NOT require multiple types of permissions.
     results.append('    - ./emerge.logs:/var/log/portage\n')
     # Here we loop over the all the files in the config/portage directory and add them.

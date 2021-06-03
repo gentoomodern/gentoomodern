@@ -6,9 +6,9 @@ from .get_gentoomuch_uid import get_gentoomuch_uid
 from .get_arch import get_arch
 from .swap_stage import swap_stage
 
-
 def get_first_commit():
     return "git log | grep commit | tail -2 | head -1 | sed -e 's/commit //g'"
+
 
 def validate_pkgname(package):
     if len(package.split('/')) < 2:
@@ -17,8 +17,29 @@ def validate_pkgname(package):
         return False
     return True
 
-def setup_git_user():
+
+#def get_desired_patch() -> str:
+#    config = os.path.join(output_path, 'desired_patch')
+
+# def set_desired_patch():
+    # config = os.path.join(output_path, 'desired_patch')    
+
+def setup_git_user() -> str:
     return ' git config --global user.email "gentoomuch-user@temporary.localhost" && git config --global user.name "Gentoomuch User" '
+
+
+# def get_unpacked_ebuild_basepath(repo_name: str, package_arg: arg, version: str, unpacked_sourcecode_dir: str = '') -> str:
+
+
+# def unpack_ebuild(repo_name: str, package_arg : str, version : str,  unpacked_sourcecode_dir : str = '') -> str:
+
+
+# def get_ebuild_source_dir(repo_name : str, package_arg : str, version : str, unpacked_sourcecode_dir: str = '') -> str:
+
+
+
+
+
 
 # Here, we will do the tooling required for you to start patching a given package+version
 # Then it unpacks your ebuild into it, and initializes the git repository for patching
@@ -34,9 +55,7 @@ def prep_patch(patch_name: str, package_arg: str, version: str, force: bool, rep
     # patches_basepath = os.path.join(patches_workdir, patch_name)
     # We first create the working directory
     unpacked_sourcecode_basedir = os.path.join(patches_mountpoint, patch_name)
-    
     os.system('cd ' + patches_workdir + ' && rm -rf ./*')
-    
     # For reference: ebuild $(portageq get_repo_path / gentoo)/ package-category/package-name/package-name-2.3-r7.ebuild clean unpack.
     cmd_str = 'PORTAGE_TMPDIR="' + unpacked_sourcecode_basedir + '" ebuild $(portageq get_repo_path / ' + repo_name + ')/' + package_arg + '/' + pkgname.split('/')[-1] + '.ebuild clean unpack && cd ' + unpacked_sourcecode_basedir + ' && ls -alh  && '
     # Here, we will clean up the directory by removing all non source-code items.
@@ -52,7 +71,7 @@ def prep_patch(patch_name: str, package_arg: str, version: str, force: bool, rep
     cmd_str += setup_git_user() + ' && git init && git add . && git commit -m "As-is from upstream (virgin.)"'
     # Now we can spin up a docker and unpack that patch into the workdir.
     code = os.system('cd ' + output_path  + ' &&  docker-compose run -u ' + get_gentoomuch_uid() + ' gentoomuch-patcher /bin/bash -c \'' + cmd_str + '\'')
-    
+    # Debug messages.
     print('Repo name:' + repo_name)
     print("Unpacked sourcecode basedir: " + unpacked_sourcecode_basedir)
     print('Pkg name (no tag): ' + pkgname_notag)
@@ -64,13 +83,15 @@ def prep_patch(patch_name: str, package_arg: str, version: str, force: bool, rep
     return True
 
 
-def list_available_package_versions(package: str, repo_name = '') -> bool:
+def list_available_package_versions(package: str, repo_name = ''):
     cmd_str = 'ls $(portageq get_repo_path / ' + repo_name + ')/' + package
-    code = os.system('cd ' + output_path + ' && docker-compose run -u ' + get_gentoomuch_uid() + ' gentoomuch-builder /bin/bash -c \'' + cmd_str + '\'')
+    code = os.system('cd ' + output_path + ' && docker-compose run -u ' + get_gentoomuch_uid() + " gentoomuch-builder /bin/bash -c '" + cmd_str + "'")
+
 
 # This method creates the proper directory under ./config/user.patches
 def save_patch(package: str, version: str, repo_name = '') -> bool:
     return False
+
 
 def try_patch(package: str, version: str, repo_name = '') -> bool:
     ### cd /var/tmp/portage/sys-fs/lvm2-2.02.145-r2/work/LVM2.2.02.145/

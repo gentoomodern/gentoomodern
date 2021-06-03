@@ -23,6 +23,10 @@ class ui_patch_prep_handler:
         self.version            = ''
     
     def handle(self):
+        print(str(self.index))
+        print(len(sys.argv))
+        if self.index == len(sys.argv):
+            exit("You need to add a name for your patch!")
         user_arg = sys.argv[self.index].strip()
         print("Handling arg = " + user_arg)
         while self.__is_optional_arg(user_arg):

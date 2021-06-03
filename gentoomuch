@@ -24,17 +24,17 @@ from include.patches import prep_patch
 from include.ui_patch_prep_handler import ui_patch_prep_handler, prep_str
 
 # Our commandline keywords
-ls_str = 'ls'
-set_str = 'set'
-sync_str = 'sync'
-patch_str = 'patch'
-pipeline_str = 'pipeline'
-freshroot_str = 'freshroot'
-bootstrap_str = 'bootstrap'
-profile_str = 'profile'
-stage_str = 'stage'
-patch_str = 'patch'
-all_str = 'all'
+ls_str          = 'ls'
+set_str         = 'set'
+sync_str        = 'sync'
+patch_str       = 'patch'
+pipeline_str    = 'pipeline'
+freshroot_str   = 'freshroot'
+bootstrap_str   = 'bootstrap'
+profile_str     = 'profile'
+stage_str       = 'stage'
+patch_str       = 'patch'
+all_str         = 'all'
 
 # First word after the "gentoomuch" command.
 primary_commands = (profile_str, stage_str, sync_str, pipeline_str, freshroot_str, bootstrap_str, patch_str )
@@ -50,7 +50,7 @@ def print_usage_stage_ls():
     print(usage_str + stage_str + ' ' + ls_str)
 
 def print_usage_stage_set():
-    print(usage_str + stage_str + ' ' + set_str +    ' <name>')
+    print(usage_str + stage_str + ' ' + set_str + ' <name>')
 
 def print_usage_profile_ls():
     print(usage_str + profile_str + ' ' + ls_str)

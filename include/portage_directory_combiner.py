@@ -56,11 +56,9 @@ class portage_directory_combiner:
         combined_path = os.path.join(current_stage_defines_path, 'packages')
         if os.path.isfile(combined_path):
             self.todo['packages'] = read_file_lines(combined_path)
-            #write_file_lines('./config/packages', self.todo['packages'])
         combined_path = os.path.join(current_stage_defines_path, 'hooks')
         if os.path.isfile(combined_path):
             self.todo['hooks'] = read_file_lines(combined_path)
-            #write_file_lines('./config/hooks', self.todo['hooks'])
         # Now we write-out the files themselves
         self.accum.writeout()
 
@@ -99,6 +97,3 @@ class portage_directory_combiner:
         code = os.system(sync_sets_str)
         if not code == 0:
             print_rsync_error('sets')
-        #code = os.system(sync_patches_str)
-        #if not code == 0:
-        #    print_rsync_error('patches')
