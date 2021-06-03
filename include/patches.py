@@ -4,6 +4,8 @@ import os, re
 from .gentoomuch_common import output_path, saved_patches_path, patches_workdir, patches_mountpoint
 from .get_gentoomuch_uid import get_gentoomuch_uid
 from .get_arch import get_arch
+from .swap_stage import swap_stage
+
 
 def get_first_commit():
     return "git log | grep commit | tail -2 | head -1 | sed -e 's/commit //g'"
@@ -20,38 +22,43 @@ def setup_git_user():
 
 # Here, we will do the tooling required for you to start patching a given package+version
 # Then it unpacks your ebuild into it, and initializes the git repository for patching
+# The container uses local user privileges as defined on your system for the uid you set this tool to use.
 def prep_patch(patch_name: str, package_arg: str, version: str, force: bool, repo_name: str = '') -> bool:
-    # swap_stage(get_arch(), 'default' , 'gentoomuch/builder', false) # 
+    swap_stage(get_arch(), 'default' , 'gentoomuch/builder', False)
     if not validate_pkgname(package_arg):
         print("Could not validate package name: " + package_arg)
         return False
-    print('DEBUG: prep_patch(patch_name=' + patch_name + ', package=' + package_arg + ', version=' + version + ', force=' + str(force) + ', repo_name=' + repo_name)
     repo_name = 'gentoo' if repo_name == '' else repo_name
-    print('Repo name:' + repo_name)
     pkgname = package_arg + '-' + version
-    print('Pkg name (with release tag): ' + pkgname)
     pkgname_notag = re.sub('-r[0-9]+$', '', pkgname)
-    print('Pkg name (no tag): ' + pkgname_notag)
+    # patches_basepath = os.path.join(patches_workdir, patch_name)
     # We first create the working directory
-    patches_basepath = os.path.join(patches_workdir, patch_name)
-    ebuilds = os.path.join(patches_basepath, repo_name)
-    os.makedirs(ebuilds, exist_ok = True)
-    # Now we can spin up a docker and unpack that patch into the workdir
-    ### ebuild $(portageq get_repo_path / gentoo)/ sys-fs/lvm2/lvm2-2.02.145-r2.ebuild clean unpack
-    unpacked_sourcecode_basedir = os.path.join(patches_mountpoint, patch_name, 'gentoo' if repo_name == '' else repo_name)#, pkgname, 'work', pkgname_notag.upper().split('/')[-1])
+    unpacked_sourcecode_basedir = os.path.join(patches_mountpoint, patch_name)
     
-    print("Unpacked sourcecode basedir: " + unpacked_sourcecode_basedir)
-    # new_source_location = os.path.join(patches_mountpoint, patch_name) if repo_name == '' else os.path.join(patches_mountpoint, repo_name, patch_name) 
-    # print("New sourcecode location: " + new_source_location)
-    print("Patches mountpoint: " + patches_mountpoint)
-    #if os.path.isdir(new_source_location) and len(os.listdir(new_source_location)) > 0:
-    #    print("Working directory for patch " + new_source_location + " already exists and is not empty!")
-    #    return False
-
-
-    # This thing exports (non-privileged users' directory bind-mounted to our workdir) the source code repo. It also initializes a git repo.
-    cmd_str = 'PORTAGE_TMPDIR="' + unpacked_sourcecode_basedir + '" ebuild $(portageq get_repo_path / ' + repo_name + ')/' + package_arg + '/' + pkgname.split('/')[-1] + '.ebuild clean unpack && cd ' + unpacked_sourcecode_dir + ' && ' + setup_git_user() + ' && git init && git add . && git commit -m "As-is from upstream (virgin.)"'  #&& mkdir -p ' + new_source_location + ' && mv ./* ' + new_source_location + ' && cd ' + patches_mountpoint + ' && rm -rf ' + package_arg.split('/')[0] + '\n'
+    os.system('cd ' + patches_workdir + ' && rm -rf ./*')
+    
+    # For reference: ebuild $(portageq get_repo_path / gentoo)/ package-category/package-name/package-name-2.3-r7.ebuild clean unpack.
+    cmd_str = 'PORTAGE_TMPDIR="' + unpacked_sourcecode_basedir + '" ebuild $(portageq get_repo_path / ' + repo_name + ')/' + package_arg + '/' + pkgname.split('/')[-1] + '.ebuild clean unpack && cd ' + unpacked_sourcecode_basedir + ' && ls -alh  && '
+    # Here, we will clean up the directory by removing all non source-code items.
+    # However, we also wish to preserve the directory structure so as the slip the whole thing into a portage directory.
+    # First, we make certain we have the source code dir to the base.
+    # Then, we clean out the one other directory.
+    # Finally, we move all the source code itself down to the base and delete the old source code directory. Done. :P
+    temp_sourcedir = os.path.join(unpacked_sourcecode_basedir, 'TEMP')
+    final_destination = os.path.join(unpacked_sourcecode_basedir, package_arg)
+    where_all_the_actual_code_is = os.path.join(unpacked_sourcecode_basedir, 'portage', pkgname, 'work', re.sub('-', '.', pkgname_notag.split('/')[-1].upper()))
+    cmd_str += 'mkdir ' + temp_sourcedir + ' && mv ' + where_all_the_actual_code_is + '/* ' + temp_sourcedir + ' && rm -rf ' + os.path.join(unpacked_sourcecode_basedir, 'portage') + ' && mkdir -p ' + package_arg  + ' && mv ' + temp_sourcedir + '/* ' + final_destination + ' && rmdir ' + temp_sourcedir + ' && cd ' + final_destination + ' && '
+    # This appends the git commands we use to initiate the users' patch-making process.
+    cmd_str += setup_git_user() + ' && git init && git add . && git commit -m "As-is from upstream (virgin.)"'
+    # Now we can spin up a docker and unpack that patch into the workdir.
     code = os.system('cd ' + output_path  + ' &&  docker-compose run -u ' + get_gentoomuch_uid() + ' gentoomuch-patcher /bin/bash -c \'' + cmd_str + '\'')
+    
+    print('Repo name:' + repo_name)
+    print("Unpacked sourcecode basedir: " + unpacked_sourcecode_basedir)
+    print('Pkg name (no tag): ' + pkgname_notag)
+    print('Pkg name (with release tag): ' + pkgname)
+    print('DEBUG: prep_patch(patch_name=' + patch_name + ', package=' + package_arg + ', version=' + version + ', force=' + str(force) + ', repo_name=' + repo_name)
+    print("Patches mountpoint: " + patches_mountpoint)
     if code != 0:
         return False
     return True
