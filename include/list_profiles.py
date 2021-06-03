@@ -3,21 +3,24 @@
 import os, docker
 from include.gentoomuch_common import arch_config_path, desired_profile_path, profiles_amd64, output_path
 from .docker_stage_exists import docker_stage_exists
-
+from .get_desired_profile import get_desired_profile
 
 def list_profiles(arch):
-    no_profile = False
-    # Get currently active profile
-    if os.path.isfile(desired_profile_path):
-        desired = open(desired_profile_path).read().strip()
+    desired_profile_info = get_desired_profile_path()
+    if desired_profile_info[0]:
+        desired = desired_profile_info[1]
+        has_desired_profile = True
+    else:
+        has_desired_profile = False
     print("Listing compatible system profiles:")
-    ctr = 1
     for p in profiles_amd64:
         if docker_stage_exists(arch, p, 'gentoomuch/builder', False):
-            bootstrapped_indicator = ' [B] '
+            bootstrapped_indicator = ':)'
         else:
-            bootstrapped_indicator = ' [ ] '
-
-        print(bootstrapped_indicator +(' [*] ' if p == desired else ' [ ] ') + str(ctr) + ' ' + p)
-        ctr += 1
+            bootstrapped_indicator = '  '
+        if no_desired_profile and p == desired:
+            desired_indicator = '[*]'
+        else:
+            desired_indicator = '[ ]'
+        print(' ' + bootstrapped_indicator + ' ' + desired_indicator + '       ' + p)
     exit()

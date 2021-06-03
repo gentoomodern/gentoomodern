@@ -3,6 +3,7 @@
 import os, re
 from include.gentoomuch_common import stage_defines_path, desired_stage_path
 
+
 # This lists stages
 def list_stages():
   # Get currently active stage. Indexing by number is not allowed in this tool: indexing would break once a new stage gets defined, leading to user surprises. :(.

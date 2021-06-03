@@ -14,12 +14,13 @@ patcher_str = 'patcher'
 containers = (builder_str, builder_privileged_str, updater_str, patcher_str)
 
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
-def create_composefile(output_path):
+def create_composefile(output_path, exporting_patch = ''):
     lines = ['# Do not make changes to this file, as they will be overriden upon the next build.\n' , 'services:\n']
     lines.extend(__output_config(builder_str))
     lines.extend(__output_config(builder_privileged_str))
     lines.extend(__output_config(updater_str))
-    lines.extend(__output_config(patcher_str))
+    if exporting_patch != '':
+        lines.extend(__output_config(patcher_str, exporting_patch))
     include_prefix = 'include/docker-compose/docker-compose.'
     lines.append('networks:\n')
     lines.append('  backend:\n')
@@ -35,7 +36,7 @@ def create_composefile(output_path):
     lines.append('    driver: local\n')
     write_file_lines(os.path.join(output_path, 'docker-compose.yml'), lines)
 
-def __output_config(container_type_str):
+def __output_config(container_type_str, exporting_patch = ''):
     if not container_type_str in containers:
         sys.exit('Gentoomuch.create-composefile: Invalid container type argument \"' + container_type_str  +  '\"')
     is_builder              = bool(container_type_str == builder_str)
@@ -77,9 +78,13 @@ def __output_config(container_type_str):
         results.append(stages_mount_str + ':ro\n')
     if is_patcher:
         patches_path = ''
+        first_dir_stripped = False
         for d in patches_workdir.split('/')[1:]:
-            patches_path += d + '/'
-        patches_path = patches_path[0:-1]
+            if first_dir_stripped:
+                patches_path += d + '/'
+            else:
+                first_dir_stripped = True
+        patches_path += exporting_patch
         results.append('    - ./' + patches_path + ':' + patches_mountpoint + '\n')
     # This one is added at the end for consistency of end-users' reading; it does NOT require multiple types of permissions.
     results.append('    - ./emerge.logs:/var/log/portage\n')

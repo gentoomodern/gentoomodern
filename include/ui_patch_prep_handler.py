@@ -23,8 +23,6 @@ class ui_patch_prep_handler:
         self.version            = ''
     
     def handle(self):
-        print(str(self.index))
-        print(len(sys.argv))
         if self.index == len(sys.argv):
             exit("You need to add a name for your patch!")
         user_arg = sys.argv[self.index].strip()
@@ -55,7 +53,6 @@ class ui_patch_prep_handler:
                 exit("ERROR in one of the arguments.")
         else:
             exit("Need to set a package version.")
-
 
     def __valid(self):
         if self.has_custom_repo == True:
@@ -89,47 +86,3 @@ class ui_patch_prep_handler:
             self.index += 1
         else:
             exit("Invalid option: " + current_arg)
-
-    #def has_changed(self) -> bool:
-    #    return False
-
-    # opts = handle_optionals(index)
-        # if opts[0] == True:
-            # opts = handle_optionals(index, opts[1])
-            # if opts[1][1] == True:
-            # index += 1
-        # if opts[0] == True:
-            # opts == handle_optionals(index, opts[1])
-            # index += 1
-        # action = sys.argv[index + 2].strip()
-        # if action == prep_str:
-            # error_str += prep_str + ' '
-            # if len(sys.argv) > index + 3:
-                # patchname = sys.argv[index + 3].strip()
-                # error_str += '<patch: ' + patchname + ' > '
-                # print(error_str)
-            # else:
-                # print(error_str + ': Need to specify a name for your patch. Please retry.')
-                # exit()
-            # if len(sys.argv) > index + 4:
-                # packagename = sys.argv[index + 4].strip()
-                # error_str += '<package: ' + packagename + ' > '
-                # print(error_str)
-                # exit()
-            # else:
-                # print(error_str + ': Need to specify a package to patch.')
-                # exit()
-            # if len(sys.argv) > index + 5:
-                # version = sys.argv[index + 5].strip()
-                # error_str += '<version: ' + version + ' > '
-                # print(prep_str + error_str)
-                # exit()
-            # else:
-                # print(error_str + ": Must specify version to patch. Here they are:")
-                # get_available_package_versions(packagename)
-                # exit()
-            # prep_patch(patchname, packagename, version, force, repo_name)
-            # exit()
-            # else:
-                # print(usage + prep_str + ' <patch-name> <package> <version-str> [--force, --repo]')
-                # exit()

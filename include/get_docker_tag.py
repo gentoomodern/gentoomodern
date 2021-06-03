@@ -15,4 +15,3 @@ def get_docker_tag(arch, profile, stage_define, upstream : bool):
     else:
         tag_tail = arch + '-' + cleaned_profile + '-' + cleaned_stage_define + ':latest' # We use the locally-built stage3.
     return image_tag_base + tag_tail
-
