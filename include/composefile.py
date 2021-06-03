@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, sys, re
-from .gentoomuch_common import output_path, config_path, active_image_tag, stages_path
+from .gentoomuch_common import output_path, config_path, active_image_tag, stages_path, patches_workdir, patches_mountpoint
 from .write_file_lines import write_file_lines
 from .get_active_stage import get_active_stage
 from .tag_parser import tag_parser
@@ -9,8 +9,9 @@ from .tag_parser import tag_parser
 builder_str = 'builder'
 builder_privileged_str = builder_str + '-privileged'
 updater_str = 'updater'
+patcher_str = 'patcher'
 
-
+containers = (builder_str, builder_privileged_str, updater_str, patcher_str)
 
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
 def create_composefile(output_path):
@@ -18,6 +19,7 @@ def create_composefile(output_path):
     lines.extend(__output_config(builder_str))
     lines.extend(__output_config(builder_privileged_str))
     lines.extend(__output_config(updater_str))
+    lines.extend(__output_config(patcher_str))
     include_prefix = 'include/docker-compose/docker-compose.'
     lines.append('networks:\n')
     lines.append('  backend:\n')
@@ -34,11 +36,12 @@ def create_composefile(output_path):
     write_file_lines(os.path.join(output_path, 'docker-compose.yml'), lines)
 
 def __output_config(container_type_str):
-    if not container_type_str == builder_str and not container_type_str == updater_str and not container_type_str == builder_privileged_str:
+    if not container_type_str in containers:
         sys.exit('Gentoomuch.create-composefile: Invalid container type argument \"' + container_type_str  +  '\"')
     is_builder              = bool(container_type_str == builder_str)
     is_builder_privileged   = bool(container_type_str == builder_privileged_str)
     is_updater              = bool(container_type_str == updater_str)
+    is_patcher              = bool(container_type_str == patcher_str)
     # Our results will be a list of strings.
     results = [] 
     # First, we define whether this'll be a builder or a packer.
@@ -61,21 +64,19 @@ def __output_config(container_type_str):
     squashed_output_str = '    - ./squashed/blob:/mnt/squashed-portage'
     squashed_mount_str  = '    - ./squashed/mountpoint:/mnt/squashed-portage'
     stages_mount_str    = '    - ./stages:/mnt/stages'
+    results.append(binpkg_str + '\n')
+    results.append(distfiles_str +'\n')
+    results.append(ebuilds_str + '\n')
+    results.append(kernels_str + '\n')
     # Here we actually write these differential parts into our list.
-    if is_builder or is_builder_privileged:
-        results.append(binpkg_str + '\n')
-        results.append(distfiles_str +'\n')
-        results.append(ebuilds_str + '\n')
-        results.append(kernels_str + '\n')
+    if is_builder or is_builder_privileged or is_patcher:
         results.append(squashed_mount_str + '\n')
         results.append(stages_mount_str + '\n')
     if is_updater:
-        results.append(binpkg_str + '\n')
-        results.append(distfiles_str +'\n')
-        results.append(ebuilds_str + '\n')
-        results.append(kernels_str + '\n')
         results.append(squashed_output_str + '\n')
         results.append(stages_mount_str + ':ro\n')
+    if is_patcher:
+        results.append('    - ./' + patches_workdir.split('/')[-1] + ':' + patches_mountpoint + '\n')
     # This one is added at the end for consistency of end-users' reading; it does NOT require multiple types of permissions.
     results.append('    - ./emerge.logs:/var/log/portage\n')
     # Here we loop over the all the files in the config/portage directory and add them.
