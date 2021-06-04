@@ -20,7 +20,7 @@ from include.get_docker_tag import get_docker_tag
 from include.save_tarball import save_tarball
 from include.download_tarball import download_tarball
 from include.setup_workdir import setup_workdir
-from include.patches import prep_patch
+from include.patches import prep_patch, try_patch, save_patch
 from include.ui_patch_prep_handler import ui_patch_prep_handler, prep_str
 
 # Our commandline keywords
@@ -35,6 +35,10 @@ profile_str     = 'profile'
 stage_str       = 'stage'
 patch_str       = 'patch'
 all_str         = 'all'
+prep_str        = 'prep'
+try_str         = 'try'
+save_str        = 'save'
+
 
 # First word after the "gentoomuch" command.
 primary_commands = (profile_str, stage_str, sync_str, pipeline_str, freshroot_str, bootstrap_str, patch_str )
@@ -69,8 +73,14 @@ def print_usage_profile():
 def print_usage_bootstrap():
     print(usage_str + bootstrap_str + ' <name|"' + all_str +'">')
 
+def print_usage_patch():
+    patch_usage = usage_str + patch_str + ' '
+    print(patch_usage + prep_str + '  <name> <package> <version-str>')
+    print(patch_usage + try_str + ' <name>')
+    print(patch_usage + save_str + ' <name>')
+
 def print_no_profile():
-    print("You need to set a base profile before continuing. Try:")
+    print("You need to set a base profile before continuing.")
 
 def print_usage():
     print(usage_str + freshroot_str)
@@ -156,6 +166,7 @@ elif prime_cmd == bootstrap_str:
             pull_sequence(get_desired_profile()[1])
         else:
             exit("Tried to bootstrap, but no profile was set.")
+    exit()
 ##################
 # Handle patching.
 ##################
@@ -163,6 +174,23 @@ elif prime_cmd == patch_str:
     error_str = usage_str
     if len(sys.argv) > 2 and sys.argv[2] == prep_str:
         ui_patch_prep_handler(3).handle()
+    # We try a patch that is currently being worked upon.
+    elif len(sys.argv) > 2 and sys.argv[2] == try_str:
+        if len(sys.argv) > 3:
+            patch_name = sys.argv[3]
+            # TODO: Implement
+            try_patch(patch_name)
+        else:
+            print("You need to provide a patch name to try.")
+    # We save a patch to our config/patches directory
+    elif len(sys.argv) > 2 and sys.argv[2] == save_str:
+        if len(sys.argv) > 3:
+            patch_name = sys.argv[3]
+            # TODO: Implement
+            save_patch(patch_name)
+        else:
+            exit("Which patch do you wish to save?")
+    exit()
 ##################################
 # Deal with the freshroot command. 
 ##################################
