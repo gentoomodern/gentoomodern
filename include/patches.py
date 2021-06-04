@@ -5,7 +5,8 @@ from .gentoomuch_common import output_path, portage_output_path, saved_patches_p
 from .get_gentoomuch_uid import get_gentoomuch_uid
 from .get_arch import get_arch
 from .swap_stage import swap_stage
-
+from .get_desired_profile import get_desired_profile
+from .composefile import create_composefile
 #patches_in_progress_dir = os.path.relpath(patches_in_progress_dir, output_path)
 
 def get_first_commit(repo_path):
@@ -38,23 +39,31 @@ def package_from_patch(patch_name : str) -> bool:
 def send_diff(path_from: str, path_to : str, patch_name : str) -> bool:
     valid, versioned_package = package_from_patch(patch_name)
     if not valid == True:
+        print("Send diff: Could not derive package name") 
         return False
-    #print(versioned_package)
+    print(versioned_package)
     p = os.path.join(path_from, patch_name, versioned_package)
     repo = git.Repo(p)
     # Get first commit.
     first_commit = list(repo.iter_commits('master'))[-1]
     num_backtracks = len(versioned_package.split('/'))
-    # print("Backtracking: " + str(num_backtracks))
-    backtrack_str = ''
-    while num_backtracks > 0:
-        backtrack_str += '../'
-        num_backtracks -= 1
     final_output_dir = os.path.join(path_to, versioned_package)
     os.system("cd " + p + " && git diff " + first_commit.hexsha + " | grep -v '^diff\|^index' | tee ." + patch_name + ".patch")
+    if os.path.isdir(final_output_dir) and len(os.listdir(final_output_dir)) > 0:
+        print("While sending the patch diff, another directory was found and it is not empty!")
+        return False
     os.makedirs(final_output_dir, exist_ok = True)
-    shutil.move(os.path.join(p, '.' + patch_name + '.patch'), os.path.join(final_output_dir, patch_name + '.patch'))
+    shutil.move(os.path.join(p, '.' + patch_name + '.patch'), os.path.join(final_output_dir,  patch_name + '.patch'))
     return True
+
+
+def strip_version(package_name):
+    return re.sub('-[0-9.]+$', '', strip_version_tag(package_name))
+    
+
+def strip_version_tag(package_name):
+    return re.sub('-r[0-9]+$', '', package_name)
+
 
 # Here, we will do the tooling required for you to start patching a given package+version
 # Then it unpacks your ebuild into it, and initializes the git repository for patching
@@ -66,7 +75,7 @@ def prep_patch(patch_name: str, package: str, version: str, force: bool, repo_na
         return False
     repo_name = 'gentoo' if repo_name == '' else repo_name
     versioned_package           = package + '-' + version
-    versioned_package_notag     = re.sub('-r[0-9]+$', '', versioned_package)
+    versioned_package_notag     = strip_version(versioned_package)
     patch_export_hostdir        = os.path.join(patches_workdir, patch_name)
     if os.path.isdir(patch_export_hostdir) and len(os.listdir(patch_export_hostdir)) != 0:
         print("A patch-in-progress workdir already is present at " + patch_export_hostdir + " and is not empty!")
@@ -108,19 +117,20 @@ def prep_patch(patch_name: str, package: str, version: str, force: bool, repo_na
     return True
 
 
-def list_available_package_versions(package: str, repo_name = ''):
-    if not validate_package_format(package):
-        exit("Could not read package version")
-    repo_name = 'gentoo' if repo_name == '' else repo_name
-    cmd_str = 'ls -alh$(portageq get_repo_path / ' + repo_name + ')/' + package
-    code = os.system('cd ' + output_path + ' && docker-compose run -u ' + get_gentoomuch_uid() + " gentoomuch-builder /bin/bash -c '" + cmd_str + "'")
+#def list_available_package_versions(package: str, repo_name = ''):
+#    if not validate_package_format(package):
+#        exit("Could not read package version")
+#    repo_name = 'gentoo' if repo_name == '' else repo_name
+#    cmd_str = 'ls -alh $(portageq get_repo_path / ' + repo_name + ')/' + package
+#    code = os.system('cd ' + output_path + ' && docker-compose run -u ' + get_gentoomuch_uid() + " gentoomuch-builder /bin/bash -c '" + cmd_str + "'")
     
 
-# This method creates the proper directory under ./config/user.patches
 def save_patch(patch_name : str, custom_output_path : str = '') -> bool:
     p = saved_patches_path if custom_output_path == '' else custom_output_path
+    p = os.path.join(p, patch_name)
     if os.path.isdir(p) and len(os.listdir(p)) == 0:
         print("While saving patch " + patch_name + ", we encountered a problem: Directory " + p + " exists and is not empty!")
+        return False
     if not os.path.isdir(p):
         os.makedirs(p, exist_ok = True)
     send_diff(patches_workdir, p, patch_name)
@@ -133,5 +143,15 @@ def try_patch(patch_name : str):
         print("Invalid patch name entered. Stopping.")
         return False
     patch_outdir = os.path.join(portage_output_path, 'patches')
-    send_diff(patches_workdir, patch_outdir, patch_name)
-    return True
+    print(patch_outdir)
+    cmd_str = "emerge --usepkg n =" + package_name
+    #cmd_str = "/bin/bash"
+    valid, profile = get_desired_profile()
+    if valid:
+        swap_stage(get_arch(), profile, 'gentoomuch/builder', True, str(patch_name))
+        code = send_diff(patches_workdir, patch_outdir, patch_name)
+        create_composefile(output_path)
+        if code == True:
+            os.system("cd " + output_path + " && docker-compose run gentoomuch-builder /bin/bash -c '" + cmd_str + "'")
+        return True
+    return False

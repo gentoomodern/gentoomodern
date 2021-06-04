@@ -8,7 +8,7 @@ from .portage_directory import portage_directory
 
 
 class portage_directory_combiner:
-    # todo: The other things we need to do after assembly.
+    # TODO: The other things we need to do after assembly.
     # accum: Our Portagedir accumulator.
     def __init__(self):
         self.todo = dict() # Dict[str, List[str]]
@@ -89,8 +89,6 @@ class portage_directory_combiner:
         #if not os.path.isdir(patches_output_path):
         #    os.mkdir(patches_output_path)
         sync_sets_str = rsync_cmd + os.path.join(pkgset_path, '*') + ' ' + sets_output_path
-        # sync_patches_str = rsync_cmd + os.path.join(patches_path, '*') + ' ' + patches_output_path
-        # A helper to print error messages without copying code.
         def print_rsync_error(tag):
             sys.exit(msg_prefix + "Could not rsync " + tag + " with error code: " + str(code))
         # We now add package sets. These are universal.

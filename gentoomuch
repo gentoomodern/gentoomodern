@@ -139,7 +139,7 @@ elif prime_cmd == profile_str:
         exit()
     elif sys.argv[2] == set_str and len(sys.argv) == 4: # Setting profile
         if not sys.argv[3].isnumeric():
-            set_desired_profile(sys.argv[3])
+            set_desired_profile(arch, sys.argv[3])
         else:
             print("You need to set a profile by name.")
         exit()
@@ -178,7 +178,7 @@ elif prime_cmd == patch_str:
     elif len(sys.argv) > 2 and sys.argv[2] == try_str:
         if len(sys.argv) > 3:
             patch_name = sys.argv[3]
-            # TODO: Implement
+            print(patch_name)
             try_patch(patch_name)
         else:
             print("You need to provide a patch name to try.")
@@ -186,7 +186,6 @@ elif prime_cmd == patch_str:
     elif len(sys.argv) > 2 and sys.argv[2] == save_str:
         if len(sys.argv) > 3:
             patch_name = sys.argv[3]
-            # TODO: Implement
             save_patch(patch_name)
         else:
             exit("Which patch do you wish to save?")

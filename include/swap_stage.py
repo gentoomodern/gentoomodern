@@ -11,7 +11,7 @@ from .composefile import create_composefile
 from .write_file_lines import write_file_lines
 
 
-def swap_stage(arch, profile, stage_def, upstream : bool, exported_patch: str = ''):
+def swap_stage(arch, profile, stage_def, upstream : bool, patch_to_test: str = ''):
     os.system('cd ' + output_path + ' && docker-compose down')
     combiner = portage_directory_combiner()
     combiner.process_stage_defines(stage_def)
@@ -35,5 +35,5 @@ def swap_stage(arch, profile, stage_def, upstream : bool, exported_patch: str = 
     if 'hooks' in combiner.todo:
         if len(combiner.todo['hooks']) > 0:
             write_file_lines(desired_hooks_path, combiner.todo['hooks'])
-    create_composefile(output_path, exported_patch)
+    create_composefile(output_path, patch_to_test)
     os.system('cd ' + output_path + ' && docker-compose up --no-start')

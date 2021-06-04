@@ -17,8 +17,10 @@ def list_profiles(arch):
     for p in profiles_amd64:
         if docker_stage_exists(arch, p, 'gentoomuch/builder', False):
             bootstrapped_indicator = ':)'
+        elif docker_stage_exists(arch, p, '', True):
+            bootstrapped_indicator = ':P'
         else:
-            bootstrapped_indicator = '  '
+            bootstrapped_indicator = ':('
         if has_desired_profile and p == desired:
             desired_indicator = '[*]'
         else:

@@ -8,6 +8,7 @@ from .containerize import containerize
 
 # This function/method downloads a stage, its manifest, and its signature.
 # It then verifies the tarball and it successful, turns it into a docker image.
+# TODO: Implement verification of present file
 def download_tarball(arch, profile):
     tail = '-' + arch
     if profile != 'default':
