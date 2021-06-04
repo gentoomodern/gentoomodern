@@ -11,6 +11,7 @@ save_str            = 'save'
 compile_str         = 'compile'
 
 
+# This thing handles the CLI arguments and interfaces it to the part of GentooMuch that preps a patch.
 class ui_patch_prep_handler:
     
     def __init__(self, index : int):
@@ -26,15 +27,14 @@ class ui_patch_prep_handler:
         if self.index == len(sys.argv):
             exit("You need to add a name for your patch!")
         user_arg = sys.argv[self.index].strip()
-        print("Handling arg = " + user_arg)
+        #print("Handling arg = " + user_arg)
         while self.__is_optional_arg(user_arg):
             print("Handling arg = " + user_arg)
             user_arg = sys.argv[self.index].strip()
             self.__handle_optional_arg()
         indices_left = len(sys.argv) - self.index
-        
-        print('Arg length: ' + str(len(sys.argv)) + '. Indices left: ' + str(indices_left))
-        print(sys.argv[indices_left:])
+        # print('Arg length: ' + str(len(sys.argv)) + '. Indices left: ' + str(indices_left))
+        # print(sys.argv[indices_left:])
         # Our error message.
         usage_cmd_tail = ''
         if indices_left > 0:

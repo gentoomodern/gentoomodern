@@ -5,8 +5,9 @@ from include.gentoomuch_common import arch_config_path, desired_profile_path, pr
 from .docker_stage_exists import docker_stage_exists
 from .get_desired_profile import get_desired_profile
 
+
 def list_profiles(arch):
-    desired_profile_info = get_desired_profile_path()
+    desired_profile_info = get_desired_profile()
     if desired_profile_info[0]:
         desired = desired_profile_info[1]
         has_desired_profile = True
@@ -18,7 +19,7 @@ def list_profiles(arch):
             bootstrapped_indicator = ':)'
         else:
             bootstrapped_indicator = '  '
-        if no_desired_profile and p == desired:
+        if has_desired_profile and p == desired:
             desired_indicator = '[*]'
         else:
             desired_indicator = '[ ]'

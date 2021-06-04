@@ -13,6 +13,7 @@ patcher_str = 'patcher'
 
 containers = (builder_str, builder_privileged_str, updater_str, patcher_str)
 
+
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
 def create_composefile(output_path, exporting_patch = ''):
     lines = ['# Do not make changes to this file, as they will be overriden upon the next build.\n' , 'services:\n']

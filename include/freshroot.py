@@ -10,6 +10,7 @@ from .get_desired_profile import get_desired_profile
 from .get_desired_stage import get_desired_stage
 from .get_gentoomuch_uid import get_gentoomuch_uid
 
+
 def freshroot():
     arch = open(arch_config_path).read().strip()
     if os.path.isfile(desired_profile_path) and os.path.isfile(desired_stage_path):
