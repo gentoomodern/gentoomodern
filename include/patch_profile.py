@@ -9,12 +9,14 @@ def patch_profile(arch, profile):
     p = os.path.join(topatch_config_path, arch, profile)
     if os.path.isfile(p):
         for candidate in read_file_lines(p):
+            candidate = candidate.strip()
             candidate_dir = os.path.join(saved_patches_path, candidate)
-            if os.path.isdir(candidate_dir) and len(os.listdir(candidate_dir)) > 0:
+            print("Seeking patch " + candidate + " from : " + candidate_dir)
+            if os.path.exists(candidate_dir):
                 final_patches_output = os.path.join(patches_output_path, candidate)
                 if os.path.isdir(final_patches_output):
                     os.system('rm -rf ' + final_patches_output)
                 print("Applying patch: " + candidate)
-                shutil.copy(candidate_dir, final_patches_output)
+                os.system("mkdir -p " + final_patches_output + " && rsync -aHX " + candidate_dir + "/* " + final_patches_output)
             else:
                 exit("Cannot apply nonexistent patch: " + candidate)
