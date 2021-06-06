@@ -18,7 +18,7 @@ def containerize(tarball_name : str, arch : str, profile : str, stagedef : str, 
     print("Containerize... desired tag = " + desired_tag)
     # Which directory do we use to build?
     # If it exists, we're doing an update and thus we remove.
-    # TODO: Replace with renaming and allow recovery from failed backup.
+    # TODO: Replace with renaming and allow recovery from backup.
     if docker_stage_exists(arch, profile, stagedef, bool(upstream)):
         os.system("docker image rm -f " + desired_tag)
     bootstrap_dir = os.path.join(output_path, 'bootstrap')
@@ -34,7 +34,8 @@ def containerize(tarball_name : str, arch : str, profile : str, stagedef : str, 
     # Now create our dockerfile.
     open(dockerfile, 'w').write(bootstrap_dockerfile(tarball_name, profile))
     shutil.move(old_tarball_path, new_tarball_path)
-    # We then import our bootstrap image, then build a new one using our dockerfile. Then we get rid of the old bootstrap image.
+    # We then import our bootstrap image, then build a new one using our dockerfile.
+    # Then we get rid of the old bootstrap image.
     code = os.system("cd " + bootstrap_dir + " && docker import " + tarball_name  + " " + bootstrap_tag + " && docker build -t " + desired_tag + " . && docker image rm -f " + bootstrap_tag + " &> /dev/null")
     shutil.move(new_tarball_path, old_tarball_path)
     if code == 0:

@@ -17,6 +17,7 @@ desired_hooks_path		    	= os.path.join(output_path, 'desired_hooks')
 # Portage-related
 portage_output_path		    	= os.path.join(output_path, 'portage')
 sets_output_path		    	= os.path.join(portage_output_path, 'sets')
+patches_output_path             = os.path.join(portage_output_path, 'patches')
 # Includes (immutable data)
 includes_path			    	= './include'
 global_config_path		    	= os.path.join(includes_path, 'portage.global')
@@ -49,3 +50,4 @@ patches_mountpoint              = '/home/' + dockerized_username + '/ebuild_expo
 patches_workdir                 = os.path.join(output_path, 'patches.work')
 patches_in_progress_dir         = os.path.join(output_path, 'patches.in.progress')
 saved_patches_path		        = os.path.join(config_path, 'user.patches')
+topatch_config_path             = os.path.join(config_path, 'patch.profiles')

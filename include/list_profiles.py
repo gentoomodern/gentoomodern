@@ -16,11 +16,11 @@ def list_profiles(arch):
     print("Listing compatible system profiles:")
     for p in profiles_amd64:
         if docker_stage_exists(arch, p, 'gentoomuch/builder', False):
-            bootstrapped_indicator = ':)'
+            bootstrapped_indicator = 'GOOD TO GO :)  '
         elif docker_stage_exists(arch, p, '', True):
-            bootstrapped_indicator = ':P'
+            bootstrapped_indicator = 'UPSTREAM READY '
         else:
-            bootstrapped_indicator = ':('
+            bootstrapped_indicator = 'NOT INSTALLED  '
         if has_desired_profile and p == desired:
             desired_indicator = '[*]'
         else:

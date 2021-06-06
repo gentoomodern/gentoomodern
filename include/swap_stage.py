@@ -9,12 +9,16 @@ from .portage_directory_combiner import portage_directory_combiner
 from .get_docker_tag import get_docker_tag
 from .composefile import create_composefile
 from .write_file_lines import write_file_lines
+from .patch_profile import patch_profile
 
 
 def swap_stage(arch : str, profile : str, stage_def : str, upstream : bool, patch_to_test: str = ''):
     os.system('cd ' + output_path + ' && docker-compose down')
+    # We assemble our (temporary) Portage directory from stages.
     combiner = portage_directory_combiner()
     combiner.process_stage_defines(stage_def)
+    # We now add patches, per profile.
+    patch_profile(arch, profile)
     dckr = docker.from_env()
     dckr_imgs = dckr.images.list()
     found = False
