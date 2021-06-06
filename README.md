@@ -51,11 +51,7 @@ We also use a multi-instanced binpkg directory to provide for all your systems o
 <ol>
 <li>Everything you keep is in the
 </pre>config</pre>
-directory; the rest is either an executable file/deps, or documentation, or temporaries. Also, many subdirectories within
-</pre>config</pre>
-have within them another one called
-<pre>gentoomuch</pre>
-and everything in those is reserved: Changing anything in there will likely break your builds, so I don't generally recommend it.
+directory; the rest is either an executable file/deps, or documentation, or temporaries. A number of configurations have within them another called "gentoomuch." Everything inside these is reserved: Changing anything in there will likely break your builds, so I don't generally recommend doing so unless you're willing to debug thing by yourself.
 </li>
 <li>Further documentation is in the config directory. These aforementioned folders are intended to be both part of our pipeline and as living, implicitly-tested documentation for anyone looking to get started.</li>
 </ol>
