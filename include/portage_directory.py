@@ -6,11 +6,12 @@ from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
 from .munger import munger
 
+
 class portage_directory:
     def __init__(self):
         self.accumulators = dict() #[str, munger]
 
-    def ingest(self, local_path):
+    def ingest(self, local_path : str):
         for (dirpath, dirnames, filenames) in os.walk(local_path):
             current_path = os.path.relpath(dirpath, local_path)
             for d in dirnames:
@@ -26,6 +27,7 @@ class portage_directory:
                     for line in read_file_lines(os.path.join(dirpath, f)): # Here we do our actual file-reading
                         self.accumulators[current_file].ingest(line)
                         # sys.exit('portage_directory.setup() - ERROR - Could not ingest ' + current_file + ' due to line : ' + line)
+
 
     def writeout(self):
         for m in self.accumulators.values():

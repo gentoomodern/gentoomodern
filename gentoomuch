@@ -19,9 +19,9 @@ from include.run_build import run_build
 from include.get_docker_tag import get_docker_tag
 from include.save_tarball import save_tarball
 from include.download_tarball import download_tarball
-from include.setup_workdir import setup_workdir
 from include.patches import prep_patch, try_patch, save_patch
 from include.ui_patch_prep_handler import ui_patch_prep_handler, prep_str
+from include.downloader import downloader
 
 # Our commandline keywords
 ls_str          = 'ls'
@@ -93,11 +93,8 @@ def print_usage():
 # We do this every time!
 arch = open(arch_config_path).read().strip()
 
-setup_workdir(arch)
-#
 # This handles the bootstrap of each stage, built from upstream.
-#
-def pull_sequence(profile):
+def pull_sequence(profile : str):
     if download_tarball(arch, profile):
     # swap_stage(arch, profile, 'gentoomuch/builder')
     # run_build(True)

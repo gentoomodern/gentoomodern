@@ -15,8 +15,8 @@ containers = (builder_str, builder_privileged_str, updater_str, patcher_str)
 
 
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
-def create_composefile(output_path, exporting_patch = ''):
-    lines = ['# Do not make changes to this file, as they will be overriden upon the next build.\n' , 'services:\n']
+def create_composefile(output_path : str, exporting_patch : str = ''):
+    lines = ['# Do not make changes to this file, as they will be overriden upon the next build.\n', 'services:\n']
     lines.extend(__output_config(builder_str))
     lines.extend(__output_config(builder_privileged_str))
     lines.extend(__output_config(updater_str))
@@ -37,7 +37,8 @@ def create_composefile(output_path, exporting_patch = ''):
     lines.append('    driver: local\n')
     write_file_lines(os.path.join(output_path, 'docker-compose.yml'), lines)
 
-def __output_config(container_type_str, exporting_patch = ''):
+
+def __output_config(container_type_str : str, exporting_patch : str = ''):
     if not container_type_str in containers:
         sys.exit('Gentoomuch.create-composefile: Invalid container type argument \"' + container_type_str  +  '\"')
     is_builder              = bool(container_type_str == builder_str)
@@ -58,18 +59,20 @@ def __output_config(container_type_str, exporting_patch = ''):
     results.append('    - /dev:/dev\n')
     results.append('    - /proc:/proc\n')
     results.append('    - /sys:/sys:ro\n')
-    # These are parts that have different permissions between the two types of containers.
     binpkg_str          = '    - binpkgs:/var/cache/binpkgs'
     distfiles_str       = '    - distfiles:/var/cache/distfiles'
     ebuilds_str         = '    - ebuilds:/var/db/repos/gentoo'
     kernels_str         = '    - kernels:/mnt/kernels'
-    squashed_output_str = '    - ./squashed/blob:/mnt/squashed-portage'
-    squashed_mount_str  = '    - ./squashed/mountpoint:/mnt/squashed-portage'
-    stages_mount_str    = '    - ./stages:/mnt/stages'
+    logs_mount_str      = '    - ./emerge.logs:/var/tmp/portage'
     results.append(binpkg_str + '\n')
     results.append(distfiles_str +'\n')
     results.append(ebuilds_str + '\n')
     results.append(kernels_str + '\n')
+    results.append(logs_mount_str + '\n')
+    # These are parts that have different permissions between the two types of containers.
+    squashed_output_str = '    - ./squashed/blob:/mnt/squashed-portage'
+    squashed_mount_str  = '    - ./squashed/mountpoint:/mnt/squashed-portage'
+    stages_mount_str    = '    - ./stages:/mnt/stages'
     # Here we actually write these differential parts into our list.
     if is_builder or is_builder_privileged or is_patcher:
         results.append(squashed_mount_str + '\n')
@@ -91,17 +94,15 @@ def __output_config(container_type_str, exporting_patch = ''):
     results.append('    - ./emerge.logs:/var/log/portage\n')
     # Here we loop over the all the files in the portage directory and add them.
     portage_tgt = '/etc/portage/'
-    if os.path.exists(portage_output_path + '/patches'):
-        print('EXISTS')
-    else:
-        print('NOPE')
+    #if os.path.exists(portage_output_path + '/patches'):
+    #    print('EXISTS')
+    #else:
+    #    print('NOPE')
     for (dirpath, directories, files) in os.walk(portage_output_path):
         for f in files:
             if not f[0] == '.' and not f == 'README.md':
                 rel_path = os.path.relpath(dirpath, output_path)
                 results.append('    - ./' + os.path.join(rel_path, f) + ':' + os.path.join('/etc/', rel_path, f) + ':ro\n')
-        for d in directories:
-            print(d)
     if is_builder_privileged:
         results.append('    cap_add:\n')
         results.append('    - CAP_SYS_ADMIN\n')

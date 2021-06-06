@@ -9,11 +9,11 @@ from .get_desired_profile import get_desired_profile
 from .composefile import create_composefile
 #patches_in_progress_dir = os.path.relpath(patches_in_progress_dir, output_path)
 
-def get_first_commit(repo_path):
+def get_first_commit(repo_path : str):
     return "git -C " + repo_path + " log | grep commit | tail -2 | head -1 | sed -e 's/commit //g' "
 
 
-def validate_package_format(package):
+def validate_package_format(package : str):
     if len(package.split('/')) < 2:
         print("setup_patch(): package name needs to be fully qualified. Got: " + package)
         return False

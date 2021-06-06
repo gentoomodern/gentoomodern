@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import os, gnupg, hashlib
-from .gentoomuch_common import stages_path, gpg_path, asc_ext
+from .gentoomuch_common import stages_path, gpg_path, asc_ext, gentoo_signing_key, gentoo_upstream_url
 from .read_file_lines import read_file_lines
 
 
-def verify_tarball(filepath):
-    gpg = gnupg.GPG(gnupghome = gpg_path)
+def verify_tarball(filepath : str):
+    gpg = gnupg.GPG()#gnupghome = gpg_path)
+    public_keys = gpg.list_keys() 
+    # print(public_keys)
     filename = os.path.relpath(filepath, stages_path)
     print("INFO: Verifying signature of file " +  filename)
     asc_file = open(filepath + asc_ext, 'rb').read()

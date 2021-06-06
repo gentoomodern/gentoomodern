@@ -10,14 +10,15 @@ from .bootstrap_dockerfile import bootstrap_dockerfile
 
 
 # This turns a tarball into a dockerized stage
-def containerize(tarball_name, arch, profile, stagedef, upstream: bool) -> bool:
-    print("Called containerize. Taball name " + tarball_name + " profile = " + profile + ", stagedef = " + stagedef + " upstream " + str(upstream))
+def containerize(tarball_name : str, arch : str, profile : str, stagedef : str, upstream : bool) -> bool:
+    print("Called containerize. Tarball name = " + tarball_name + " profile = " + profile + ", stagedef = " + stagedef + ", upstream = " + str(upstream))
     # This tag is used to name an image that is imported as a bootstrap image.
     bootstrap_tag = image_tag_base + "bootstrap:latest"
     desired_tag = get_docker_tag(arch, profile, stagedef, bool(upstream))
     print("Containerize... desired tag = " + desired_tag)
     # Which directory do we use to build?
-    # If it exists, we're doing an update and thus we remove. TODO: Replace with renaming and allow recovery from failed backup.
+    # If it exists, we're doing an update and thus we remove.
+    # TODO: Replace with renaming and allow recovery from failed backup.
     if docker_stage_exists(arch, profile, stagedef, bool(upstream)):
         os.system("docker image rm -f " + desired_tag)
     bootstrap_dir = os.path.join(output_path, 'bootstrap')

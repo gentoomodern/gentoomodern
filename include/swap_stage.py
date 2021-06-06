@@ -11,7 +11,7 @@ from .composefile import create_composefile
 from .write_file_lines import write_file_lines
 
 
-def swap_stage(arch, profile, stage_def, upstream : bool, patch_to_test: str = ''):
+def swap_stage(arch : str, profile : str, stage_def : str, upstream : bool, patch_to_test: str = ''):
     os.system('cd ' + output_path + ' && docker-compose down')
     combiner = portage_directory_combiner()
     combiner.process_stage_defines(stage_def)

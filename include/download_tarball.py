@@ -5,16 +5,20 @@ from .gentoomuch_common import gentoo_upstream_url, gentoo_signing_key, stages_p
 from .verify_tarball import verify_tarball
 from .containerize import containerize
 
-
-# This function/method downloads a stage, its manifest, and its signature.
-# It then verifies the tarball and it successful, turns it into a docker image.
-# TODO: Implement verification of present file
+#################################################################################
+# This function/method downloads a stage, its manifest, and its signature.      #
+# It then verifies the tarball and it successful, turns it into a docker image. #
+#################################################################################
+# TODO: Check whether file exists locally.
 def download_tarball(arch, profile):
     tail = '-' + arch
     if profile != 'default':
         tail += '-' + profile
     url_base = gentoo_upstream_url + arch + "/autobuilds/"
-    # This one is named all wierd. :P
+    #####################################################################################
+    # In the "root" directory of the upstream URL, for each stage we have a small file. #
+    # latest-stage3-<profile>.txt                                                       #
+    #####################################################################################
     if arch == 'amd64' and profile == 'x32':
         tail = '-x32'
     bootstrap_url = url_base + "latest-stage3" + tail + ".txt"
@@ -27,6 +31,9 @@ def download_tarball(arch, profile):
     except urllib.error.HTTPError as e:
         print("ERROR: Could not download seed file!")
         return False
+    ##############################################
+    # Munge the indexing file and retrieve info. #
+    ##############################################
     new_url = ''
     fname = ''
     fsize = -1
@@ -43,30 +50,43 @@ def download_tarball(arch, profile):
     if not figured_it_out:
         print("ERROR: Could not munge stage3 path from seed.")
         return False
-    tarball_path = os.path.join(stages_path, fname)
+    tarball_path            = os.path.join(stages_path, fname)
+    tarball_asc             = tarball_path + asc_ext
+    sig_url                 = new_url + asc_ext
     print("TARBALL PATH " + tarball_path)
-    for suffix in (asc_ext, ''):
-        req = urllib.request.Request(new_url + suffix)
-        print("INFO: Getting file " + fname + suffix + " from " + new_url + suffix)
-        try:
-            with urllib.request.urlopen(req) as response:
-                if suffix == '':
-                    with open(tarball_path + suffix, 'wb') as f:
-                        f.write(response.read())
-                        actual_size = os.stat(tarball_path + suffix).st_size
-                    if actual_size != fsize:
-                        print('ERROR: Downloaded size mismatch for ' + fname + '.  Intended: ' + fsize + '. Actual: ' + actual_size)
-                        return False
-                    print("INFO: Downloaded file " + tarball_path + suffix)
-                else:
-                    if os.path.isfile(tarball_path + suffix):
-                        os.remove(tarball_path + suffix)
-                    with open(tarball_path + suffix, 'wb') as f:
-                        f.write(response.read())
-        except urllib.error.HTTPError as e:
-            print("ERROR: " + fname + suffix + " not found at " + new_url + suffix)
-            return False
-    if verify_tarball(tarball_path + suffix):
+    ##################
+    # ASC extension. #
+    ##################
+    req = urllib.request.Request(sig_url)
+    if os.path.isfile(tarball_asc):
+        os.remove(tarball_asc)
+    try:
+        with urllib.request.urlopen(req) as response:
+            with open(tarball_asc, 'wb') as f:
+                f.write(response.read())
+    except urllib.error.HTTPError as e:
+        print("ERROR: " + fname + asc_ext + " not found at " + sig_url)
+        return False
+    ############
+    # Tarball. #
+    ############
+    print("INFO: Getting file " + fname + " from " + new_url)
+    req = urllib.request.Request(new_url)
+    try:
+        with urllib.request.urlopen(req) as response:
+            with open(tarball_path, 'wb') as f:
+                f.write(response.read())
+                actual_size = os.stat(tarball_path).st_size
+                if actual_size != fsize:
+                    print('ERROR: Downloaded size mismatch for ' + fname + '.  Intended: ' + fsize + '. Actual: ' + actual_size)
+                    return False
+                print("INFO: Downloaded file " + tarball_path)
+    except urllib.error.HTTPError as e:
+        print("ERROR: " + fname + asc_ext + " not found at " + sig_url)
+        return False
+    
+
+    if verify_tarball(tarball_path):
         # Dockerize that thing, ya'll
         print("INFO: Containerizing upstream tarball")
-        return containerize(fname + suffix, arch, profile, '', bool(True))
+        return containerize(fname, arch, profile, '', bool(True))

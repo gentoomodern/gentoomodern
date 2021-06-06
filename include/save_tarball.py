@@ -28,8 +28,48 @@ def save_tarball(arch, profile, stage_define, upstream: bool):
         packages_str += ' '
     print('PACKAGES TO INSTALL : ' + packages_str)
       # The following dogs' meal of a command preps a stage inside a docker container. It then changes root into it and emerges. Then, it exits the chroot, unmounts all tempories, and packs a tarball as "stage3-<arch>-<base>-<user-stage-define>.tar.xz"
-      # TODO: Parcel this out into smaller sections for manageability.
-    cmd_str = "cd " + output_path + " && docker-compose run gentoomuch-builder-privileged /bin/bash -c \"emerge pigz && mount -t tmpfs gentoomuch_serializer_temp_root /mnt/gentoo && rm -rf /mnt/gentoo/etc/portage/* && cd /mnt/gentoo && tar xpf /stage3-* --xattrs-include='*.*' --numeric-owner && rm -rf /mnt/gentoo/etc/portage/* && rsync -aXH /etc/portage/* /mnt/gentoo/etc/portage && mount -t proc gentoomuch_serializer_temp_proc /mnt/gentoo/proc && mount --rbind /sys /mnt/gentoo/sys && mount --make-rslave /mnt/gentoo/sys && mount --rbind /dev /mnt/gentoo/dev && mount --make-rslave /mnt/gentoo/dev && mount -t tmpfs gentoomuch_serializer_tmp /mnt/gentoo/tmp && mount -t tmpfs gentoomuch_serializer_var_tmp /mnt/gentoo/var/tmp && mount --bind /var/cache/binpkgs /mnt/gentoo/var/cache/binpkgs && mkdir /mnt/gentoo/var/db/repos/gentoo && mount --bind /var/db/repos/gentoo /mnt/gentoo/var/db/repos/gentoo && echo 'UTC' > ./etc/timezone && echo 'nameserver 8.8.8.8' > ./etc/resolv.conf && chroot . /bin/bash -c 'env-update && . /etc/profile && emerge " + ("--emptytree " if upstream else "-uD --newuse --changed-use ") + packages_str + "@world' && umount -fl /mnt/gentoo/proc && umount -fl /mnt/gentoo/sys && umount -fl /mnt/gentoo/dev && umount -fl /mnt/gentoo/var/db/repos/gentoo && umount -fl /mnt/gentoo/var/cache/binpkgs && cd /mnt/gentoo && tar -cf /mnt/stages/" + archive_name + " . --use-compress-program=pigz --xattrs " + ("--selinux" if re.match("selinux", profile) else "") + " --numeric-owner --acls && cd / && chown 1000:1000 /mnt/stages/" + archive_name + "\""
+      # TODO: Parcel this out into smaller sections for manageability. The only real blocker here is the time it takes to test the command itself :P
+    cmd_str = "cd " + output_path + " && "
+    cmd_str += "docker-compose run gentoomuch-builder-privileged /bin/bash -c \""
+    cmd_str += "emerge pigz && "
+    cmd_str += "cd /mnt/gentoo && "
+    cmd_str += "tar xpf /stage3-* --xattrs-include='*.*' --numeric-owner && "
+    cmd_str += "rm -rf /mnt/gentoo/etc/portage/* && "
+    cmd_str += "rsync -aXH /etc/portage/* /mnt/gentoo/etc/portage && "
+    cmd_str += "mount -t proc none /mnt/gentoo/proc && "
+    cmd_str += "mount -t tmpfs none /mnt/gentoo/tmp && "
+    cmd_str += "mount --rbind /sys /mnt/gentoo/sys && "
+    cmd_str += "mount --make-rslave /mnt/gentoo/sys && "
+    cmd_str += "mount --rbind /dev /mnt/gentoo/dev && "
+    cmd_str += "mount --make-rslave /mnt/gentoo/dev && "
+    cmd_str += "mount -t tmpfs none /mnt/gentoo/var/tmp && "
+    cmd_str += "mkdir -p /mnt/gentoo/var/tmp/portage && "
+    cmd_str += "mount --bind /var/tmp/portage /mnt/gentoo/var/tmp/portage && "
+    cmd_str += "mount --bind /var/cache/binpkgs /mnt/gentoo/var/cache/binpkgs && "
+    cmd_str += "mkdir /mnt/gentoo/var/db/repos/gentoo && "
+    cmd_str += "mount --bind /var/db/repos/gentoo /mnt/gentoo/var/db/repos/gentoo && "
+    cmd_str += "echo 'UTC' > ./etc/timezone && "
+    cmd_str += "echo 'nameserver 8.8.8.8' > ./etc/resolv.conf && "
+    cmd_str += "chroot . /bin/bash -c '" # Enter chroot
+    cmd_str += "env-update && "
+    cmd_str += ". /etc/profile && "
+    cmd_str += "emerge " + ("--emptytree " if upstream else "-uD --newuse --changed-use ") + packages_str + " @world && "
+    cmd_str += "chown 1000:1000 -R /var/tmp/portage"
+    cmd_str += "' && " # Exit chroot
+    cmd_str += "chown 1000:1000 -R /var/tmp/portage && "
+    # cmd_str += "umount -fl /mnt/gentoo/var/tmp/portage && "
+    # cmd_str += "chown 1000:1000 -R /var/tmp/portage/* && "
+    cmd_str += "umount -fl /mnt/gentoo/tmp && "
+    cmd_str += "umount -fl /mnt/gentoo/proc && "
+    cmd_str += "umount -fl /mnt/gentoo/sys && "
+    cmd_str += "umount -fl /mnt/gentoo/dev && "
+    cmd_str += "umount -fl /mnt/gentoo/var/db/repos/gentoo && "
+    cmd_str += "umount -fl /mnt/gentoo/var/cache/binpkgs && "
+    cmd_str += "umount -fl /mnt/gentoo/var/tmp/portage && "
+    cmd_str += "cd /mnt/gentoo && "
+    cmd_str += "tar -cvf /mnt/stages/" + archive_name + " . --use-compress-program=pigz --xattrs --selinux --numeric-owner --acls && "
+    cmd_str += "chown 1000:1000 /mnt/stages/" + archive_name
+    cmd_str +=  "\""
     code = os.system(cmd_str)
     if not code == 0:
         exit("FAILED TO CREATE TARBALL: " + archive_name)
@@ -43,7 +83,6 @@ def save_tarball(arch, profile, stage_define, upstream: bool):
     if results and upstream:
         print("******************************************************************************************************************")
         print("***        CONGRATULATIONS! YOU HAVE JUST BOOTSTRAPPED A PROPER, OPTIMIZED, DOCKERIZED GENTOO STAGE3!          ***")
-        print("******************************************************************************************************************")
         print("******************************************************************************************************************")
         print("***                                                LIKE A BOSS!                                                ***")
         print("******************************************************************************************************************")
