@@ -22,6 +22,8 @@ from include.download_tarball import download_tarball
 from include.patches import prep_patch, try_patch, save_patch
 from include.ui_patch_prep_handler import ui_patch_prep_handler, prep_str
 from include.downloader import downloader
+from include.kernel_munger import kernel_munger
+
 
 # Our commandline keywords
 ls_str          = 'ls'
@@ -33,6 +35,11 @@ freshroot_str   = 'freshroot'
 bootstrap_str   = 'bootstrap'
 profile_str     = 'profile'
 stage_str       = 'stage'
+kernel_str      = 'kernel'
+config_str      = 'config'
+diff_str        = 'diff'
+pull_str        = 'pull'
+help_str        = 'help'
 patch_str       = 'patch'
 all_str         = 'all'
 prep_str        = 'prep'
