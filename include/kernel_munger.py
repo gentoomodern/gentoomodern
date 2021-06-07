@@ -5,7 +5,10 @@ class kernel_munger:
 
     def __init__(self):
         self.variables_to_values = {} # str:str
-
+    #################################################################
+    # You call this method on as many kernel fragments as you want. #
+    # As soon as it encounters clashing options, it returns False.  #
+    #################################################################
     def munge(self, kconf_path: str) -> bool:
         f = open(kconf_path, 'r')
         ctr = 0

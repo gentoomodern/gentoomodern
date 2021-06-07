@@ -17,7 +17,8 @@ def download_tarball(arch, profile):
     url_base = gentoo_upstream_url + arch + "/autobuilds/"
     #####################################################################################
     # In the "root" directory of the upstream URL, for each stage we have a small file. #
-    # latest-stage3-<profile>.txt                                                       #
+    # latest-stage3.txt             (default)                                           #
+    # latest-stage3-<profile>.txt   (all others)                                        #
     #####################################################################################
     if arch == 'amd64' and profile == 'x32':
         tail = '-x32'
@@ -84,9 +85,12 @@ def download_tarball(arch, profile):
     except urllib.error.HTTPError as e:
         print("ERROR: " + fname + asc_ext + " not found at " + sig_url)
         return False
-    
-
+    #############################################
+    # Here we verify the tarball from upstream. #
+    #############################################
     if verify_tarball(tarball_path):
-        # Dockerize that thing, ya'll
+        ###############################
+        # Dockerize that thing, ya'll #
+        ###############################
         print("INFO: Containerizing upstream tarball")
         return containerize(fname, arch, profile, '', bool(True))

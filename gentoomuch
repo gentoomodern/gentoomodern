@@ -23,7 +23,7 @@ from include.patches import prep_patch, try_patch, save_patch
 from include.ui_patch_prep_handler import ui_patch_prep_handler, prep_str
 from include.downloader import downloader
 from include.kernel_munger import kernel_munger
-
+from include.docker_stage_exists import docker_stage_exists
 
 # Our commandline keywords
 ls_str          = 'ls'
@@ -211,7 +211,15 @@ elif prime_cmd == pipeline_str:
 # Sync Portage tree. 
 ####################
 elif prime_cmd == sync_str:
-    swap_stage(arch, 'default', 'gentoomuch/builder', True)
+    # TODO:
+    # Use the "default" profile upstream stage, as it is pretty much always the best-tested. 
+    if stage_exists(arch, 'default', '', True):
+        swap_stage(arch, 'default', '', True)
+    else:
+        if download_tarball(arch, 'default'):
+            swap_stage(arch, 'default', '', True)
+        else:
+            exit("Could not synchronize Gentoo: Dockerized stage unavailable")
     # create_composefile(output_path)
     sync()
     #TODO: Remount SquashFS

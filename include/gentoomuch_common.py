@@ -9,6 +9,7 @@ debug				        	= True
 output_path				    	= './gentoomuch-data'
 stages_path		            	= os.path.join(output_path, 'stages')
 gpg_path				    	= os.path.join(output_path, 'gpg')
+squashed_path                   = os.path.join(output_path, 'squashed')
 emergelogs_path             	= os.path.join(output_path, 'emerge.logs')
 desired_stage_path		    	= os.path.join(output_path, 'desired_stage')
 desired_profile_path	    	= os.path.join(output_path, 'desired_profile')
