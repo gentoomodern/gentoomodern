@@ -213,13 +213,6 @@ elif prime_cmd == pipeline_str:
 elif prime_cmd == sync_str:
     # TODO:
     # Use the "default" profile upstream stage, as it is pretty much always the best-tested. 
-    if stage_exists(arch, 'default', '', True):
-        swap_stage(arch, 'default', '', True)
-    else:
-        if download_tarball(arch, 'default'):
-            swap_stage(arch, 'default', '', True)
-        else:
-            exit("Could not synchronize Gentoo: Dockerized stage unavailable")
     # create_composefile(output_path)
     sync()
     #TODO: Remount SquashFS
