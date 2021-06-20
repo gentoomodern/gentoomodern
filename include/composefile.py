@@ -15,13 +15,13 @@ containers = (builder_str, builder_privileged_str, updater_str, patcher_str)
 
 
 # This uses the current state of the work/portage directory and automatically creates a composefile that'll properly include each file. This avoids much handcruft.
-def create_composefile(output_path : str, exporting_patch : str = ''):
+def create_composefile(output_path : str, ksrc : str = 'gentoo-sources', exporting_patch : str = ''):
     lines = ['# Do not make changes to this file, as they will be overriden upon the next build.\n', 'services:\n']
-    lines.extend(__output_config(builder_str))
-    lines.extend(__output_config(builder_privileged_str))
-    lines.extend(__output_config(updater_str))
+    lines.extend(__output_config(builder_str, ksrc))
+    lines.extend(__output_config(builder_privileged_str, ksrc))
+    lines.extend(__output_config(updater_str, ksrc))
     if exporting_patch != '':
-        lines.extend(__output_config(patcher_str, exporting_patch))
+        lines.extend(__output_config(patcher_str, ksrc, exporting_patch))
     include_prefix = 'include/docker-compose/docker-compose.'
     lines.append('networks:\n')
     lines.append('  backend:\n')
@@ -33,12 +33,14 @@ def create_composefile(output_path : str, exporting_patch : str = ''):
     lines.append('    driver: local\n')
     lines.append('  binpkgs:\n')
     lines.append('    driver: local\n')
-    lines.append('  kernels:\n')
+    lines.append('  kernel-' + ksrc + ':\n')
+    lines.append('    driver: local\n')
+    lines.append('  ccache:\n')
     lines.append('    driver: local\n')
     write_file_lines(os.path.join(output_path, 'docker-compose.yml'), lines)
 
 
-def __output_config(container_type_str : str, exporting_patch : str = ''):
+def __output_config(container_type_str : str, ksrc : str, exporting_patch : str = ''):
     if not container_type_str in containers:
         sys.exit('Gentoomuch.create-composefile: Invalid container type argument \"' + container_type_str  +  '\"')
     is_builder              = bool(container_type_str == builder_str)
@@ -50,7 +52,7 @@ def __output_config(container_type_str : str, exporting_patch : str = ''):
     # First, we define whether this'll be a builder or a packer.
     results.append('  gentoomuch-' + container_type_str + ':\n')
     # We append the universal parts.
-    results.append('    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.\n')
+    # results.append('    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.\n')
     results.append('    image: ' + active_image_tag + '\n')
     results.append('    command: /bin/bash\n')
     results.append('    networks:\n')
@@ -62,23 +64,26 @@ def __output_config(container_type_str : str, exporting_patch : str = ''):
     binpkg_str          = '    - binpkgs:/var/cache/binpkgs'
     distfiles_str       = '    - distfiles:/var/cache/distfiles'
     ebuilds_str         = '    - ebuilds:/var/db/repos/gentoo'
-    kernels_str         = '    - kernels:/mnt/kernels'
+    kernels_str         = '    - kernel-' + ksrc + ':/usr/src'
     logs_mount_str      = '    - ./emerge.logs:/var/tmp/portage'
     results.append(binpkg_str + '\n')
     results.append(distfiles_str +'\n')
-    results.append(ebuilds_str + '\n')
+    if is_updater:
+        results.append(ebuilds_str + '\n')
+    else:
+        results.append(ebuilds_str + ':ro\n')
     results.append(kernels_str + '\n')
     results.append(logs_mount_str + '\n')
     # These are parts that have different permissions between the two types of containers.
-    squashed_output_str = '    - ./squashed/blob:/mnt/squashed-portage'
-    squashed_mount_str  = '    - ./squashed/mountpoint:/mnt/squashed-portage'
+    #squashed_output_str = '    - ./squashed:/mnt/squashed-portage'
+    #squashed_mount_str  = '    - ./squashed/mountpoint:/mnt/squashed-portage'
     stages_mount_str    = '    - ./stages:/mnt/stages'
     # Here we actually write these differential parts into our list.
     if is_builder or is_builder_privileged or is_patcher:
-        results.append(squashed_mount_str + '\n')
+        #results.append(squashed_mount_str + '\n')
         results.append(stages_mount_str + '\n')
     if is_updater:
-        results.append(squashed_output_str + '\n')
+        #results.append(squashed_output_str + '\n')
         results.append(stages_mount_str + ':ro\n')
     if is_patcher:
         patches_path = ''
@@ -90,8 +95,6 @@ def __output_config(container_type_str : str, exporting_patch : str = ''):
                 first_dir_stripped = True
         patches_path += exporting_patch
         results.append('    - ./' + patches_path + ':' + patches_mountpoint + '\n')
-    # This one is added at the end for consistency of end-users' reading; it does NOT require multiple types of permissions.
-    results.append('    - ./emerge.logs:/var/log/portage\n')
     # Here we loop over the all the files in the portage directory and add them.
     portage_tgt = '/etc/portage/'
     #if os.path.exists(portage_output_path + '/patches'):

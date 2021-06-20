@@ -2,7 +2,8 @@
 
 import os, sys, re
 from typing import Tuple
-from include.gentoomuch_common import arch_config_path, config_path, output_path, profiles_amd64, usage_str
+from include.gentoomuch_common import arch_config_path, config_path, output_path, profiles_amd64, usage_str, patches_workdir, patches_in_progress_dir, saved_patches_path, topatch_config_path, stages_path, squashed_path, emergelogs_path, env_output_path, portage_output_path, sets_output_path, patches_output_path
+
 from include.freshroot import freshroot
 from include.sync import sync
 from include.swap_stage import swap_stage
@@ -23,10 +24,11 @@ from include.patches import prep_patch, try_patch, save_patch
 from include.ui_patch_prep_handler import ui_patch_prep_handler, prep_str
 from include.downloader import downloader
 from include.kernel_munger import kernel_munger
-from include.docker_stage_exists import docker_stage_exists
+from include.stage_exists import stage_exists
 
 # Our commandline keywords
 ls_str          = 'ls'
+rm_str          = 'rm'
 set_str         = 'set'
 sync_str        = 'sync'
 patch_str       = 'patch'
@@ -48,7 +50,7 @@ save_str        = 'save'
 
 
 # First word after the "gentoomuch" command.
-primary_commands = (profile_str, stage_str, sync_str, pipeline_str, freshroot_str, bootstrap_str, patch_str )
+primary_commands = (profile_str, stage_str, sync_str, pipeline_str, freshroot_str, bootstrap_str, patch_str, kernel_str )
 # Commands you can use ls and set to visualize and manipulate.
 #ls_and_set_usedwiths = (profile_str, stage_str)
 # 
@@ -86,6 +88,12 @@ def print_usage_patch():
     print(patch_usage + try_str + ' <name>')
     print(patch_usage + save_str + ' <name>')
 
+def print_usage_kernel():
+    kernel_usage = usage_str + kernel_str + ' '
+    print(kernel_usage + prep_str + ' <config>')
+    print(kernel_usage + save_str + ' <config>')
+    print(kernel_usage + set_str + ' <sources>')
+
 def print_no_profile():
     print("You need to set a base profile before continuing.")
 
@@ -96,21 +104,32 @@ def print_usage():
     print_usage_bootstrap()
     print_usage_profile()
     print_usage_stage()
+    print_usage_kernel()
 
-# We do this every time!
+###################################
+# We do the following every time! #
+###################################
 arch = open(arch_config_path).read().strip()
+# Now we create importage config files, so that they aren't automatically created with root:root permissions
+for d in (patches_workdir, patches_in_progress_dir, saved_patches_path, topatch_config_path, stages_path, squashed_path, emergelogs_path, env_output_path, portage_output_path, sets_output_path, patches_output_path):
+    os.makedirs(d, exist_ok = True)
 
-# This handles the bootstrap of each stage, built from upstream.
+##################################################################
+# This handles the bootstrap of each stage, built from upstream. #
+##################################################################
 def pull_sequence(profile : str):
     if download_tarball(arch, profile):
     # swap_stage(arch, profile, 'gentoomuch/builder')
     # run_build(True)
         save_tarball(arch, profile, 'gentoomuch/builder', bool(True))
 
-# Now, we get properly started.
-########################
-# Get the first command.
-########################
+###################################
+# Now, we get properly started... #
+###################################
+
+##########################
+# Get the first command. #
+##########################
 prime_cmd = ''
 if len(sys.argv) > 1:
     if sys.argv[1] in primary_commands:
@@ -118,9 +137,9 @@ if len(sys.argv) > 1:
     else:
         print_usage()
         exit()
-##############################################
-# Stage definitions-related commands (ls/set).
-##############################################
+################################################
+# Stage definitions-related commands (ls/set). #
+################################################
 if prime_cmd == stage_str:
     if sys.argv[2] == ls_str and len(sys.argv) == 3: # Listing stages
         list_stages()
@@ -134,9 +153,9 @@ if prime_cmd == stage_str:
     else: # Error message for stages
         print_usage_stage()
         exit()
-###################################
-# Profile-related command (ls/set).
-###################################
+#####################################
+# Profile-related command (ls/set). #
+#####################################
 elif prime_cmd == profile_str:
     if sys.argv[2] == ls_str and len(sys.argv) == 3: # Listing profiles
         list_profiles(arch)
@@ -150,9 +169,9 @@ elif prime_cmd == profile_str:
     else: # Error message for profile
         print_usage_profile() 
         exit()
-#############################################
-# Bootstrap a stage from an upstream tarball.
-#############################################
+###############################################
+# Bootstrap a stage from an upstream tarball. #
+###############################################
 elif prime_cmd == bootstrap_str:
     # If we are to pull all stages and bootstrap. Risky and time-consuming.
     if len(sys.argv) > 2 and sys.argv[2] == all_str:
@@ -171,9 +190,9 @@ elif prime_cmd == bootstrap_str:
         else:
             exit("Tried to bootstrap, but no profile was set.")
     exit()
-##################
-# Handle patching.
-##################
+####################
+# Handle patching. #
+####################
 elif prime_cmd == patch_str:
     error_str = usage_str
     if len(sys.argv) > 2 and sys.argv[2] == prep_str:
@@ -192,29 +211,37 @@ elif prime_cmd == patch_str:
             patch_name = sys.argv[3]
             save_patch(patch_name)
         else:
-            exit("Which patch do you wish to save?")
+            exit("Under what name do you wish to save the patch?")
     exit()
-##################################
-# Deal with the freshroot command. 
-##################################
+################################
+# Handle kernel configuration. #
+################################
+elif prime_cmd == kernel_str:
+    error_str = usage_str + kernel_str + " "
+    # We create a work environment for the user to work in.
+    if len(sys.argv) > 2 and sys.argv[2] == prep_str:
+        exit("Not implemented yet.")
+    elif len(sys.argv) > 2 and sys.argv[2] == save_str:
+        exit("Not implemented yet.")
+    else:
+        print_kernel_usage()
+        exit()
+####################################
+# Deal with the freshroot command. #
+####################################
 elif prime_cmd == freshroot_str: 
-    #swap_stage(arch, 'default', 'gentoomuch/builder')
     freshroot()
-#######################
-# Run pipelined builds.
-#######################
+#########################
+# Run pipelined builds. #
+#########################
 elif prime_cmd == pipeline_str:
-    print('Running pipeline')
+    exit("Not implemented yet.")
     # Get stage defines from buildlist and build them.
     # TODO: Implement
-####################
-# Sync Portage tree. 
-####################
+######################
+# Sync Portage tree. #
+######################
 elif prime_cmd == sync_str:
-    # TODO:
-    # Use the "default" profile upstream stage, as it is pretty much always the best-tested. 
-    # create_composefile(output_path)
-    sync()
-    #TODO: Remount SquashFS
+    sync(arch)
 else:
     print_usage()

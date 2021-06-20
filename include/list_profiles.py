@@ -2,7 +2,7 @@
 
 import os, docker
 from include.gentoomuch_common import arch_config_path, desired_profile_path, profiles_amd64, output_path
-from .docker_stage_exists import docker_stage_exists
+from .stage_exists import stage_exists
 from .get_desired_profile import get_desired_profile
 
 
@@ -15,9 +15,9 @@ def list_profiles(arch):
         has_desired_profile = False
     print("Listing compatible system profiles:")
     for p in profiles_amd64:
-        if docker_stage_exists(arch, p, 'gentoomuch/builder', False):
+        if stage_exists(arch, p, 'gentoomuch/builder', False):
             bootstrapped_indicator = 'GOOD TO GO :)  '
-        elif docker_stage_exists(arch, p, '', True):
+        elif stage_exists(arch, p, '', True):
             bootstrapped_indicator = 'UPSTREAM READY '
         else:
             bootstrapped_indicator = 'NOT INSTALLED  '

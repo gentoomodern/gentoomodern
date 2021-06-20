@@ -4,7 +4,7 @@ import docker
 from .get_docker_tag import get_docker_tag
 
 
-def docker_stage_exists(arch, profile, stagedef, upstream: bool) -> bool:
+def stage_exists(arch, profile, stagedef, upstream: bool) -> bool:
     dckr = docker.from_env()
     dckr_imgs = dckr.images.list()
     t = get_docker_tag(arch, profile, stagedef, bool(upstream))

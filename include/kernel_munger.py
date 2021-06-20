@@ -2,9 +2,10 @@
 
 
 class kernel_munger:
-
+    
     def __init__(self):
         self.variables_to_values = {} # str:str
+
     #################################################################
     # You call this method on as many kernel fragments as you want. #
     # As soon as it encounters clashing options, it returns False.  #
@@ -27,6 +28,7 @@ class kernel_munger:
                 return False
             # The following would mean that there is another = sign in the value that is being assigned.
             # For example, it can happen in the case of a built-in command.
+            # In such a case, we append all subsequent parts of our list together
             elif len(parts) > 2:
                 key   = parts[0]
                 value = ''
@@ -38,12 +40,13 @@ class kernel_munger:
                 value = parts[1]
             if key in self.variables_to_values and self.variables_to_values[key] != value:
                 print("Existing variable " + key + " in kernel config, with a different value than the one being assigned.")
+                return False
             self.variables_to_values[key] = value
             ctr += 1
             f.close()
             return True
 
-    def writeout(self, output_file: str):
-        f = open(output_file, 'w')
-        for k, v in self.variables_to_values:
+    def writeout(self, output_path: str):
+        f = open(output_path, 'w')
+        for k,v in self.variables_to_values:
             f.writeline(k + '=' + v + '\n')

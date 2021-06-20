@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
 import sys, os 
-from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path
+from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
-from .munger import munger
+from .portage_file_munger import portage_file_munger
 
 
 class portage_directory:
     def __init__(self):
-        self.accumulators = dict() #[str, munger]
+        self.accumulators = dict() #[str, portage_file_munger]
 
     def ingest(self, local_path : str):
         for (dirpath, dirnames, filenames) in os.walk(local_path):
@@ -22,9 +22,11 @@ class portage_directory:
                 if f[0] != '.':
                     current_path = os.path.relpath(dirpath, local_path)
                     current_file = os.path.join(current_path, f)
-                    if not current_file in self.accumulators: # Add a munger object to prevent a crash
-                        self.accumulators[current_file] = munger(current_path, f)
-                    for line in read_file_lines(os.path.join(dirpath, f)): # Here we do our actual file-reading
+                    # Add a portage_file_munger object to prevent a crash
+                    if not current_file in self.accumulators:
+                        self.accumulators[current_file] = portage_file_munger(current_path, f)
+                    # Here we do our actual file-reading
+                    for line in read_file_lines(os.path.join(dirpath, f)):
                         self.accumulators[current_file].ingest(line)
                         # sys.exit('portage_directory.setup() - ERROR - Could not ingest ' + current_file + ' due to line : ' + line)
 

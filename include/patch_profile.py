@@ -5,8 +5,8 @@ from .gentoomuch_common import output_path, portage_output_path, image_tag_base,
 from .read_file_lines import read_file_lines
 
 
-def patch_profile(arch, profile):
-    p = os.path.join(topatch_config_path, arch, profile)
+def patch_profile(profile):
+    p = os.path.join(topatch_config_path, profile)
     if os.path.isfile(p):
         for candidate in read_file_lines(p):
             candidate = candidate.strip()

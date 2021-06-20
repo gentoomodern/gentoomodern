@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys, os, re
-from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, kernel_path, global_config_path, debug
+from .gentoomuch_common import portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path, debug
 from .read_file_lines import read_file_lines
 from .read_by_token import read_by_token
 from .write_file_lines import write_file_lines
@@ -10,7 +10,7 @@ dont_munge_files = (['', 'bashrc'], ['', 'modules'], ['', 'README.md'], ['', 'mi
 dont_munge_dirs = ('sets', 'patches', 'savedconfig')
 
 
-class munger:
+class portage_file_munger:
     def __init__(self, current_dir, current_file):
         self.use_flags = dict() #[str, Dict[bool, List[str]]] 
         self.unmodified_lines = list()#[] #[str]
@@ -57,7 +57,9 @@ class munger:
     def get_current_filename(self):
         return self.current_file
 
-    # The argument atom refers to the first word in the config file. I do not know whether or not this terminology jives with the Gentoo upstream; I will double-check, as such this method may be renamed.
+    # The argument "atom" refers to the first word in the config file.
+    # I do not know whether or not this terminology jives with the Gentoo upstream...
+    # I will double-check, so one day this method may be renamed.
     def __is_atom_portage_var(self, atom):
         return bool(re.search('^USE', atom)) or bool(re.search('^CPU_FLAGS_', atom)) or bool(re.search('^ACCEPT_', atom)) or bool(re.search('^FEATURES', atom))
 
