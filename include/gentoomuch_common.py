@@ -26,20 +26,35 @@ patches_output_path            		= os.path.join(portage_output_path, 'patches')
 includes_path			    		= './include'
 global_portage_config_path		    = os.path.join(includes_path, 'portage.global')
 dockerfiles_path		    		= os.path.join(includes_path, 'dockerfiles')
-# Config defines
-config_path				    		= './config'
-stage_defines_path		    		= os.path.join(config_path, 'stage.defines')
-kernel_defines_path            		= os.path.join(config_path, 'kernel.defines')
-cpu_path				    		= os.path.join(config_path, 'cpu.defines')
-pkgset_path				    		= os.path.join(config_path, 'package.sets')
-local_config_basepath	       		= os.path.join(config_path, 'portage.frags')
-hooks_path				       		= os.path.join(config_path, 'build.hooks')
-kconf_frags_path				    = os.path.join(config_path, 'kconf.frags')
-saved_patches_path		       		= os.path.join(config_path, 'user.patches')
-topatch_config_path            		= os.path.join(config_path, 'patches.apply')
+# Config defines, local
+local_config_path				    = './config/local'
+local_stage_defines_path		    = os.path.join(local_config_path, 'stage.defines')
+local_kernel_defines_path           = os.path.join(local_config_path, 'kernel.defines')
+local_system_defines_path           = os.path.join(local_config_path, 'system.defines')
+local_buildhook_defines_path	    = os.path.join(local_config_path, 'buildhook.defines')
+local_cpu_path				    	= os.path.join(local_config_path, 'cpu.frags')
+local_pkgset_path				    = os.path.join(local_config_path, 'package.sets')
+local_portage_frags_path	       	= os.path.join(local_config_path, 'portage.frags')
+local_buildhook_frags_path	        = os.path.join(local_config_path, 'buildhook.frags')
+local_kconf_frags_path	            = os.path.join(local_config_path, 'kconf.frags')
+local_patch_diff_path		        = os.path.join(local_config_path, 'patch.diffs')
+local_patch_profiles_path           = os.path.join(local_config_path, 'patch.profiles')
 # Environment settings (ie: Stuff you set and forget.)
-env_settings_path              		= os.path.join(config_path, 'env')
-arch_config_path		       		= os.path.join(env_settings_path, 'arch')
+local_config_env_path              	= os.path.join(local_config_path, 'env')
+local_config_arch_path		       	= os.path.join(local_config_env_path, 'arch')
+# Config defines, included
+included_config_path                = "./config/include"
+included_stage_defines_path		    = os.path.join(included_config_path, 'stage.defines')
+included_kernel_defines_path        = os.path.join(included_config_path, 'kernel.defines')
+included_system_defines_path        = os.path.join(included_config_path, 'system.defines')
+included_buildhook_defines_path	    = os.path.join(included_config_path, 'buildhook.defines')
+included_cpu_path				    = os.path.join(included_config_path, 'cpu.frags')
+included_pkgset_path				= os.path.join(included_config_path, 'package.sets')
+included_portage_frags_path	       	= os.path.join(included_config_path, 'portage.frags')
+included_buildhook_frags_path	    = os.path.join(included_config_path, 'buildhook.frags')
+included_kconf_frags_path	        = os.path.join(included_config_path, 'kconf.frags')
+included_patch_diff_path		    = os.path.join(included_config_path, 'patch.diffs')
+included_patch_profiles_path        = os.path.join(included_config_path, 'patch.profiles')
 # These pertain to the stage signing.
 asc_ext			               		= '.DIGESTS.asc'
 gentoo_signing_key		       		= "0xBB572E0E2D182910"
