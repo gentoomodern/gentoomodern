@@ -32,7 +32,7 @@ local_stage_defines_path		    = os.path.join(local_config_path, 'stage.defines')
 local_kernel_defines_path           = os.path.join(local_config_path, 'kernel.defines')
 local_system_defines_path           = os.path.join(local_config_path, 'system.defines')
 local_buildhook_defines_path	    = os.path.join(local_config_path, 'buildhook.defines')
-local_cpu_path				    	= os.path.join(local_config_path, 'cpu.frags')
+local_cpu_frags_path				= os.path.join(local_config_path, 'cpu.frags')
 local_pkgset_path				    = os.path.join(local_config_path, 'package.sets')
 local_portage_frags_path	       	= os.path.join(local_config_path, 'portage.frags')
 local_buildhook_frags_path	        = os.path.join(local_config_path, 'buildhook.frags')
@@ -48,7 +48,7 @@ included_stage_defines_path		    = os.path.join(included_config_path, 'stage.def
 included_kernel_defines_path        = os.path.join(included_config_path, 'kernel.defines')
 included_system_defines_path        = os.path.join(included_config_path, 'system.defines')
 included_buildhook_defines_path	    = os.path.join(included_config_path, 'buildhook.defines')
-included_cpu_path				    = os.path.join(included_config_path, 'cpu.frags')
+included_cpu_frags_path				= os.path.join(included_config_path, 'cpu.frags')
 included_pkgset_path				= os.path.join(included_config_path, 'package.sets')
 included_portage_frags_path	       	= os.path.join(included_config_path, 'portage.frags')
 included_buildhook_frags_path	    = os.path.join(included_config_path, 'buildhook.frags')
@@ -62,10 +62,10 @@ gentoo_upstream_url            		= "http://ftp-osl.osuosl.org/pub/gentoo/release
 # These are the base profiles we download from upstream. Gentoomuch recompiles these with architecture-optmized flags and further build upon the results.
 profiles_amd64			       		= ('default','hardened+nomultilib','hardened-selinux+nomultilib','hardened-selinux','hardened','musl-hardened','musl-vanilla','nomultilib','systemd','uclibc-hardened','uclibc-vanilla','x32')
 # This is for the Docker tags that we access as we work.
+profiles_amd64_dockerized	   		=  ( get_dockerized_profile_name(p) for p in profiles_amd64 )
 image_tag_base			       		= 'localhost:5000/gentoomuch-'
 active_image_tag		       		= image_tag_base + 'current:latest'
-profiles_amd64_dockerized	   		=  ( get_dockerized_profile_name(p) for p in profiles_amd64 )
 dockerized_username            		= 'gentoomuch-user'
 usage_str                      		= "    gentoomuch "
 # Patches
-patches_mountpoint             		= '/home/' + dockerized_username + '/ebuild_exports'
+ebuilds_export_mountpoint           = '/home/' + dockerized_username + '/ebuild_exports'
