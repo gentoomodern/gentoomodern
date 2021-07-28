@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from .gentoomodern_common import arch_config_path, output_path, desired_stage_path, desired_profile_path
+from .gentoomodern_common import output_path, desired_stage_path, desired_profile_path
 from .swap_stage import swap_stage
 from .composefile import create_composefile
 from .get_dockerized_profile_name import get_dockerized_profile_name
@@ -9,10 +9,10 @@ from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 from .get_desired_profile import get_desired_profile
 from .get_desired_stage import get_desired_stage
 from .get_gentoomodern_uid import get_gentoomodern_uid
-
+from .get_arch import get_arch
 
 def freshroot():
-    arch = open(arch_config_path).read().strip()
+    arch = get_arch()
     if os.path.isfile(desired_profile_path):
         desired_profile = open(desired_profile_path).read().strip()
         print("    Trying to start fresh root with profile " + desired_profile + " and stage definition ")

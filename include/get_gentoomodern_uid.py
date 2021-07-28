@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from .gentoomodern_common import env_settings_path
+from .gentoomodern_common import config_env_path
 
 def get_gentoomodern_uid() -> str:
-    return open(os.path.join(env_settings_path, 'uid'), 'r').read().strip()
+    return open(os.path.join(config_env_path, 'uid'), 'r').read().strip()

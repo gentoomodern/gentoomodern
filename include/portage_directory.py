@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys, os 
-from .gentoomodern_common import portage_output_path, config_path, stage_defines_path, cpu_path, pkgset_path, local_config_basepath, hooks_path
+from .gentoomodern_common import portage_output_path, config_path, stage_defines_path, cpu_frags_path, pkgset_path, buildhook_frags_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
 from .portage_file_munger import portage_file_munger

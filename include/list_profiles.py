@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, docker
-from include.gentoomodern_common import arch_config_path, desired_profile_path, profiles_amd64, output_path
+from include.gentoomodern_common import desired_profile_path, profiles_amd64, output_path
 from .stage_exists import stage_exists
 from .get_desired_profile import get_desired_profile
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, re, shutil, git
-from .gentoomodern_common import output_path, portage_output_path, saved_patches_path, patches_workdir, patches_mountpoint, patches_in_progress_dir
+from .gentoomodern_common import output_path, portage_output_path, patch_diff_path, patches_workdir, patches_in_progress_dir
 from .get_gentoomodern_uid import get_gentoomodern_uid
 from .get_arch import get_arch
 from .swap_stage import swap_stage

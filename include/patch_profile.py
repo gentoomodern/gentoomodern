@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, shutil
-from .gentoomodern_common import output_path, portage_output_path, image_tag_base, active_image_tag, desired_packages_path, desired_hooks_path, output_path, topatch_config_path, saved_patches_path, patches_output_path
+from .gentoomodern_common import output_path, portage_output_path, image_tag_base, active_image_tag, desired_packages_path, desired_hooks_path, output_path, patch_diff_path, patches_output_path
 from .read_file_lines import read_file_lines
 
 

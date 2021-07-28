@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from .gentoomodern_common import dockerized_username, patches_mountpoint
+from .gentoomodern_common import dockerized_username
 from .get_gentoomodern_uid import get_gentoomodern_uid
 
 def bootstrap_dockerfile(tarball_name: str, profile: str) -> str:

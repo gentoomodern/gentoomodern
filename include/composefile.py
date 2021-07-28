@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, sys, re
-from .gentoomodern_common import output_path, config_path, active_image_tag, stages_path, patches_workdir, patches_mountpoint, portage_output_path
+from .gentoomodern_common import output_path, config_path, active_image_tag, stages_path, patches_workdir, portage_output_path
 from .write_file_lines import write_file_lines
 from .get_active_stage import get_active_stage
 from .tag_parser import tag_parser
