@@ -1,40 +1,40 @@
 <p>
 STATUS: Almost ready to drop... This thing should be at initial operational capability within a week! Then, cleanup, system tests, documentation, release! This means that for practical reasons the documentation might not always be in-sync and that features aren't all yet complete; also, while this tool is pleasant there are still a few janky bits to grind out.
 </p>
-<h3>GentooMuch: Because something like this was bound to happen...</h3>
+<h3>GentooModern: Because something like this was bound to happen...</h3>
 
 <h4>Intro:</h4>
 <p>
 I absolutely <i>fell in love</i> with Gentoo Linux several years ago. It is an amazing meta-distribution backed by a vibrant all-volunteer group of developers and maintainers who operate mostly by concensus. You can readily optimize a Gentoo system to obtain the best performance, reliability, and compatibility possible. The significant advantage of a tailored operating system is as things remain in harmony. However, unless carefully managed, a source-based distribution such as Gentoo is guaranteed to suffer from configuration drift as patches and hacks accumulate. This toolkit provides automations to enable such careful management. Using Gentoomuch allows any user to be brave... If you use source control on the config directory, then congratulations: your builds are now reversible. Gentoo and DevOps are making babies!
 </p>
 <p>
-GentooMuch allows Gentoo users to reversibly experiment with unknown use-flag combinations and easily create patches for broken packages; once the public API gets developed, it'll be the ideal tool for shakedown testing. GentooMuch allows long-time developers another means to orchestrate their own build processes. It gives sysadmins who must juggle entire networks a modern way to reduce technical debt. Using this tool is a rather civilized way of managing multiple Gentoo installations; it has very good amenities.
+GentooModern allows Gentoo users to reversibly experiment with unknown use-flag combinations and easily create patches for broken packages; once the public API gets developed, it'll be the ideal tool for shakedown testing. GentooModern allows long-time developers another means to orchestrate their own build processes. It gives sysadmins who must juggle entire networks a modern way to reduce technical debt. Using this tool is a rather civilized way of managing multiple Gentoo installations; it has very good amenities.
 </p>
-<h4>GentooMuch allows you manage an entire network's worth of Gentoo systems without fuss, while still being fun to use!</h4>
+<h4>GentooModern allows you manage an entire network's worth of Gentoo systems without fuss, while still being fun to use!</h4>
 Gentoo Linux has been cast as intimidating and error-prone, and this toolkit aims to remove the bad by ensuring that all your builds are from a known state and by offering you an easy way to define and build multiple systems! We use Docker-Compose to maintain a clean working environment on every run. The software creates an optimized buildmaster directly from any of the publicly-available profiles. However, this toolkit also keeps the best part of Gentoo; it is a <i>fun</i> little toolkit!
 <p>
-GentooMuch aims to to dovetail into the existing ecosystem by being very carefully designed for minimum intrusiveness: Due to being greatly inspired by Gentoo's existing workflows, its patterns should be implicitly relatable to existing users. The tool also feels a bit like using the Docker command and that is no coincidence. I didn't want this tool to jam up a workflow.
+GentooModern aims to to dovetail into the existing ecosystem by being very carefully designed for minimum intrusiveness: Due to being greatly inspired by Gentoo's existing workflows, its patterns should be implicitly relatable to existing users. The tool also feels a bit like using the Docker command and that is no coincidence. I didn't want this tool to jam up a workflow.
 </p>
 <h4>This tool is just made to be played with.</h4>
 In fact, to setup, just call
-<pre>gentoomuch sync</pre>
+<pre>gentoomodern sync</pre>
 in order to get the Portage directory. It then packs a squashfs for faster future work and mounts it for you. Then, you check out available profiles with
-<pre>gentoomuch profile ls</pre>
+<pre>gentoomodern profile ls</pre>
 set one with
-<pre>gentoomuch profile set</pre>
+<pre>gentoomodern profile set</pre>
 and finally you bootstrap it with
-<pre>gentoomuch bootstrap</pre>
+<pre>gentoomodern bootstrap</pre>
 This creates an optimized builder, which will benefit from all future improvements to this build system. You then enter into an fresh sandbox environment with
-<pre>gentoomuch freshroot</pre>
+<pre>gentoomodern freshroot</pre>
 and start emerging packages right away! It'll keep the built ones so you won't have to recompile them from scratch again.
 </p>
 <p>
 We support the important use-case of prepping and using patches when your profile breaks; if upstream has a package broken on the minimalistic and marginally-supported libc you're using on your tricked-out home router or your wierdo edge-case FPGA-optimized minimalistic ultrasecured AI system, and you need to quickly make it work, just go
-<pre>gentoomuch patch prep</pre>
+<pre>gentoomodern patch prep</pre>
 You work in the directory that gets automatically prepared for your convenience, and then you try compiling the patched package with
-<pre>gentoomuch patch try</pre>
+<pre>gentoomodern patch try</pre>
 until it works. Once you're done, just use
-<pre>gentoomuch patch save</pre>
+<pre>gentoomodern patch save</pre>
 and you'll be able to make use of it across any of your profiles after defining it as a file in
 </pre>config/patch.profiles</pre>
 </p>
@@ -51,7 +51,7 @@ We also use a multi-instanced binpkg directory to provide for all your systems o
 <ol>
 <li>Everything you keep is in the
 </pre>config</pre>
-directory; the rest is either an executable file/deps, or documentation, or temporaries. A number of configurations have within them another called "gentoomuch." Everything inside these is reserved: Changing anything in there will likely break your builds, so I don't generally recommend doing so unless you're willing to debug thing by yourself.
+directory; the rest is either an executable file/deps, or documentation, or temporaries. A number of configurations have within them another called "gentoomodern." Everything inside these is reserved: Changing anything in there will likely break your builds, so I don't generally recommend doing so unless you're willing to debug thing by yourself.
 </li>
 <li>Further documentation is in the config directory. These aforementioned folders are intended to be both part of our pipeline and as living, implicitly-tested documentation for anyone looking to get started.</li>
 </ol>
@@ -60,10 +60,10 @@ Nothing ever comes completely cost-free - If you are an existing (ie: skeptical)
 <ol>
 <li>Your workflow will change a bit. Mostly it'll mean creating subdirectories for your sets of packages/flags and then defining your machines from these sets, instead of directly within /etc/portage, Also, you now access your build environments by using the freshroot command.
 </li>
-<li>When building stage3 Docker images, GentooMuch keeps the tarball inside instead of deleting it as upstream does with theirs. This does entail an additional cost of 200-300MiB of disc space per profile you bootstrap on your local machine. However, you then benefit by completely avoiding the chicken-and-egg situation!
+<li>When building stage3 Docker images, GentooModern keeps the tarball inside instead of deleting it as upstream does with theirs. This does entail an additional cost of 200-300MiB of disc space per profile you bootstrap on your local machine. However, you then benefit by completely avoiding the chicken-and-egg situation!
 </li>
 <li>Responsiveness is a bit less snappy than a pure chroot, but the vast majority is your wait will be limited to the time when you'll bootstrapping a dockerized image... The rest is a joke.</li>
-<li>GentooMuch is currently being developed on AMD64 systems but support for others will come very, very soon.
+<li>GentooModern is currently being developed on AMD64 systems but support for others will come very, very soon.
 </li>
 </ol>
 </p>

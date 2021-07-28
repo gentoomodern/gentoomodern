@@ -6,4 +6,4 @@
 - A script called ``pull-upstream-stage`` to bootstrap the local Dockerized image.
 - A script called ``pipeline`` runs all the builds in ``./config/build.list`
 - A script called ``sync`` starts a root and syncs portage via ``emerge --sync``. Note: Unless you maintain a local rsync mirror for Portage, it is recommended to run this script sparingly and to refrain from using ``emerge --sync`` in your own shells. Otherwise, the upstream servers will block you.
-- A script called ``freshroot`` allows the user to start a root from the currently-active stage3 (the one labeled as gentoomuch/stage3:latest
+- A script called ``freshroot`` allows the user to start a root from the currently-active stage3 (the one labeled as gentoomodern/stage3:latest

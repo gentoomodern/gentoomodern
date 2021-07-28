@@ -2,7 +2,7 @@
 
 import os
 from .kernel_munger import kernel_munger
-from .gentoomuch_common import kconf_frags_path 
+from .gentoomodern_common import kconf_frags_path 
 
 def combine_kconfigs(configs : [str]) -> bool:
     results = kernel_munger()

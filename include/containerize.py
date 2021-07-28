@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, shutil
-from .gentoomuch_common import output_path, stages_path, image_tag_base
+from .gentoomodern_common import output_path, stages_path, image_tag_base
 from .get_dockerized_profile_name import get_dockerized_profile_name
 from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 from .get_docker_tag import get_docker_tag

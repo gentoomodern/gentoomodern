@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from .gentoomuch_common import desired_stage_path
+from .gentoomodern_common import desired_stage_path
 
 
 def get_desired_stage():

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from .gentoomuch_common import desired_packages_path, output_path
+from .gentoomodern_common import desired_packages_path, output_path
 from .read_file_lines import read_file_lines
 
 
@@ -16,7 +16,7 @@ def run_build(arch, profile, stagedef, upstream, empty_tree = False):
         for p in packages:
             pkgs_str += p.strip()
             pkgs_str +=  ' '
-    cmd_str = "cd " + output_path + " && docker-compose run gentoomuch-builder /bin/bash -c 'emerge -uDqv " + ("--emptytree" if empty_tree else "--changed-use")  + ' ' + pkgs_str + "@world'"
+    cmd_str = "cd " + output_path + " && docker-compose run gentoomodern-builder /bin/bash -c 'emerge -uDqv " + ("--emptytree" if empty_tree else "--changed-use")  + ' ' + pkgs_str + "@world'"
     code = os.system(cmd_str)
     if code != 0:
         exit("Issues while compiling... Arch: " + arch + '. Profile: ' + profile + '. Stage: ' + stagedef + '. Upstream: ' + str(upstream))

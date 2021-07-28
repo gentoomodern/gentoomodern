@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import os, re, shutil, git
-from .gentoomuch_common import output_path, portage_output_path, saved_patches_path, patches_workdir, patches_mountpoint, patches_in_progress_dir
-from .get_gentoomuch_uid import get_gentoomuch_uid
+from .gentoomodern_common import output_path, portage_output_path, saved_patches_path, patches_workdir, patches_mountpoint, patches_in_progress_dir
+from .get_gentoomodern_uid import get_gentoomodern_uid
 from .get_arch import get_arch
 from .swap_stage import swap_stage
 from .get_desired_profile import get_desired_profile
@@ -98,8 +98,8 @@ def prep_patch(patch_name: str, package: str, version: str, force: bool, repo_na
     # Now we assemble the actual command string.
     cmd_str += 'mkdir ' + temp_sourcedir + ' && mv ' + where_all_the_actual_code_is + '/* ' + temp_sourcedir + ' && rm -rf ' + os.path.join(patches_mountpoint, 'portage') + ' && mkdir -p ' + versioned_package  + ' && mv ' + temp_sourcedir + '/* ' + final_destination + ' && rmdir ' + temp_sourcedir
     # Now we can spin up a docker and unpack that patch into the workdir.
-    swap_stage(get_arch(), 'default' , 'gentoomuch/builder', False, patch_name)
-    code = os.system('cd ' + output_path  + ' &&  docker-compose run -u ' + get_gentoomuch_uid() + " gentoomuch-patcher /bin/bash -c '" + cmd_str + "'")
+    swap_stage(get_arch(), 'default' , 'gentoomodern/builder', False, patch_name)
+    code = os.system('cd ' + output_path  + ' &&  docker-compose run -u ' + get_gentoomodern_uid() + " gentoomodern-patcher /bin/bash -c '" + cmd_str + "'")
     # This appends the git commands we use to initiate the users' patch-making process.
     os.system('cd ' + os.path.join(patch_export_hostdir, versioned_package) + ' && git init && git add . && git commit -m "As-is from upstream (virgin.)"')
     # Debug messages.
@@ -122,7 +122,7 @@ def prep_patch(patch_name: str, package: str, version: str, force: bool, repo_na
 #        exit("Could not read package version")
 #    repo_name = 'gentoo' if repo_name == '' else repo_name
 #    cmd_str = 'ls -alh $(portageq get_repo_path / ' + repo_name + ')/' + package
-#    code = os.system('cd ' + output_path + ' && docker-compose run -u ' + get_gentoomuch_uid() + " gentoomuch-builder /bin/bash -c '" + cmd_str + "'")
+#    code = os.system('cd ' + output_path + ' && docker-compose run -u ' + get_gentoomodern_uid() + " gentoomodern-builder /bin/bash -c '" + cmd_str + "'")
     
 
 def save_patch(patch_name : str, custom_output_path : str = '') -> bool:
@@ -148,10 +148,10 @@ def try_patch(patch_name : str):
     #cmd_str = "/bin/bash"
     valid, profile = get_desired_profile()
     if valid:
-        swap_stage(get_arch(), profile, 'gentoomuch/builder', True, str(patch_name))
+        swap_stage(get_arch(), profile, 'gentoomodern/builder', True, str(patch_name))
         code = send_diff(patches_workdir, patch_outdir, patch_name)
         create_composefile(output_path)
         if code == True:
-            os.system("cd " + output_path + " && docker-compose run gentoomuch-builder /bin/bash -c '" + cmd_str + "'")
+            os.system("cd " + output_path + " && docker-compose run gentoomodern-builder /bin/bash -c '" + cmd_str + "'")
         return True
     return False

@@ -2,7 +2,7 @@
 
 import os, sys, re
 from typing import Tuple
-from include.gentoomuch_common import arch_config_path, config_path, output_path, profiles_amd64, usage_str, patches_workdir, patches_in_progress_dir, saved_patches_path, topatch_config_path, stages_path, squashed_path, emergelogs_path, env_output_path, portage_output_path, sets_output_path, patches_output_path
+from include.gentoomodern_common import arch_config_path, config_path, output_path, profiles_amd64, usage_str, patches_workdir, patches_in_progress_dir, saved_patches_path, topatch_config_path, stages_path, squashed_path, emergelogs_path, env_output_path, portage_output_path, sets_output_path, patches_output_path
 
 from include.freshroot import freshroot
 from include.sync import sync
@@ -49,7 +49,7 @@ try_str         = 'try'
 save_str        = 'save'
 
 
-# First word after the "gentoomuch" command.
+# First word after the "gentoomodern" command.
 primary_commands = (profile_str, stage_str, sync_str, pipeline_str, freshroot_str, bootstrap_str, patch_str, kernel_str )
 # Commands you can use ls and set to visualize and manipulate.
 #ls_and_set_usedwiths = (profile_str, stage_str)
@@ -119,9 +119,9 @@ for d in (patches_workdir, patches_in_progress_dir, saved_patches_path, topatch_
 ##################################################################
 def pull_sequence(profile : str):
     if download_tarball(arch, profile):
-    # swap_stage(arch, profile, 'gentoomuch/builder')
+    # swap_stage(arch, profile, 'gentoomodern/builder')
     # run_build(True)
-        save_tarball(arch, profile, 'gentoomuch/builder', bool(True))
+        save_tarball(arch, profile, 'gentoomodern/builder', bool(True))
 
 ###################################
 # Now, we get properly started... #

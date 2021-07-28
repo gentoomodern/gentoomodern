@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import docker
-from .gentoomuch_common import active_image_tag
+from .gentoomodern_common import active_image_tag
 from .tag_parser import tag_parser
 
 

@@ -3,7 +3,7 @@
 # Other languages do a better job implementing it.
 
 import os
-from .gentoomuch_common import stages_defines_path, kernel_defines_path
+from .gentoomodern_common import stages_defines_path, kernel_defines_path
 from .kernel_munger import kernel_munger
 from .portage_munger import portage_munger
 

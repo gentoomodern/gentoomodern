@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, sys, re
-from .gentoomuch_common import output_path, config_path, active_image_tag, stages_path, patches_workdir, patches_mountpoint, portage_output_path
+from .gentoomodern_common import output_path, config_path, active_image_tag, stages_path, patches_workdir, patches_mountpoint, portage_output_path
 from .write_file_lines import write_file_lines
 from .get_active_stage import get_active_stage
 from .tag_parser import tag_parser
@@ -50,7 +50,7 @@ def __output_config(container_type_str : str, ksrc : str, exporting_patch : str 
     # Our results will be a list of strings.
     results = [] 
     # First, we define whether this'll be a builder or a packer.
-    results.append('  gentoomuch-' + container_type_str + ':\n')
+    results.append('  gentoomodern-' + container_type_str + ':\n')
     # We append the universal parts.
     # results.append('    # The following line is a cool trick that fools the docker program into using a locally-tagged image as if it came from a proper repository.\n')
     results.append('    image: ' + active_image_tag + '\n')

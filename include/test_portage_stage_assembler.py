@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, unittest
-from .gentoomuch_common import global_portage_config_path, cpu_defines_path
+from .gentoomodern_common import global_portage_config_path, cpu_defines_path
 from .portage_stage_assembler import portage_stage_assembler
 from .portage_file_munger import 
 
@@ -19,7 +19,7 @@ from .portage_file_munger import
 #############################################################################
 
 baseline_files = {}
-baseline_files['make.conf'] = read_file_lines(os.path.join(cpu_defines_path, 'gentoomuch/test'))
+baseline_files['make.conf'] = read_file_lines(os.path.join(cpu_defines_path, 'gentoomodern/test'))
 baseline_files['make.conf'].extend(read_file_lines(os.path.join(global_portage_config_path, 'make.conf')))
 baseline_files['package.accept_keywords'] = read_file_lines(os.path.join(global_portage_config_path, 'package.accept_keywords'))
 baseline_files['repos.conf/gentoo.conf'] = read_file_lines(os.path.path(global_portage_config_path, 'repos.conf/gentoo.conf'))

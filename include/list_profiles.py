@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, docker
-from include.gentoomuch_common import arch_config_path, desired_profile_path, profiles_amd64, output_path
+from include.gentoomodern_common import arch_config_path, desired_profile_path, profiles_amd64, output_path
 from .stage_exists import stage_exists
 from .get_desired_profile import get_desired_profile
 
@@ -15,7 +15,7 @@ def list_profiles(arch):
         has_desired_profile = False
     print("Listing compatible system profiles:")
     for p in profiles_amd64:
-        if stage_exists(arch, p, 'gentoomuch/builder', False):
+        if stage_exists(arch, p, 'gentoomodern/builder', False):
             bootstrapped_indicator = 'GOOD TO GO :)  '
         elif stage_exists(arch, p, '', True):
             bootstrapped_indicator = 'UPSTREAM READY '

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, re
-from include.gentoomuch_common import stage_defines_path, desired_stage_path
+from include.gentoomodern_common import stage_defines_path, desired_stage_path
 
 
 # This lists stages

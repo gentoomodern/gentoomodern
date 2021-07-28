@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import re, docker
-from .gentoomuch_common import image_tag_base, active_image_tag, profiles_amd64_dockerized
+from .gentoomodern_common import image_tag_base, active_image_tag, profiles_amd64_dockerized
 
 
 class tag_parser:
@@ -17,12 +17,12 @@ class tag_parser:
         self.profile = ''
         self.stage_define = ''
         self.upstream = False
-        # If we are dealing with localhost:5000/gentoomuch-current:latest
+        # If we are dealing with localhost:5000/gentoomodern-current:latest
         if tag == active_image_tag:
             return
         # STATE OF INPUT:
-        # A) localhost:5000/gentoomuch-amd64-musl-hardened:upstream
-        # B) localhost:5000/gentoomuch-amd64-musl-hardened-custom-memalloc-test:latest
+        # A) localhost:5000/gentoomodern-amd64-musl-hardened:upstream
+        # B) localhost:5000/gentoomodern-amd64-musl-hardened-custom-memalloc-test:latest
         tag = re.sub(re.escape(image_tag_base), '', tag)
         # STATE OF INPUT:
         # A) amd64-musl-hardened:upstream
@@ -38,7 +38,7 @@ class tag_parser:
         # STATE OF INPUT:
         # A) musl-hardened
         # B) musl-hardened-custom-memalloc-test
-        profile_found = False # We start searching within our set of profiles. These are defined in gentoomuch_common.py
+        profile_found = False # We start searching within our set of profiles. These are defined in gentoomodern_common.py
         for p in profiles_amd64_dockerized: 
             if tag.startswith(p): # If we match, we can set our data and break out.
                 self.profile = p

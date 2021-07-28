@@ -2,7 +2,7 @@
 
 # This sets the currently active basestage.
 import os, sys, re, docker
-from .gentoomuch_common import output_path, config_path, image_tag_base, active_image_tag, desired_packages_path, desired_hooks_path
+from .gentoomodern_common import output_path, config_path, image_tag_base, active_image_tag, desired_packages_path, desired_hooks_path
 from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 from .get_dockerized_profile_name import get_dockerized_profile_name
 from .portage_stage_assembler import portage_stage_assembler

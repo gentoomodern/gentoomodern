@@ -2,7 +2,7 @@ Here is a descriptions of the contents of the configurations folders. This shoul
 <pre>
 build.hooks
 </pre>
-These files get run at specific points in the GentooMuch build process.
+These files get run at specific points in the GentooModern build process.
 
 <pre>
 cpu.defines
@@ -12,7 +12,7 @@ Here we put the "-march"-style variables, with a named cpu config of your choice
 <pre>
 env
 </pre>
-Here we have information pertaining to the GentooMuch environment; the system architecture, the uid/gid of the operating user, and upstream url info.
+Here we have information pertaining to the GentooModern environment; the system architecture, the uid/gid of the operating user, and upstream url info.
 
 <pre>
 kernel.defines

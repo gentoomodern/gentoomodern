@@ -6,7 +6,7 @@ from .get_dockerized_profile_name import get_dockerized_profile_name
 
 #Stuff all scripts here should use
 debug				        		= True
-output_path				    		= './gentoomuch-data'
+output_path				    		= './gentoomodern-data'
 stages_path		            		= os.path.join(output_path, 'stages')
 gpg_path				    		= os.path.join(output_path, 'gpg')
 squashed_path                  		= os.path.join(output_path, 'squashed')
@@ -63,9 +63,9 @@ gentoo_upstream_url            		= "http://ftp-osl.osuosl.org/pub/gentoo/release
 profiles_amd64			       		= ('default','hardened+nomultilib','hardened-selinux+nomultilib','hardened-selinux','hardened','musl-hardened','musl-vanilla','nomultilib','systemd','uclibc-hardened','uclibc-vanilla','x32')
 # This is for the Docker tags that we access as we work.
 profiles_amd64_dockerized	   		=  ( get_dockerized_profile_name(p) for p in profiles_amd64 )
-image_tag_base			       		= 'localhost:5000/gentoomuch-'
+image_tag_base			       		= 'localhost:5000/gentoomodern-'
 active_image_tag		       		= image_tag_base + 'current:latest'
-dockerized_username            		= 'gentoomuch-user'
-usage_str                      		= "    gentoomuch "
+dockerized_username            		= 'gentoomodern-user'
+usage_str                      		= "    gentoomodern "
 # Patches
 ebuilds_export_mountpoint           = '/home/' + dockerized_username + '/ebuild_exports'

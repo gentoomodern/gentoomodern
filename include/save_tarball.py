@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os, sys, docker, re
-from .gentoomuch_common import desired_packages_path, stages_path, output_path
+from .gentoomodern_common import desired_packages_path, stages_path, output_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
 from .get_dockerized_profile_name import get_dockerized_profile_name
@@ -30,7 +30,7 @@ def save_tarball(arch, profile, stage_define, upstream: bool):
       # The following dogs' meal of a command preps a stage inside a docker container. It then changes root into it and emerges. Then, it exits the chroot, unmounts all tempories, and packs a tarball as "stage3-<arch>-<base>-<user-stage-define>.tar.xz"
       # TODO: Parcel this out into smaller sections for manageability. The only real blocker here is the time it takes to test the command itself :P
     cmd_str = "cd " + output_path + " && "
-    cmd_str += "docker-compose run gentoomuch-builder-privileged /bin/bash -c \""
+    cmd_str += "docker-compose run gentoomodern-builder-privileged /bin/bash -c \""
     cmd_str += "emerge pigz && "
     cmd_str += "cd /mnt/gentoo && "
     cmd_str += "tar xpf /stage3-* --xattrs-include='*.*' --numeric-owner && "

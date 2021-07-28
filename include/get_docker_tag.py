@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import re
-from .gentoomuch_common import image_tag_base
+from .gentoomodern_common import image_tag_base
 from .get_dockerized_profile_name import get_dockerized_profile_name
 from .get_dockerized_stagedef_name import get_dockerized_stagedef_name
 

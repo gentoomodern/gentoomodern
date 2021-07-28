@@ -2,7 +2,7 @@
 /build/
 **/__pycache__
 !build/README.md
-gentoomuch-data/
+gentoomodern-data/
 !**/README*
 !**/PLACEHOLDER
 !config/packages.flags/zentoo/**
