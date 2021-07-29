@@ -110,5 +110,8 @@ def __output_config(container_type_str : str, ksrc : str, exporting_patch : str 
         results.append('    cap_add:\n')
         results.append('    - CAP_SYS_ADMIN\n')
         results.append('    - CAP_NET_ADMIN\n')
+    else:
+        results.append('    cap_add:\n')
+        results.append('    - CAP_SYS_PTRACE\n')
     # Finally, we return the list of string.
     return results

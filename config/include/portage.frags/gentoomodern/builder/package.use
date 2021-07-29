@@ -1,1 +1,3 @@
 dev-vcs/git gnpug
+dev-lang/rust clippy rls rustfmt parallel-compiler wasm llvm_targets_AArch64 llvm_targets_ARM llvm_targets_AVR llvm_targets_WebAssembly llvm_targets_Mips llvm_targets_PowerPC llvm_targets_X86
+dev-util/sccache dist-client dist-server

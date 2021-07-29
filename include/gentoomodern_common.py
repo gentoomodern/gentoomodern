@@ -27,7 +27,7 @@ includes_path				= './include'
 global_portage_config_path  = os.path.join(includes_path, 'portage.global')
 dockerfiles_path		    = os.path.join(includes_path, 'dockerfiles')
 # Config defines, local
-config_path			        = './config/local'
+config_path			        = './config/include'
 stage_defines_path	        = os.path.join(config_path, 'stage.defines')
 kernel_defines_path         = os.path.join(config_path, 'kernel.defines')
 system_defines_path         = os.path.join(config_path, 'system.defines')
@@ -39,8 +39,10 @@ buildhook_frags_path	    = os.path.join(config_path, 'buildhook.frags')
 kconf_frags_path            = os.path.join(config_path, 'kconf.frags')
 patch_diff_path		        = os.path.join(config_path, 'patch.diffs')
 patch_profiles_path         = os.path.join(config_path, 'patch.profiles')
+patches_mountpoint          = "/mnt/patches"
 # Environment settings (ie: Stuff you set and forget.)
-config_env_path             = os.path.join(config_path, 'env')
+local_config_path           = "./config/local"
+config_env_path             = os.path.join(local_config_path, 'env')
 config_arch_path		    = os.path.join(config_env_path, 'arch')
 # These pertain to the stage signing.
 asc_ext			            = '.DIGESTS.asc'

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from .gentoomodern_common import dockerized_username
+from .gentoomodern_common import dockerized_username, patches_mountpoint
 from .get_gentoomodern_uid import get_gentoomodern_uid
 
 def bootstrap_dockerfile(tarball_name: str, profile: str) -> str:
@@ -20,8 +20,8 @@ def bootstrap_dockerfile(tarball_name: str, profile: str) -> str:
     uid = get_gentoomodern_uid()
     results += '&& groupadd -g 1000 ' + dockerized_username + '\\\n'
     results += '&& useradd -m -u ' + uid + ' -g ' + uid + ' -G portage ' + dockerized_username + ' \\\n'
-    results += '&& mkdir ' + patches_mountpoint +  ' \\\n'
-    results += '&& chown -R ' + uid + ':' + uid + ' ' + patches_mountpoint + '\\\n'
+    results += '&& mkdir ' + patches_mountpoint + ' \\\n'
+    results += '&& chown -R ' + uid + ':' + uid + ' ' + patches_mountpoint + '\n'
     #results += '&& echo \'export PS1=\"[\\u@' + profile  + '] \\W # \"\' > /root/bashrc\n' # DOES NOT WORK
     #results += '&& USER ' + dockerized_username
     #results += 'WORKDIR /home/' + dockerized_username + '\n'

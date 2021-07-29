@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 import os, shutil
-from .gentoomodern_common import output_path, portage_output_path, image_tag_base, active_image_tag, desired_packages_path, desired_hooks_path, output_path, patch_diff_path, patches_output_path
+from .gentoomodern_common import output_path, portage_output_path, image_tag_base, active_image_tag, desired_packages_path, desired_hooks_path, output_path, patch_diff_path, patches_output_path, patch_profiles_path
 from .read_file_lines import read_file_lines
 
 
 def patch_profile(profile):
-    p = os.path.join(topatch_config_path, profile)
+    p = os.path.join(patch_profiles_path, profile)
     if os.path.isfile(p):
         for candidate in read_file_lines(p):
             candidate = candidate.strip()

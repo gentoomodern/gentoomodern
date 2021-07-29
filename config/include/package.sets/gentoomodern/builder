@@ -6,3 +6,5 @@ app-arch/cpio
 dev-vcs/git
 app-eselect/eselect-repository
 sys-fs/squashfs-tools
+dev-lang/rust
+dev-util/sccache

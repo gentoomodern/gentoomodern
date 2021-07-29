@@ -5,6 +5,7 @@ from .gentoomodern_common import output_path, squashed_path
 from .get_gentoomodern_uid import get_gentoomodern_uid
 from .stage_exists import stage_exists
 from .swap_stage import swap_stage
+from .download_tarball import download_tarball
 
 def sync(arch):
     ##########################################################

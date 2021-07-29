@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import os
-from .gentoomodern_common import desired_packages_path, output_path
+from .gentoomodern_common import desired_packages_path, output_path, emergelogs_path
 from .read_file_lines import read_file_lines
-
+from .get_gentoomodern_uid import get_gentoomodern_uid
 
 def run_build(arch, profile, stagedef, upstream, empty_tree = False):
     swap_stage(arch, profile, stagedef, bool(upstream))
@@ -18,5 +18,7 @@ def run_build(arch, profile, stagedef, upstream, empty_tree = False):
             pkgs_str +=  ' '
     cmd_str = "cd " + output_path + " && docker-compose run gentoomodern-builder /bin/bash -c 'emerge -uDqv " + ("--emptytree" if empty_tree else "--changed-use")  + ' ' + pkgs_str + "@world'"
     code = os.system(cmd_str)
+    uid = get_gentoomuch_uid()
+    os.system("chmod -R " + uid + ":" + uid + " " + emergelogs_path)
     if code != 0:
         exit("Issues while compiling... Arch: " + arch + '. Profile: ' + profile + '. Stage: ' + stagedef + '. Upstream: ' + str(upstream))

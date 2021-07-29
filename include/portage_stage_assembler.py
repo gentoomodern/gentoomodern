@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys, os 
-from .gentoomodern_common import portage_output_path, config_path, stage_defines_path, cpu_frags_path, pkgset_path, buildhook_frags_path, global_portage_config_path, debug, sets_output_path
+from .gentoomodern_common import portage_output_path, config_path, stage_defines_path, cpu_frags_path, pkgset_path, buildhook_frags_path, global_portage_config_path, debug, sets_output_path, portage_frags_path
 from .read_file_lines import read_file_lines
 from .write_file_lines import write_file_lines
 from .portage_directory import portage_directory
@@ -34,7 +34,7 @@ class portage_stage_assembler:
             sys.exit(msg_prefix + 'Could not find cpu defines file: ' + os.path.join(current_stage_defines_path, 'cpu'))
         cpu_conf = open(os.path.join(current_stage_defines_path, 'cpu')).read().strip()
         # Now we verify CPU-related info.
-        local_cpu_path = os.path.join(cpu_path, cpu_conf)
+        local_cpu_path = os.path.join(cpu_frags_path, cpu_conf)
         if not os.path.isdir(local_cpu_path):
             sys.exit(msg_prefix + 'CPU config directory: ' + local_cpu_path + ' does not exist.')
         # Now ingest.
@@ -49,7 +49,7 @@ class portage_stage_assembler:
             sys.exit(msg_prefix + 'Stage3 definition flag file: ' + flags_defines_path + ' does not exist.')
         # Now we can loop over all local portages, accumulating them.
         for local in flags_conf:
-            combined_path = os.path.join(local_config_basepath, local.strip())
+            combined_path = os.path.join(portage_frags_path, local.strip())
             # Verify directory exists.
             if not os.path.isdir(combined_path):
                 sys.exit(msg_prefix + 'Local portage flags config directory ' + combined_path + ' does not exist.')
